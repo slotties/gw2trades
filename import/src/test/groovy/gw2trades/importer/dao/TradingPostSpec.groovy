@@ -31,7 +31,7 @@ class TradingPostSpec extends Specification {
 
     def listings() {
         given:
-        apiClient.get(TradingPost.URL_COMMERCE_LISTINGS + "/1,2,3") >> "[" +
+        apiClient.get(TradingPost.URL_COMMERCE_LISTINGS + "?ids=1,2,3") >> "[" +
                 "  {" +
                 "    \"id\": 19709," +
                 "    \"buys\": [" +
@@ -57,7 +57,7 @@ class TradingPostSpec extends Specification {
                 "]"
 
         when:
-        def listings = tradingPost.listings(1, 2, 3)
+        def listings = tradingPost.listings([ 1, 2, 3 ])
 
         then:
         listings.size() == 2
@@ -84,7 +84,7 @@ class TradingPostSpec extends Specification {
 
     def listingsWithSingleItem() {
         given:
-        apiClient.get(TradingPost.URL_COMMERCE_LISTINGS + "/1") >>
+        apiClient.get(TradingPost.URL_COMMERCE_LISTINGS + "?ids=1") >> "[" +
                 "  {" +
                 "    \"id\": 19709," +
                 "    \"buys\": [" +
@@ -95,10 +95,11 @@ class TradingPostSpec extends Specification {
                 "      { \"listings\":  2, \"unit_price\": 63, \"quantity\":  499 }," +
                 "      { \"listings\":  3, \"unit_price\": 64, \"quantity\":  289 }" +
                 "    ]" +
-                "  }"
+                "  }" +
+                "]"
 
         when:
-        def listings = tradingPost.listings(1)
+        def listings = tradingPost.listings([ 1 ])
 
         then:
         listings.size() == 1

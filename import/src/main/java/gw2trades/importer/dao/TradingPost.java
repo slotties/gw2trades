@@ -5,8 +5,6 @@ import gw2trades.importer.http.ApiClient;
 import gw2trades.importer.model.CommerceListings;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,22 +33,14 @@ public class TradingPost {
         return itemIds;
     }
 
-    public List<CommerceListings> listings(int... itemIds) throws IOException {
-        String idsStr = Arrays.stream(itemIds)
-                .boxed()
+    public List<CommerceListings> listings(List<Integer> itemIds) throws IOException {
+        String idsStr = itemIds.stream()
                 .map(String::valueOf)
                 .collect(Collectors.joining(","));
 
-        String url = URL_COMMERCE_LISTINGS + "/" + idsStr;
+        String url = URL_COMMERCE_LISTINGS + "?ids=" + idsStr;
         String content = apiClient.get(url);
-        List<CommerceListings> commerceListings;
-        if (itemIds.length == 1) {
-            commerceListings = new ArrayList<>(1);
-            CommerceListings listing = objectMapper.readValue(content, CommerceListings.class);
-            commerceListings.add(listing);
-        } else {
-            commerceListings = objectMapper.readValue(content, objectMapper.getTypeFactory().constructCollectionType(List.class, CommerceListings.class));
-        }
+        List<CommerceListings> commerceListings = objectMapper.readValue(content, objectMapper.getTypeFactory().constructCollectionType(List.class, CommerceListings.class));
 
         return commerceListings;
     }
