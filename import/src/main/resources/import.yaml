@@ -1,0 +1,5 @@
+influxdb:
+  user: root
+  pass: root
+  url: http://127.0.0.1:8086
+  dbName: gw2trades

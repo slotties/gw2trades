@@ -3,9 +3,11 @@ package gw2trades.importer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gw2trades.importer.dao.TradingPost;
 import gw2trades.importer.http.ApiClient;
-import gw2trades.importer.model.CommerceListings;
+import org.yaml.snakeyaml.Yaml;
 
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 /**
  * TODO
@@ -20,22 +22,18 @@ public class Main {
         tradingPost.setApiClient(apiClient);
         tradingPost.setObjectMapper(objectMapper);
 
-        List<Integer> itemIds = tradingPost.listItemIds();
-        int batchSize = 50;
-        int batches = (int) Math.ceil((float) itemIds.size() / (float) batchSize);
-        for (int i = 0; i < batches; i++) {
-            System.out.printf("Pulling batch %d of %d (total %d items)...\n",
-                    i, batches, itemIds.size());
+        Config config = readConfig("/import.yaml");
 
-            // TODO: implement parallel processing to improve speed
-            List<Integer> itemIdBatch = itemIds.subList(i * batchSize, Math.min(itemIds.size() - 1, (i + 1) * batchSize));
-            List<CommerceListings> listings = tradingPost.listings(itemIdBatch);
-            // TODO: import listings somewhere
-            for (CommerceListings listing : listings) {
-                System.out.printf("%d: %d buyers, %d sellers\n",
-                        listing.getItemId(),
-                        listing.getBuys().size(), listing.getSells().size());
-            }
+        Importer importer = new Importer(config, tradingPost);
+        // TODO: handle errors
+        importer.execute();
+    }
+
+    private static Config readConfig(String fileName) throws IOException {
+        Yaml yamlConfig = new Yaml();
+        try (InputStream in = Main.class.getResourceAsStream(fileName)) {
+            Map configData = (Map) yamlConfig.load(in);
+            return new Config(configData);
         }
     }
 }
