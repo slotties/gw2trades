@@ -2,7 +2,7 @@ package gw2trades.importer.dao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gw2trades.importer.http.ApiClient;
-import gw2trades.importer.model.CommerceListings;
+import gw2trades.repository.api.model.ItemListings;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,14 +33,14 @@ public class TradingPost {
         return itemIds;
     }
 
-    public List<CommerceListings> listings(List<Integer> itemIds) throws IOException {
+    public List<ItemListings> listings(List<Integer> itemIds) throws IOException {
         String idsStr = itemIds.stream()
                 .map(String::valueOf)
                 .collect(Collectors.joining(","));
 
         String url = URL_COMMERCE_LISTINGS + "?ids=" + idsStr;
         String content = apiClient.get(url);
-        List<CommerceListings> commerceListings = objectMapper.readValue(content, objectMapper.getTypeFactory().constructCollectionType(List.class, CommerceListings.class));
+        List<ItemListings> commerceListings = objectMapper.readValue(content, objectMapper.getTypeFactory().constructCollectionType(List.class, ItemListings.class));
 
         return commerceListings;
     }

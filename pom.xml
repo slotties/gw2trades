@@ -9,6 +9,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>repository</module>
         <module>import</module>
     </modules>
 

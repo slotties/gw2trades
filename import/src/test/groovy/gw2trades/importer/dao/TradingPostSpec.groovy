@@ -2,7 +2,7 @@ package gw2trades.importer.dao
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import gw2trades.importer.http.ApiClient
-import gw2trades.importer.model.CommerceListing
+import gw2trades.repository.api.model.ItemListing
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -64,22 +64,22 @@ class TradingPostSpec extends Specification {
         listings.get(0).itemId == 19709
         listings.get(0).buys != null
         listings.get(0).buys.size() == 2
-        listings.get(0).buys.contains(new CommerceListing(unitPrice: 1, quantity: 335))
-        listings.get(0).buys.contains(new CommerceListing(unitPrice: 8, quantity: 3092))
+        listings.get(0).buys.contains(new ItemListing(unitPrice: 1, quantity: 335))
+        listings.get(0).buys.contains(new ItemListing(unitPrice: 8, quantity: 3092))
         listings.get(0).sells != null
         listings.get(0).sells.size() == 2
-        listings.get(0).sells.contains(new CommerceListing(unitPrice: 63, quantity: 499))
-        listings.get(0).sells.contains(new CommerceListing(unitPrice: 64, quantity: 289))
+        listings.get(0).sells.contains(new ItemListing(unitPrice: 63, quantity: 499))
+        listings.get(0).sells.contains(new ItemListing(unitPrice: 64, quantity: 289))
 
         listings.get(1).itemId == 19684
         listings.get(1).buys != null
         listings.get(1).buys.size() == 2
-        listings.get(1).buys.contains(new CommerceListing(unitPrice: 1, quantity: 1962))
-        listings.get(1).buys.contains(new CommerceListing(unitPrice: 5, quantity: 45))
+        listings.get(1).buys.contains(new ItemListing(unitPrice: 1, quantity: 1962))
+        listings.get(1).buys.contains(new ItemListing(unitPrice: 5, quantity: 45))
         listings.get(1).sells != null
         listings.get(1).sells.size() == 2
-        listings.get(1).sells.contains(new CommerceListing(unitPrice: 98, quantity: 951))
-        listings.get(1).sells.contains(new CommerceListing(unitPrice: 99, quantity: 211))
+        listings.get(1).sells.contains(new ItemListing(unitPrice: 98, quantity: 951))
+        listings.get(1).sells.contains(new ItemListing(unitPrice: 99, quantity: 211))
     }
 
     def listingsWithSingleItem() {
@@ -106,11 +106,11 @@ class TradingPostSpec extends Specification {
         listings.get(0).itemId == 19709
         listings.get(0).buys != null
         listings.get(0).buys.size() == 2
-        listings.get(0).buys.contains(new CommerceListing(unitPrice: 1, quantity: 335))
-        listings.get(0).buys.contains(new CommerceListing(unitPrice: 8, quantity: 3092))
+        listings.get(0).buys.contains(new ItemListing(unitPrice: 1, quantity: 335))
+        listings.get(0).buys.contains(new ItemListing(unitPrice: 8, quantity: 3092))
         listings.get(0).sells != null
         listings.get(0).sells.size() == 2
-        listings.get(0).sells.contains(new CommerceListing(unitPrice: 63, quantity: 499))
-        listings.get(0).sells.contains(new CommerceListing(unitPrice: 64, quantity: 289))
+        listings.get(0).sells.contains(new ItemListing(unitPrice: 63, quantity: 499))
+        listings.get(0).sells.contains(new ItemListing(unitPrice: 64, quantity: 289))
     }
 }
