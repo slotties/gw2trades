@@ -40,6 +40,11 @@ public class ItemListing {
     }
 
     @Override
+    public int hashCode() {
+        return (this.quantity * 17) ^ this.unitPrice;
+    }
+
+    @Override
     public String toString() {
         return "[" +
                 "unitPrice:" + this.unitPrice + "," +
