@@ -11,7 +11,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * TODO
+ * This repository implementation writes data into an Influx DB. Every item receives its own series.
+ *
  * @author Stefan Lotties (slotties@gmail.com)
  */
 public class InfluxDbRepository implements ItemRepository {
@@ -25,9 +26,7 @@ public class InfluxDbRepository implements ItemRepository {
     public void store(Collection<ItemListings> listings, long timestamp) {
         BatchPoints points = BatchPoints
                 .database("gw2trades")
-                        // TODO: read doc
                 .retentionPolicy("default")
-                        // TODO: read doc
                 .consistency(InfluxDB.ConsistencyLevel.ALL)
                 .build();
 
@@ -48,7 +47,6 @@ public class InfluxDbRepository implements ItemRepository {
         int priceTotal = 0;
         int amountOfPrices = 0;
 
-        // TODO: percentiles
         for (ItemListing listing : listings) {
             minPrice = Math.min(minPrice, listing.getUnitPrice());
             maxPrice = Math.max(maxPrice, listing.getUnitPrice());
