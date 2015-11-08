@@ -3,10 +3,12 @@ package gw2trades.importer;
 import gw2trades.importer.dao.TradingPost;
 import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.api.model.ItemListings;
+import gw2trades.repository.filesystem.FilesystemItemRepository;
 import gw2trades.repository.influxdb.InfluxDbConnectionManager;
 import gw2trades.repository.influxdb.InfluxDbRepository;
 import org.influxdb.InfluxDB;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,6 +29,7 @@ public class Importer {
     }
 
     public void execute() throws IOException {
+        /*
         InfluxDbConnectionManager connectionManager = new InfluxDbConnectionManager(
                 config.required("influxdb", "url"),
                 config.optional("influxdb", "user").orElse(""),
@@ -35,6 +38,11 @@ public class Importer {
         setupDatabase(connectionManager);
 
         ItemRepository repository = new InfluxDbRepository(connectionManager);
+        */
+
+        File dataDir = new File(config.required("filesystem", "dir"));
+        System.out.printf("Importing into %s ...\n", dataDir.getAbsolutePath());
+        ItemRepository repository = new FilesystemItemRepository(dataDir);
 
         List<Integer> itemIds = tradingPost.listItemIds();
 

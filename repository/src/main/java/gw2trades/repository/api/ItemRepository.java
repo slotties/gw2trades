@@ -2,6 +2,7 @@ package gw2trades.repository.api;
 
 import gw2trades.repository.api.model.ItemListings;
 
+import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -13,5 +14,5 @@ public interface ItemRepository {
      * @param listings
      * @param timestamp
      */
-    void store(Collection<ItemListings> listings, long timestamp);
+    void store(Collection<ItemListings> listings, long timestamp) throws IOException;
 }
