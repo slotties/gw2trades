@@ -9,9 +9,7 @@ import gw2trades.repository.api.model.PriceStatistics;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Stefan Lotties (slotties@gmail.com)
@@ -74,14 +72,23 @@ public class FilesystemItemRepository implements ItemRepository {
 
         int minPrice = Integer.MAX_VALUE;
         int maxPrice = 0;
+        int totalAmount = 0;
+        int totalPrice = 0;
 
         for (ItemListing listing : listings) {
             minPrice = Math.min(minPrice, listing.getUnitPrice());
             maxPrice = Math.max(maxPrice, listing.getUnitPrice());
+            totalAmount += listing.getQuantity();
+            totalPrice += (listing.getQuantity() * listing.getUnitPrice());
         }
 
         stats.setMaxPrice(maxPrice);
         stats.setMinPrice(minPrice);
+        if (totalAmount != 0) {
+            stats.setAverage((double) totalPrice / (double) totalAmount);
+        }
+
+        stats.setTotalAmount(totalAmount);
 
         return stats;
     }

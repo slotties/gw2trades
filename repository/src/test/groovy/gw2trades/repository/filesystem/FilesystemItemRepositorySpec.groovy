@@ -34,14 +34,14 @@ class FilesystemItemRepositorySpec extends Specification {
                 new ItemListings(
                         itemId: 123,
                         sells: [
-                                new ItemListing(unitPrice: 5),
-                                new ItemListing(unitPrice: 7),
-                                new ItemListing(unitPrice: 1)
+                                new ItemListing(unitPrice: 5, quantity: 1),
+                                new ItemListing(unitPrice: 7, quantity: 1),
+                                new ItemListing(unitPrice: 1, quantity: 1)
                         ],
                         buys: [
-                                new ItemListing(unitPrice: 10),
-                                new ItemListing(unitPrice: 17),
-                                new ItemListing(unitPrice: 15)
+                                new ItemListing(unitPrice: 10, quantity: 1),
+                                new ItemListing(unitPrice: 17, quantity: 1),
+                                new ItemListing(unitPrice: 15, quantity: 1)
                         ]
                 )
 
@@ -76,8 +76,14 @@ class FilesystemItemRepositorySpec extends Specification {
         assert listingStatistics.buyStatistics != null
         assert listingStatistics.buyStatistics.minPrice == 10
         assert listingStatistics.buyStatistics.maxPrice == 17
+        assert Math.floor(listingStatistics.buyStatistics.average) == Math.floor((10.0 + 17.0 + 15.0) / 3.0)
+        assert listingStatistics.buyStatistics.totalAmount == 3
+        // FIXME: assert listingStatistics.buyStatistics.median == 15
         assert listingStatistics.sellStatistics != null
         assert listingStatistics.sellStatistics.minPrice == 1
         assert listingStatistics.sellStatistics.maxPrice == 7
+        assert Math.floor(listingStatistics.sellStatistics.average) == Math.floor((1.0 + 7.0 + 5.0) / 3.0)
+        assert listingStatistics.sellStatistics.totalAmount == 3
+        // FIXME: assert listingStatistics.sellStatistics.median == 5
     }
 }
