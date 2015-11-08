@@ -6,6 +6,9 @@ import gw2trades.repository.api.model.ItemListings;
 import gw2trades.repository.filesystem.FilesystemItemRepository;
 import gw2trades.repository.influxdb.InfluxDbConnectionManager;
 import gw2trades.repository.influxdb.InfluxDbRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.ConfigurationFactory;
 import org.influxdb.InfluxDB;
 
 import java.io.File;
@@ -16,7 +19,8 @@ import java.util.List;
  * @author Stefan Lotties (slotties@gmail.com)
  */
 public class Importer {
-    // TODO: use slf4j
+    private static final Logger LOGGER = LogManager.getLogger(Importer.class);
+
     private TradingPost tradingPost;
     private Config config;
     private String databaseName;
@@ -41,7 +45,7 @@ public class Importer {
         */
 
         File dataDir = new File(config.required("filesystem", "dir"));
-        System.out.printf("Importing into %s ...\n", dataDir.getAbsolutePath());
+        LOGGER.info("Importing into {} ...\n", dataDir.getAbsolutePath());
         ItemRepository repository = new FilesystemItemRepository(dataDir);
 
         List<Integer> itemIds = tradingPost.listItemIds();
@@ -49,22 +53,22 @@ public class Importer {
         int batchSize = 50;
         int batches = (int) Math.ceil((float) itemIds.size() / (float) batchSize);
         for (int i = 0; i < batches; i++) {
-            System.out.printf("Pulling batch %d of %d (total %d items)...\n",
-                    i, batches, itemIds.size());
+            LOGGER.info("Pulling batch {} of {} (total {} items)...\n", i, batches, itemIds.size());
 
             // TODO: implement parallel processing to improve speed
             List<Integer> itemIdBatch = itemIds.subList(i * batchSize, Math.min(itemIds.size() - 1, (i + 1) * batchSize));
             List<ItemListings> listings = tradingPost.listings(itemIdBatch);
 
-            System.out.println("Writing into repository ...");
+            LOGGER.info("Writing into repository ...");
             repository.store(listings, System.currentTimeMillis());
         }
     }
-
+/*
     private void setupDatabase(InfluxDbConnectionManager influxDbConnectionManager) {
         InfluxDB influxDb = influxDbConnectionManager.getConnection();
         influxDb.deleteDatabase("gw2trades");
         // FIXME: check if database exists
         influxDb.createDatabase("gw2trades");
     }
+*/
 }

@@ -10,9 +10,9 @@ import java.util.Collection;
  */
 public interface ItemRepository {
     /**
-     * TODO
-     * @param listings
-     * @param timestamp
+     * Stores all given listings in this repository.
+     * @param listings one or many listings
+     * @param timestamp a point on the timeline to store the listings at (important for providing timelines of price changes)
      */
     void store(Collection<ItemListings> listings, long timestamp) throws IOException;
 }
