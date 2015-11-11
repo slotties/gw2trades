@@ -1,5 +1,7 @@
 package gw2trades.repository.api.model;
 
+import java.util.Objects;
+
 /**
  * @author Stefan Lotties (slotties@gmail.com)
  */
@@ -30,5 +32,22 @@ public class ListingStatistics {
 
     public void setSellStatistics(PriceStatistics sellStatistics) {
         this.sellStatistics = sellStatistics;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ListingStatistics) {
+            ListingStatistics other = (ListingStatistics) obj;
+            return other.itemId == this.itemId &&
+                    Objects.equals(this.buyStatistics, other.buyStatistics) &&
+                    Objects.equals(this.sellStatistics, other.sellStatistics);
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.itemId ^ Objects.hashCode(this.buyStatistics) ^ Objects.hashCode(this.sellStatistics);
     }
 }

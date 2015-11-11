@@ -49,4 +49,44 @@ public class PriceStatistics {
     public void setTotalAmount(int totalAmount) {
         this.totalAmount = totalAmount;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof PriceStatistics) {
+            PriceStatistics other = (PriceStatistics) obj;
+            return other.minPrice == this.minPrice &&
+                    other.maxPrice == this.maxPrice &&
+                    other.average == this.average &&
+                    other.median == this.median &&
+                    other.totalAmount == this.totalAmount;
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = this.minPrice;
+        hash = (31 * this.maxPrice) ^ hash;
+        hash = (31 * (int) this.average) ^ hash;
+        hash = (31 * this.median) ^ hash;
+        hash = (31 * this.totalAmount) ^ hash;
+
+        return hash;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append("[")
+                .append("min=").append(this.minPrice)
+                .append(",max=").append(this.maxPrice)
+                .append(",avg=").append(this.average)
+                .append(",median=").append(this.median)
+                .append(",total#=").append(this.totalAmount)
+                .append("]");
+
+        return sb.toString();
+    }
 }
