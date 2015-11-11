@@ -7,7 +7,9 @@ import gw2trades.repository.api.model.ItemListings;
 import gw2trades.repository.api.model.ListingStatistics;
 import gw2trades.repository.api.model.PriceStatistics;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
@@ -41,7 +43,7 @@ public class FilesystemItemRepository implements ItemRepository {
         for (ItemListings listing : listings) {
             ListingStatistics stats = createStatistics(listing);
 
-            appendHistory(stats);
+            appendHistory(stats, timestamp);
             writeFullListing(listing, timestamp);
             statisticsIndex.put(listing.getItemId(), stats);
         }
@@ -102,12 +104,19 @@ public class FilesystemItemRepository implements ItemRepository {
         }
     }
 
-    private void appendHistory(ListingStatistics stats) throws IOException {
+    private void appendHistory(ListingStatistics stats, long timestamp) throws IOException {
         ensureDirectoryExists(this.historyDirectory);
 
         File file = new File(this.historyDirectory, Integer.toString(stats.getItemId()));
 
-        // TODO: really write history
+        String jsonString = this.objectMapper.writeValueAsString(stats);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+            writer.write(Long.toString(timestamp));
+            writer.write(":");
+            writer.write(jsonString);
+            writer.write("\n");
+            writer.flush();
+        }
     }
 
     private void writeFullListing(ItemListings listings, long timestamp) throws IOException {

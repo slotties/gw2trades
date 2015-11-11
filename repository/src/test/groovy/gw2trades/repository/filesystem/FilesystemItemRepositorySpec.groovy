@@ -61,8 +61,25 @@ class FilesystemItemRepositorySpec extends Specification {
         assert dumpedListings.buys.size() == listings.buys.size()
         assert dumpedListings.buys.containsAll(listings.buys)
 
-        // TODO: test when implemented
-        // assert new File(this.tempDir, "history/123" + timestamp).exists()
+        def historyFile = new File(this.tempDir, "histories/123")
+        assert historyFile.exists()
+        def historyContent = FileUtils.readFileToString(historyFile)
+        assert historyContent.indexOf(timestamp + ":") == 0
+        def json = historyContent.substring((timestamp + ":").length())
+        def historyStats = mapper.readValue(json, ListingStatistics)
+        assert historyStats != null
+        assert historyStats.itemId == 123
+        assert historyStats.buyStatistics != null
+        assert historyStats.buyStatistics.minPrice == 10
+        assert historyStats.buyStatistics.maxPrice == 17
+        assert Math.floor(historyStats.buyStatistics.average) == Math.floor((10.0 + 17.0 + 15.0) / 3.0)
+        assert historyStats.buyStatistics.totalAmount == 3
+        // FIXME: assert listingStatistics.buyStatistics.median == 15
+        assert historyStats.sellStatistics != null
+        assert historyStats.sellStatistics.minPrice == 1
+        assert historyStats.sellStatistics.maxPrice == 7
+        assert Math.floor(historyStats.sellStatistics.average) == Math.floor((1.0 + 7.0 + 5.0) / 3.0)
+        assert historyStats.sellStatistics.totalAmount == 3
 
         def statsFile = new File(this.tempDir, "stats.index")
         assert statsFile.exists()
