@@ -200,4 +200,77 @@ class FilesystemItemRepositorySpec extends Specification {
                 )
         )
     }
+
+    def statsFile() {
+        given:
+        def listings123_1 = new ItemListings(
+                itemId: 123,
+                buys: [new ItemListing(unitPrice: 1, quantity: 1)],
+                sells: [new ItemListing(unitPrice: 10, quantity: 10)]
+        )
+        def listings456_1 = new ItemListings(
+                itemId: 456,
+                buys: [new ItemListing(unitPrice: 2, quantity: 2)],
+                sells: [new ItemListing(unitPrice: 20, quantity: 20)]
+        )
+        def listings123_2 = new ItemListings(
+                itemId: 123,
+                buys: [new ItemListing(unitPrice: 10, quantity: 10)],
+                sells: [new ItemListing(unitPrice: 100, quantity: 100)]
+        )
+        def listings456_2 = new ItemListings(
+                itemId: 456,
+                buys: [new ItemListing(unitPrice: 20, quantity: 20)],
+                sells: [new ItemListing(unitPrice: 200, quantity: 200)]
+        )
+
+        def timestamp = System.currentTimeMillis()
+        def mapper = new ObjectMapper()
+
+        when:
+        this.repository.store([listings123_1, listings456_1], timestamp)
+        this.repository.store([listings123_2, listings456_2], timestamp + 1)
+
+        then:
+        def statsFile = new File(this.tempDir, "stats.index")
+        assert statsFile.exists()
+        Map<Integer, ListingStatistics> stats = mapper.readValue(statsFile, mapper.getTypeFactory().constructMapType(Map.class, Integer.class, ListingStatistics.class));
+        assert stats.size() == 2
+        assert stats.containsKey(123)
+        assert stats.containsKey(456)
+
+        def listingStatistics = stats.get(123)
+        assert listingStatistics == new ListingStatistics(
+                itemId: 123,
+                buyStatistics: new PriceStatistics(
+                        minPrice: 10,
+                        maxPrice: 10,
+                        average: 10,
+                        totalAmount: 10
+                ),
+                sellStatistics: new PriceStatistics(
+                        minPrice: 100,
+                        maxPrice: 100,
+                        average: 100,
+                        totalAmount: 100
+                )
+        )
+
+        def listingStatistics2 = stats.get(456)
+        assert listingStatistics2 == new ListingStatistics(
+                itemId: 456,
+                buyStatistics: new PriceStatistics(
+                        minPrice: 20,
+                        maxPrice: 20,
+                        average: 20,
+                        totalAmount: 20
+                ),
+                sellStatistics: new PriceStatistics(
+                        minPrice: 200,
+                        maxPrice: 200,
+                        average: 200,
+                        totalAmount: 200
+                )
+        )
+    }
 }
