@@ -9,7 +9,6 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.github.slotties.gw2trades</groupId>
     <artifactId>gw2trades-repository</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
