@@ -1,0 +1,13 @@
+Hello world!
+
+<table>
+#foreach($stats in $listingStatistics)
+    <tr>
+        <td>${stats.itemId}</td>
+        <td>${stats.buyStatistics.maxPrice}</td>
+        <td>${stats.buyStatistics.average}</td>
+        <td>${stats.sellStatistics.minPrice}</td>
+        <td>${stats.sellStatistics.average}</td>
+    </tr>
+#end
+</table>
