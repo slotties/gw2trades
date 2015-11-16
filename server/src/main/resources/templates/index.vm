@@ -1,5 +1,7 @@
 #parse("/pager.vm")
 
+#macro(orderLink $whenOrderBy)?page=$!{currentPage}&orderBy=${whenOrderBy}#if($whenOrderBy == $orderBy && $orderDir=="asc")&orderDir=desc#else&orderDir=asc#end#end
+
 <table class="table table-striped table-bordered table-hover">
     <tr>
         <td>&nbsp;</th>
@@ -8,10 +10,10 @@
     </tr>
     <tr>
         <th>Item</th>
-        <th>Highest bidder</th>
-        <th>Average price</th>
-        <th>Lowest seller</th>
-        <th>Average price</th>
+        <th><a href="#orderLink("highestBidder")">Highest bidder</a></th>
+        <th><a href="#orderLink("avgBidder")">Average price</a></th>
+        <th><a href="#orderLink("lowestSeller")">Lowest seller</a></th>
+        <th><a href="#orderLink("avgSeller")">Average price</a></th>
     </tr>
 #foreach($stats in $listingStatistics)
     <tr>

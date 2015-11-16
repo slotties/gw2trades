@@ -2,8 +2,13 @@ package gw2trades.server.frontend;
 
 import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.api.model.ListingStatistics;
+import gw2trades.server.frontend.sorters.BuyersByAveragePrice;
+import gw2trades.server.frontend.sorters.BuyersByMaxPrice;
+import gw2trades.server.frontend.sorters.ReverseComparator;
+import gw2trades.server.frontend.sorters.SellersByAveragePrice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -11,6 +16,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -26,6 +32,7 @@ public class IndexController {
     @RequestMapping("/index.html")
     public ModelAndView index(
             @RequestParam(required = false) String orderBy,
+            @RequestParam(required = false) String orderDir,
             @RequestParam(defaultValue = "1") int page) throws IOException {
 
         if (page < 1) {
@@ -35,8 +42,11 @@ public class IndexController {
         ModelAndView model = new ModelAndView("frame");
 
         List<ListingStatistics> allStats = new ArrayList<>(itemRepository.listStatistics());
-        if (orderBy != null) {
-            // TODO
+        if (StringUtils.hasText(orderBy) && StringUtils.hasText(orderDir)) {
+            Comparator<ListingStatistics> cmp = resolveComparator(orderBy, orderDir);
+            if (cmp != null) {
+                allStats.sort(cmp);
+            }
         }
 
         int lastPage = (int) Math.ceil((float) allStats.size() / (float) this.pageSize);
@@ -49,7 +59,36 @@ public class IndexController {
         model.addObject("lastPage", lastPage);
         model.addObject("currentPage", page);
         model.addObject("listingStatistics", allStats);
+        model.addObject("orderBy", orderBy);
+        model.addObject("orderDir", orderDir);
 
         return model;
+    }
+
+    private Comparator<ListingStatistics> resolveComparator(String orderBy, String orderDir) {
+        Comparator<ListingStatistics> cmp = null;
+
+        switch (orderBy) {
+            case "highestBidder":
+                cmp = new BuyersByMaxPrice();
+                break;
+            case "avgBidder":
+                cmp = new BuyersByAveragePrice();
+                break;
+            case "lowestSeller":
+                cmp = new BuyersByMaxPrice();
+                break;
+            case "avgSeller":
+                cmp = new SellersByAveragePrice();
+                break;
+        }
+
+        if (cmp != null) {
+            if ("desc".equals(orderDir)) {
+                cmp = new ReverseComparator<>(cmp);
+            }
+        }
+
+        return cmp;
     }
 }

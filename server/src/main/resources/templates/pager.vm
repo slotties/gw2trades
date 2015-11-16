@@ -1,8 +1,11 @@
 ## TODO: aria labels
+
+#macro(indexPagerLink $page)?page=${page}&orderBy=$!{orderBy}&orderDir=$!{orderDir}#end
+
 <nav>
     <ul class="pagination">
         <li class="#if($currentPage == 1)disabled#end">
-            <a href="#if($currentPage == 1)javascript:void(0);#else?page=${mathtool.sub($currentPage, 1)}#end">
+            <a href="#if($currentPage == 1)javascript:void(0);#else#indexPagerLink($mathtool.sub($currentPage, 1))#end">
                 <span>&laquo;</span>
             </a>
         </li>
@@ -19,7 +22,7 @@
                 #set($skippedEntryBefore = false)
             #elseif($idx < 3 || ($idx >= $mathtool.sub($currentPage, 1) && $idx <= $mathtool.add($currentPage, 1)) || ($idx > $mathtool.sub($lastPage, 2)))
                 <li>
-                    <a href="?page=${idx}">
+                    <a href="#indexPagerLink($idx)">
                         <span>${idx}</span>
                     </a>
                 </li>
@@ -35,7 +38,7 @@
         #end
 
         <li class="#if($currentPage == $lastPage)disabled#end">
-            <a href="#if($currentPage == $lastPage)javascript:void(0);#else?page=${mathtool.add($currentPage, 1)}#end">
+            <a href="#if($currentPage == $lastPage)javascript:void(0);#else#indexPagerLink($mathtool.add($currentPage, 1))#end">
                 <span>&raquo;</span>
             </a>
         </li>
