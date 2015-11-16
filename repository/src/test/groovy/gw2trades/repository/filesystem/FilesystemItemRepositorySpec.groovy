@@ -273,4 +273,63 @@ class FilesystemItemRepositorySpec extends Specification {
                 )
         )
     }
+
+    def listStatistics() {
+        given:
+        def listings123 = new ItemListings(
+                itemId: 123,
+                buys: [new ItemListing(unitPrice: 1, quantity: 1)],
+                sells: [new ItemListing(unitPrice: 10, quantity: 10)]
+        )
+        def listings456 = new ItemListings(
+                itemId: 456,
+                buys: [new ItemListing(unitPrice: 2, quantity: 2)],
+                sells: [new ItemListing(unitPrice: 20, quantity: 20)]
+        )
+
+        def expectedStats123 = new ListingStatistics(
+                itemId: 123,
+                buyStatistics: new PriceStatistics(
+                        minPrice: 1,
+                        maxPrice: 1,
+                        average: 1.0,
+                        totalAmount: 1
+                ),
+                sellStatistics: new PriceStatistics(
+                        minPrice: 10,
+                        maxPrice: 10,
+                        average: 10.0,
+                        totalAmount: 10
+                )
+        )
+        def expectedStats456 = new ListingStatistics(
+                itemId: 456,
+                buyStatistics: new PriceStatistics(
+                        minPrice: 2,
+                        maxPrice: 2,
+                        average: 2.0,
+                        totalAmount: 2
+                ),
+                sellStatistics: new PriceStatistics(
+                        minPrice: 20,
+                        maxPrice: 20,
+                        average: 20.0,
+                        totalAmount: 20
+                )
+        )
+
+        when:
+        this.repository.store([listings123, listings456], System.currentTimeMillis())
+        def stats = this.repository.listStatistics()
+
+        then:
+        assert stats != null
+        assert stats.size() == 2
+
+        def storedListings123 = stats.stream().filter({ s -> s.itemId == 123 }).findFirst().get()
+        assert storedListings123 == expectedStats123
+
+        def storedListings456 = stats.stream().filter({ s -> s.itemId == 456 }).findFirst().get()
+        assert storedListings456 == expectedStats456
+    }
 }

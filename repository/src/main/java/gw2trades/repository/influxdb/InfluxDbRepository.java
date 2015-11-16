@@ -3,10 +3,12 @@ package gw2trades.repository.influxdb;
 import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.api.model.ItemListing;
 import gw2trades.repository.api.model.ItemListings;
+import gw2trades.repository.api.model.ListingStatistics;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -39,6 +41,12 @@ public class InfluxDbRepository implements ItemRepository {
 
         InfluxDB influxDB = connectionManager.getConnection();
         influxDB.write(points);
+    }
+
+    @Override
+    public Collection<ListingStatistics> listStatistics() throws IOException {
+        // TODO
+        return null;
     }
 
     private Point createPoint(int itemId, String type, List<ItemListing> listings) {

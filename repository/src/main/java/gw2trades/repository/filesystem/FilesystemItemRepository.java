@@ -35,6 +35,11 @@ public class FilesystemItemRepository implements ItemRepository {
         this.objectMapper = new ObjectMapper();
     }
 
+    @Override
+    public Collection<ListingStatistics> listStatistics() throws IOException {
+        Map<Integer, ListingStatistics> stats = readStatistics();
+        return stats.values();
+    }
 
     @Override
     public void store(Collection<ItemListings> listings, long timestamp) throws IOException {
@@ -52,9 +57,11 @@ public class FilesystemItemRepository implements ItemRepository {
     }
 
     private Map<Integer, ListingStatistics> readStatistics() throws IOException {
-        Map<Integer, ListingStatistics> stats = new HashMap<>();
+        Map<Integer, ListingStatistics> stats;
         if (this.statisticsIndex.exists()) {
-            this.objectMapper.readValue(this.statisticsIndex, objectMapper.getTypeFactory().constructMapType(Map.class, Integer.class, ListingStatistics.class));
+            stats = this.objectMapper.readValue(this.statisticsIndex, objectMapper.getTypeFactory().constructMapType(Map.class, Integer.class, ListingStatistics.class));
+        } else {
+            stats = new HashMap<>();
         }
 
         return stats;
