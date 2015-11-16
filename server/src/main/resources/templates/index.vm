@@ -1,6 +1,18 @@
-Hello world!
+#parse("/pager.vm")
 
-<table>
+<table class="table table-striped table-bordered table-hover">
+    <tr>
+        <td>&nbsp;</th>
+        <th colspan="2">Buy</th>
+        <th colspan="2">Sell</th>
+    </tr>
+    <tr>
+        <th>Item</th>
+        <th>Highest bidder</th>
+        <th>Average price</th>
+        <th>Lowest seller</th>
+        <th>Average price</th>
+    </tr>
 #foreach($stats in $listingStatistics)
     <tr>
         <td>${stats.itemId}</td>
@@ -11,3 +23,5 @@ Hello world!
     </tr>
 #end
 </table>
+
+#parse("/pager.vm")

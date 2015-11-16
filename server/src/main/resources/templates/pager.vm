@@ -1,0 +1,43 @@
+## TODO: aria labels
+<nav>
+    <ul class="pagination">
+        <li class="#if($currentPage == 1)disabled#end">
+            <a href="#if($currentPage == 1)javascript:void(0);#else?page=${mathtool.sub($currentPage, 1)}#end">
+                <span>&laquo;</span>
+            </a>
+        </li>
+
+        ## TODO: think about a smarter way to do this
+        #set($skippedEntryBefore = false)
+        #foreach($idx in [1..$lastPage])
+            #if($idx == $currentPage)
+                <li class="disabled">
+                    <a href="javascript:void(0);">
+                        <span>${idx}</span>
+                    </a>
+                </li>
+                #set($skippedEntryBefore = false)
+            #elseif($idx < 3 || ($idx >= $mathtool.sub($currentPage, 1) && $idx <= $mathtool.add($currentPage, 1)) || ($idx > $mathtool.sub($lastPage, 2)))
+                <li>
+                    <a href="?page=${idx}">
+                        <span>${idx}</span>
+                    </a>
+                </li>
+                #set($skippedEntryBefore = false)
+            #elseif(!$skippedEntryBefore)
+                <li class="disabled">
+                    <a href="javascript:void(0);">
+                        <span>...</span>
+                    </a>
+                </li>
+                #set($skippedEntryBefore = true)
+            #end
+        #end
+
+        <li class="#if($currentPage == $lastPage)disabled#end">
+            <a href="#if($currentPage == $lastPage)javascript:void(0);#else?page=${mathtool.add($currentPage, 1)}#end">
+                <span>&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
