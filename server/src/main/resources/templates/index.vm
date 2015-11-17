@@ -22,10 +22,10 @@
                 ${stats.itemId}
             </a>
         </td>
-        <td>${stats.buyStatistics.maxPrice}</td>
-        <td>${stats.buyStatistics.average}</td>
-        <td>${stats.sellStatistics.minPrice}</td>
-        <td>${stats.sellStatistics.average}</td>
+        <td>#price(${stats.buyStatistics.maxPrice})</td>
+        <td>#price($mathtool.floor($stats.buyStatistics.average))</td>
+        <td>#price(${stats.sellStatistics.minPrice})</td>
+        <td>#price($mathtool.floor($stats.sellStatistics.average))</td>
     </tr>
 #end
 </table>

@@ -1,0 +1,12 @@
+.currency-gold {
+    background: url('../images/coin_gold.png') center right no-repeat;
+    padding-right: 24px;
+}
+.currency-silver {
+    background: url('../images/coin_silver.png') center right no-repeat;
+    padding-right: 24px;
+}
+.currency-copper {
+    background: url('../images/coin_copper.png') center right no-repeat;
+    padding-right: 24px;
+}

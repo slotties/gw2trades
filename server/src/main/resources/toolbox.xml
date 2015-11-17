@@ -5,4 +5,9 @@
         <scope>application</scope>
         <class>org.apache.velocity.tools.generic.MathTool</class>
     </tool>
+    <tool>
+        <key>gw2</key>
+        <scope>application</scope>
+        <class>gw2trades.server.util.GuildWars2Util</class>
+    </tool>
 </toolbox>

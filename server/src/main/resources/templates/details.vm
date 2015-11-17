@@ -1,3 +1,11 @@
+## TODO: move to central macro file
+#macro(price $coins)
+    #set($price = $gw2.price($coins))
+    <span class="currency-gold">${price.goldCoins}</span>
+    <span class="currency-silver">${price.silverCoins}</span>
+    <span class="currency-copper">${price.copperCoins}</span>
+#end
+
 <table class="table table-striped table-bordered table-hover">
     <tr>
         <th>Item</th>
@@ -9,11 +17,11 @@
     <tr>
     <tr>
         <th>Highest bidder</th>
-        <td>${latestStats.buyStatistics.maxPrice}</td>
+        <td>#price(${latestStats.buyStatistics.maxPrice})</td>
     <tr>
     <tr>
         <th>Average bidder</th>
-        <td>${latestStats.buyStatistics.average}</td>
+        <td>#price($mathtool.floor($latestStats.buyStatistics.average))</td>
     <tr>
     <tr>
         <th>Amount of bidders</th>
@@ -22,11 +30,11 @@
 
     <tr>
         <th>Lowest seller</th>
-        <td>${latestStats.sellStatistics.minPrice}</td>
+        <td>#price(${latestStats.sellStatistics.minPrice})</td>
     <tr>
     <tr>
         <th>Average seller</th>
-        <td>${latestStats.sellStatistics.average}</td>
+        <td>#price($mathtool.floor($latestStats.sellStatistics.average))</td>
     <tr>
     <tr>
         <th>Amount of sellers</th>
