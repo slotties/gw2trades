@@ -49,6 +49,18 @@ public class InfluxDbRepository implements ItemRepository {
         return null;
     }
 
+    @Override
+    public List<ListingStatistics> getHistory(int itemId, long fromTimestamp, long toTimestamp) throws IOException {
+        // TODO
+        return null;
+    }
+
+    @Override
+    public ListingStatistics latestStatistics(int itemId) throws IOException {
+        // TODO
+        return null;
+    }
+
     private Point createPoint(int itemId, String type, List<ItemListing> listings) {
         int minPrice = Integer.MAX_VALUE;
         int maxPrice = 0;

@@ -1,0 +1,41 @@
+<table class="table table-striped table-bordered table-hover">
+    <tr>
+        <th>Item</th>
+        <td>FIXME: name here</td>
+    </tr>
+    <tr>
+        <th>Item-ID</th>
+        <td>${latestStats.itemId}</td>
+    <tr>
+    <tr>
+        <th>Highest bidder</th>
+        <td>${latestStats.buyStatistics.maxPrice}</td>
+    <tr>
+    <tr>
+        <th>Average bidder</th>
+        <td>${latestStats.buyStatistics.average}</td>
+    <tr>
+    <tr>
+        <th>Amount of bidders</th>
+        <td>${latestStats.buyStatistics.totalAmount}</td>
+    <tr>
+
+    <tr>
+        <th>Lowest seller</th>
+        <td>${latestStats.sellStatistics.minPrice}</td>
+    <tr>
+    <tr>
+        <th>Average seller</th>
+        <td>${latestStats.sellStatistics.average}</td>
+    <tr>
+    <tr>
+        <th>Amount of sellers</th>
+        <td>${latestStats.sellStatistics.totalAmount}</td>
+    <tr>
+
+    ## TODO: flip profit min<->max, avg<->avg
+</table>
+
+## TODO: draw fancy graphs
+History:
+${history}

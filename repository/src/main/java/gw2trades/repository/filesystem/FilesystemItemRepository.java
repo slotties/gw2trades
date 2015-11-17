@@ -7,10 +7,7 @@ import gw2trades.repository.api.model.ItemListings;
 import gw2trades.repository.api.model.ListingStatistics;
 import gw2trades.repository.api.model.PriceStatistics;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -42,11 +39,39 @@ public class FilesystemItemRepository implements ItemRepository {
     }
 
     @Override
+    public List<ListingStatistics> getHistory(int itemId, long fromTimestamp, long toTimestamp) throws IOException {
+        List<ListingStatistics> listings = new ArrayList<>();
+
+        File historyFile = new File(this.historyDirectory, Integer.toString(itemId));
+        try (BufferedReader reader = new BufferedReader(new FileReader(historyFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                int tsIdx = line.indexOf(':');
+                long timestamp = Long.valueOf(line.substring(0, tsIdx));
+                if (timestamp >= fromTimestamp && timestamp <= toTimestamp) {
+                    ListingStatistics stats = this.objectMapper.readValue(line.substring(tsIdx + 1), ListingStatistics.class);
+                    listings.add(stats);
+                }
+            }
+        }
+
+        return listings;
+    }
+
+    @Override
+    public ListingStatistics latestStatistics(int itemId) throws IOException {
+        Map<Integer, ListingStatistics> stats = readStatistics();
+        // TODO: throw exception when unknown?
+        return stats.get(itemId);
+    }
+
+    @Override
     public void store(Collection<ItemListings> listings, long timestamp) throws IOException {
         Map<Integer, ListingStatistics> statisticsIndex = readStatistics();
 
         for (ItemListings listing : listings) {
             ListingStatistics stats = createStatistics(listing);
+            stats.setTimestamp(timestamp);
 
             appendHistory(stats, timestamp);
             writeFullListing(listing, timestamp);

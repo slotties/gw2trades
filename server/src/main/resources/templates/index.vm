@@ -17,7 +17,11 @@
     </tr>
 #foreach($stats in $listingStatistics)
     <tr>
-        <td>${stats.itemId}</td>
+        <td>
+            <a href="/details/${stats.itemId}.html">
+                ${stats.itemId}
+            </a>
+        </td>
         <td>${stats.buyStatistics.maxPrice}</td>
         <td>${stats.buyStatistics.average}</td>
         <td>${stats.sellStatistics.minPrice}</td>

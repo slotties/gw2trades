@@ -7,8 +7,17 @@ import java.util.Objects;
  */
 public class ListingStatistics {
     private int itemId;
+    private long timestamp;
     private PriceStatistics buyStatistics;
     private PriceStatistics sellStatistics;
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
 
     public int getItemId() {
         return itemId;

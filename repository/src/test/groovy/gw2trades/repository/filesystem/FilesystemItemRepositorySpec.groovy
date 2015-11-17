@@ -332,4 +332,92 @@ class FilesystemItemRepositorySpec extends Specification {
         def storedListings456 = stats.stream().filter({ s -> s.itemId == 456 }).findFirst().get()
         assert storedListings456 == expectedStats456
     }
+
+    def getHistory() {
+        given:
+        def listings1 = new ItemListings(
+                itemId: 123,
+                buys: [new ItemListing(unitPrice: 1, quantity: 1)],
+                sells: [new ItemListing(unitPrice: 10, quantity: 10)]
+        )
+        def listings2 = new ItemListings(
+                itemId: 123,
+                buys: [new ItemListing(unitPrice: 2, quantity: 2)],
+                sells: [new ItemListing(unitPrice: 20, quantity: 20)]
+        )
+        def listings3 = new ItemListings(
+                itemId: 123,
+                buys: [new ItemListing(unitPrice: 3, quantity: 3)],
+                sells: [new ItemListing(unitPrice: 30, quantity: 30)]
+        )
+
+        def ts1 = System.currentTimeMillis()
+        def ts2 = ts1 + 1000
+        def ts3 = ts2 + 1000
+
+        def expectedStats1 = new ListingStatistics(
+                itemId: 123,
+                timestamp: ts1,
+                buyStatistics: new PriceStatistics(minPrice: 1, maxPrice: 1, totalAmount: 1, average: 1.0),
+                sellStatistics: new PriceStatistics(minPrice: 10, maxPrice: 10, totalAmount: 10, average: 10.0)
+        )
+        def expectedStats2 = new ListingStatistics(
+                itemId: 123,
+                timestamp: ts2,
+                buyStatistics: new PriceStatistics(minPrice: 2, maxPrice: 2, totalAmount: 2, average: 2.0),
+                sellStatistics: new PriceStatistics(minPrice: 20, maxPrice: 20, totalAmount: 20, average: 20.0)
+        )
+
+        when:
+        this.repository.store([listings1], ts1)
+        this.repository.store([listings2], ts2)
+        this.repository.store([listings3], ts3)
+        // 3 are stored but just 2 should be returned as we limit the timestamps from ts1 to ts2 (both inclusive)
+        def stats = this.repository.getHistory(123, ts1, ts2)
+
+        then:
+        assert stats != null
+        assert stats.size() == 2
+
+        assert stats.get(0) == expectedStats1
+        assert stats.get(1) == expectedStats2
+    }
+
+    def latestStatistics() {
+        given:
+        def listings123 = new ItemListings(
+                itemId: 123,
+                buys: [new ItemListing(unitPrice: 1, quantity: 1)],
+                sells: [new ItemListing(unitPrice: 10, quantity: 10)]
+        )
+        def listings456 = new ItemListings(
+                itemId: 456,
+                buys: [new ItemListing(unitPrice: 2, quantity: 2)],
+                sells: [new ItemListing(unitPrice: 20, quantity: 20)]
+        )
+        def listings123_2 = new ItemListings(
+                itemId: 123,
+                buys: [new ItemListing(unitPrice: 3, quantity: 3)],
+                sells: [new ItemListing(unitPrice: 30, quantity: 30)]
+        )
+
+        def ts1 = System.currentTimeMillis()
+        def ts2 = ts1 + 1000
+
+        def expectedStats = new ListingStatistics(
+                itemId: 123,
+                timestamp: ts1,
+                buyStatistics: new PriceStatistics(minPrice: 3, maxPrice: 3, totalAmount: 3, average: 3.0),
+                sellStatistics: new PriceStatistics(minPrice: 30, maxPrice: 30, totalAmount: 30, average: 30.0)
+        )
+
+        when:
+        this.repository.store([listings123, listings456], ts1)
+        this.repository.store([listings123_2], ts2)
+        def stats = this.repository.latestStatistics(123)
+
+        then:
+        assert stats != null
+        assert stats == expectedStats
+    }
 }
