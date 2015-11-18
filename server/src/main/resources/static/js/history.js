@@ -7,7 +7,8 @@
     },
     width = 960 - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom,
-    data = gw2historyData;
+    data = gw2historyData,
+    maxPrice = d3.max(data, function(d) { return Math.max(d.buyStatistics.maxPrice, d.sellStatistics.minPrice); });
 
     var x = d3.time.scale()
         .range([0, width])
@@ -15,7 +16,7 @@
 
     var y = d3.scale.linear()
         .range([height, 0])
-        .domain([ 0, d3.max(data, function(d) { return d.buyStatistics.maxPrice; }) * 1.1 ]);
+        .domain([ 0, maxPrice * 1.1 ]);
 
     var xAxis = d3.svg.axis()
         .scale(x)
@@ -34,7 +35,7 @@
         .x(function(d) { return x(d.timestamp); })
         .y(function(d) { return y(d.buyStatistics.maxPrice); });
 
-    var svg = d3.select("body").append("svg")
+    var svg = d3.select("#priceHistory").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
