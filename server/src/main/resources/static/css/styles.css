@@ -10,3 +10,38 @@
     background: url('../images/coin_copper.png') center right no-repeat;
     padding-right: 24px;
 }
+
+/*
+    Charts
+*/
+.gw2-charts-axis path,
+.gw2-charts-axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.gw2-charts-x.gw2-charts-axis path {
+    display: none;
+}
+
+.gw2-history-buyers {
+    fill: none;
+    stroke: #AA4643;
+    stroke-width: 2px;
+}
+.gw2-history-sellers {
+    fill: none;
+    stroke: #337ab7;
+    stroke-width: 2px;
+}
+.gw2-history-profit {
+    fill: none;
+    stroke: #448F30;
+    stroke-width: 2px;
+}
+
+.gw2-charts-overlay {
+    fill: none;
+    pointer-events: all;
+}

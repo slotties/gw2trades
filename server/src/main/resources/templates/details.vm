@@ -44,6 +44,8 @@
     ## TODO: flip profit min<->max, avg<->avg
 </table>
 
-## TODO: draw fancy graphs
-History:
-${history}
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script>
+    window.gw2historyData = ${history};
+</script>
+<script src="/js/history.js"></script>
