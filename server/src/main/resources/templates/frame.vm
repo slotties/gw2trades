@@ -12,5 +12,15 @@
 
         <link rel="stylesheet" href="/static/css/styles.css">
     </head>
-    <body>#parse("${view}.vm")</body>
+    <body>
+        <nav class="navbar navbar-fixed-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/index.html">gw2trades</a>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            #parse("${view}.vm")
+        </div>
+    </body>
 </html>

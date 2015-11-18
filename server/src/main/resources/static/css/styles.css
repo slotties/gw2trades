@@ -45,3 +45,11 @@
     fill: none;
     pointer-events: all;
 }
+
+/*
+    Navigation
+*/
+.navbar {
+    /* FIXME: */
+    background-color: #0f0;
+}
