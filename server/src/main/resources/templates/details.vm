@@ -48,4 +48,4 @@
 <script>
     window.gw2historyData = ${history};
 </script>
-<script src="/js/history.js"></script>
+<script src="/static/js/history.js"></script>
