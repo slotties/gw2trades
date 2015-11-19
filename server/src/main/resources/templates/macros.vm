@@ -1,5 +1,6 @@
 #macro(price $coins)
-    #set($price = $gw2.price($coins))
+    #set($price = $gw2.price($mathtool.abs($coins)))
+    #if($coins < 0)<span class="currency-negative">-</span>#end
     #if($price.goldCoins > 0)<span class="currency-gold">${price.goldCoins}</span>#end
     #if($price.silverCoins > 0 || $price.goldCoins > 0)<span class="currency-silver">${price.silverCoins}</span>#end
     <span class="currency-copper">${price.copperCoins}</span>

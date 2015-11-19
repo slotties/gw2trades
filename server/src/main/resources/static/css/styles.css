@@ -21,6 +21,10 @@
 .currency-copper {
     background: url('../images/coin_copper.png') center right no-repeat;
 }
+.currency-negative {
+    font-weight: bold;
+    color: C8231F;
+}
 
 .currency-gold,
 .currency-silver,

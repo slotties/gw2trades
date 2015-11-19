@@ -1,5 +1,11 @@
 <div class="page-header">
-    <h1>TODO: item name + icon</h1>
+    <h1>
+        TODO: item name + icon
+
+    </h1>
+    <h3>
+        Profit: #price($gw2.profit($latestStats.buyStatistics.maxPrice, $latestStats.sellStatistics.minPrice))
+    </h3>
 </div>
 
 <div class="row">
