@@ -13,7 +13,7 @@
 .currency-copper {
     padding-right: 24px;
     display: inline-block;
-    width: 42px;
+    width: 48px;
     text-align: right;
 }
 
@@ -59,6 +59,12 @@
 /*
     Navigation
 */
-.navbar-default .navbar-brand:hover {
+.navbar-default .navbar-brand {
+    color: #C8241F;
+}
+
+a,
+a:hover,
+a:focus {
     color: #C8241F;
 }
