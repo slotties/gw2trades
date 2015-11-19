@@ -1,6 +1,7 @@
 package gw2trades.server.util;
 
 import gw2trades.server.model.Price;
+import org.apache.commons.lang.StringEscapeUtils;
 
 /**
  * @author Stefan Lotties (slotties@gmail.com)
@@ -15,5 +16,12 @@ public class GuildWars2Util {
         int profit = (sellingPrice - buyingPrice) - fixCosts;
 
         return profit;
+    }
+
+    public String wikiName(String itemName) {
+        String escapedItemName = itemName.replace(' ', '_');
+        escapedItemName = StringEscapeUtils.escapeHtml(escapedItemName);
+
+        return escapedItemName;
     }
 }

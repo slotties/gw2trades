@@ -2,6 +2,7 @@ package gw2trades.server.frontend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gw2trades.repository.api.ItemRepository;
+import gw2trades.repository.api.model.Item;
 import gw2trades.repository.api.model.ListingStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,6 +38,9 @@ public class DetailsController {
         List<ListingStatistics> history = itemRepository.getHistory(itemId, from.toInstant(ZoneOffset.UTC).toEpochMilli(), to.toInstant(ZoneOffset.UTC).toEpochMilli());
         ListingStatistics latestStats = itemRepository.latestStatistics(itemId);
 
+        Item item = itemRepository.getItem(itemId);
+
+        model.addObject("item", item);
         model.addObject("latestStats", latestStats);
         model.addObject("history", this.objectMapper.writeValueAsString(history));
         model.addObject("view", "details");

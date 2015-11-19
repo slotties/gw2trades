@@ -1,11 +1,13 @@
 package gw2trades.server.frontend;
 
 import gw2trades.repository.api.ItemRepository;
+import gw2trades.repository.api.model.Item;
 import gw2trades.repository.api.model.ListingStatistics;
 import gw2trades.server.frontend.sorters.BuyersByAveragePrice;
 import gw2trades.server.frontend.sorters.BuyersByMaxPrice;
 import gw2trades.server.frontend.sorters.ReverseComparator;
 import gw2trades.server.frontend.sorters.SellersByAveragePrice;
+import gw2trades.server.model.ItemListingStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -15,9 +17,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Stefan Lotties (slotties@gmail.com)
@@ -55,14 +56,30 @@ public class IndexController {
         int to = Math.min(allStats.size(), from + pageSize);
         allStats = allStats.subList(from, to);
 
+        List<ItemListingStatistics> itemListingStats = allStats.stream()
+                .map(stats -> new ItemListingStatistics(itemOrNull(stats.getItemId()), stats))
+                .collect(Collectors.toList());
+
         model.addObject("view", "index");
         model.addObject("lastPage", lastPage);
         model.addObject("currentPage", page);
-        model.addObject("listingStatistics", allStats);
+        model.addObject("listingStatistics", itemListingStats);
         model.addObject("orderBy", orderBy);
         model.addObject("orderDir", orderDir);
 
         return model;
+    }
+
+    private Item itemOrNull(int itemId) {
+        try {
+            return itemRepository.getItem(itemId);
+        } catch (IOException e) {
+            Item item = new Item();
+            item.setItemId(itemId);
+            item.setName("BAD_ITEM");
+            item.setIconUrl("javascript:void(0);");
+            return item;
+        }
     }
 
     private Comparator<ListingStatistics> resolveComparator(String orderBy, String orderDir) {

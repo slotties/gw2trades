@@ -20,14 +20,14 @@
 #foreach($stats in $listingStatistics)
     <tr>
         <td>
-            <a href="/details/${stats.itemId}.html">
-                ${stats.itemId}
+            <a href="/details/${stats.item.itemId}.html">
+                ${stats.item.name}
             </a>
         </td>
-        <td>#price(${stats.buyStatistics.maxPrice})</td>
-        <td>#price($mathtool.floor($stats.buyStatistics.average))</td>
-        <td>#price(${stats.sellStatistics.minPrice})</td>
-        <td>#price($mathtool.floor($stats.sellStatistics.average))</td>
+        <td>#price(${stats.statistics.buyStatistics.maxPrice})</td>
+        <td>#price($mathtool.floor($stats.statistics.buyStatistics.average))</td>
+        <td>#price(${stats.statistics.sellStatistics.minPrice})</td>
+        <td>#price($mathtool.floor($stats.statistics.sellStatistics.average))</td>
     </tr>
 #end
 </table>
