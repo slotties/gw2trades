@@ -1,14 +1,20 @@
 .currency-gold {
     background: url('../images/coin_gold.png') center right no-repeat;
-    padding-right: 24px;
 }
 .currency-silver {
     background: url('../images/coin_silver.png') center right no-repeat;
-    padding-right: 24px;
 }
 .currency-copper {
     background: url('../images/coin_copper.png') center right no-repeat;
+}
+
+.currency-gold,
+.currency-silver,
+.currency-copper {
     padding-right: 24px;
+    display: inline-block;
+    width: 42px;
+    text-align: right;
 }
 
 /*
@@ -46,10 +52,13 @@
     pointer-events: all;
 }
 
+#body-container {
+    margin-top: 50px;
+}
+
 /*
     Navigation
 */
-.navbar {
-    /* FIXME: */
-    background-color: #0f0;
+.navbar-default .navbar-brand:hover {
+    color: #C8241F;
 }

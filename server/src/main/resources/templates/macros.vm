@@ -1,0 +1,8 @@
+#macro(price $coins)
+    #set($price = $gw2.price($coins))
+    #if($price.goldCoins > 0)<span class="currency-gold">${price.goldCoins}</span>#end
+    #if($price.silverCoins > 0)<span class="currency-silver">${price.silverCoins}</span>#end
+    <span class="currency-copper">${price.copperCoins}</span>
+#end
+
+#macro(indexPagerLink $page)?page=${page}&orderBy=$!{orderBy}&orderDir=$!{orderDir}#end

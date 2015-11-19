@@ -1,7 +1,5 @@
 ## TODO: aria labels
 
-#macro(indexPagerLink $page)?page=${page}&orderBy=$!{orderBy}&orderDir=$!{orderDir}#end
-
 <nav>
     <ul class="pagination">
         <li class="#if($currentPage == 1)disabled#end">
