@@ -1,7 +1,8 @@
 <div class="page-header">
     <h1>
         TODO: item name + icon
-
+        <a href="http://wiki-de.guildwars2.com/wiki/FIXME"><img src="/static/images/gw2wiki.jpg"></a>
+        <a href="https://gw2treasures.com/item/${latestStats.itemId}"><img src="/static/images/gw2treasures.png"></a>
     </h1>
     <h3>
         Profit: #price($gw2.profit($latestStats.buyStatistics.maxPrice, $latestStats.sellStatistics.minPrice))
