@@ -2,35 +2,54 @@
     <h1>TODO: item name + icon</h1>
 </div>
 
-<table class="table table-striped table-bordered table-hover">
-    <tr>
-        <th>Highest bidder</th>
-        <td>#price(${latestStats.buyStatistics.maxPrice})</td>
-    <tr>
-    <tr>
-        <th>Average bidder</th>
-        <td>#price($mathtool.floor($latestStats.buyStatistics.average))</td>
-    <tr>
-    <tr>
-        <th>Amount of bidders</th>
-        <td>${latestStats.buyStatistics.totalAmount}</td>
-    <tr>
-
-    <tr>
-        <th>Lowest seller</th>
-        <td>#price(${latestStats.sellStatistics.minPrice})</td>
-    <tr>
-    <tr>
-        <th>Average seller</th>
-        <td>#price($mathtool.floor($latestStats.sellStatistics.average))</td>
-    <tr>
-    <tr>
-        <th>Amount of sellers</th>
-        <td>${latestStats.sellStatistics.totalAmount}</td>
-    <tr>
-
-    ## TODO: flip profit min<->max, avg<->avg
-</table>
+<div class="row">
+    <div class="col-md-6">
+        <table class="table table-striped table-bordered table-hover">
+            <tr>
+                <th colspan="2">Buyers</th>
+            </tr>
+            <tr>
+                <th>Highest bidder</th>
+                <td>#price(${latestStats.buyStatistics.maxPrice})</td>
+            <tr>
+            <tr>
+                <th>Average bidder</th>
+                <td>#price($mathtool.floor($latestStats.buyStatistics.average))</td>
+            <tr>
+            <tr>
+                <th>Lowest bidder</th>
+                <td>#price($mathtool.floor($latestStats.buyStatistics.minPrice))</td>
+            <tr>
+            <tr>
+                <th>Amount of bidders</th>
+                <td>${latestStats.buyStatistics.totalAmount}</td>
+            <tr>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <table class="table table-striped table-bordered table-hover">
+            <tr>
+                <th colspan="2">Buyers</th>
+            </tr>
+            <tr>
+                <th>Lowest seller</th>
+                <td>#price(${latestStats.sellStatistics.minPrice})</td>
+            <tr>
+            <tr>
+                <th>Average seller</th>
+                <td>#price($mathtool.floor($latestStats.sellStatistics.average))</td>
+            <tr>
+            <tr>
+                <th>Highest seller</th>
+                <td>#price($mathtool.floor($latestStats.sellStatistics.maxPrice))</td>
+            <tr>
+            <tr>
+                <th>Amount of sellers</th>
+                <td>${latestStats.sellStatistics.totalAmount}</td>
+            <tr>
+        </table>
+    </div>
+</div>
 
 <div id="priceHistory"></div>
 
