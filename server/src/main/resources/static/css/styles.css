@@ -65,6 +65,9 @@
 
 a,
 a:hover,
-a:focus {
+a:focus,
+.pagination>li>a,
+.pagination>li>a:hover,
+.pagination>li>a:focus {
     color: #C8241F;
 }
