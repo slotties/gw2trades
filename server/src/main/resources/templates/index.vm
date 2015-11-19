@@ -1,6 +1,8 @@
-#parse("/pager.vm")
+<div class="page-header">
+    <h1>All items</h1>
+</div>
 
-#macro(orderLink $whenOrderBy)?page=$!{currentPage}&orderBy=${whenOrderBy}#if($whenOrderBy == $orderBy && $orderDir=="asc")&orderDir=desc#else&orderDir=asc#end#end
+#parse("/pager.vm")
 
 <table class="table table-striped table-bordered table-hover">
     <tr>

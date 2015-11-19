@@ -7,3 +7,5 @@
 #end
 
 #macro(indexPagerLink $page)?page=${page}&orderBy=$!{orderBy}&orderDir=$!{orderDir}#end
+
+#macro(orderLink $whenOrderBy)?page=$!{currentPage}&orderBy=${whenOrderBy}#if($whenOrderBy == $orderBy && $orderDir=="asc")&orderDir=desc#else&orderDir=asc#end#end
