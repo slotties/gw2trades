@@ -17,16 +17,27 @@
 
     var x = d3.time.scale()
         .range([0, width])
-        .domain([new Date(data[0].timestamp), new Date(data[data.length - 1].timestamp)]);
+        .domain([
+            // TODO: scala depending on the selected time frame
+            new Date(data[data.length - 1].timestamp - (7 * 24 * 60 * 60 * 1000)),
+            new Date(data[data.length - 1].timestamp)
+        ]);
 
     var y = d3.scale.linear()
         .range([height, 0])
         .domain([ 0, maxPrice * 1.1 ]);
 
+    var xTickFormat = d3.time.format.multi([
+        ["%I:%M", function(d) { return d.getMinutes(); }],
+        ["%H:%M", function(d) { return d.getHours(); }],
+        ["%e %b", function(d) { return true; }]
+    ]);
+
     var xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom")
-        .tickFormat(d3.time.format("%I:%M"));
+        .tickFormat(xTickFormat)
+        .ticks(d3.time.hours, 8);
 
     var yAxis = d3.svg.axis()
         .scale(y)
