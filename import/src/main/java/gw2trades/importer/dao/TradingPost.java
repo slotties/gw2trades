@@ -2,6 +2,7 @@ package gw2trades.importer.dao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gw2trades.importer.http.ApiClient;
+import gw2trades.repository.api.model.Item;
 import gw2trades.repository.api.model.ItemListings;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
  */
 public class TradingPost {
     static final String URL_COMMERCE_LISTINGS = "https://api.guildwars2.com/v2/commerce/listings";
+    static final String URL_ITEMS = "https://api.guildwars2.com/v2/items";
 
     private ApiClient apiClient;
     private ObjectMapper objectMapper;
@@ -43,5 +45,17 @@ public class TradingPost {
         List<ItemListings> commerceListings = objectMapper.readValue(content, objectMapper.getTypeFactory().constructCollectionType(List.class, ItemListings.class));
 
         return commerceListings;
+    }
+
+    public List<Item> listItems(List<Integer> itemIds) throws IOException {
+        String idsStr = itemIds.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+
+        String url = URL_ITEMS + "?ids=" + idsStr;
+        String content = apiClient.get(url);
+        List<Item> items = objectMapper.readValue(content, objectMapper.getTypeFactory().constructCollectionType(List.class, Item.class));
+
+        return items;
     }
 }

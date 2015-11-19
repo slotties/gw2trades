@@ -113,4 +113,35 @@ class TradingPostSpec extends Specification {
         listings.get(0).sells.contains(new ItemListing(unitPrice: 63, quantity: 499))
         listings.get(0).sells.contains(new ItemListing(unitPrice: 64, quantity: 289))
     }
+
+    def listItems() {
+        given:
+        apiClient.get(TradingPost.URL_ITEMS + "?ids=123,456") >> "[{\"name\":\"Zhos Maske\",\"description\":\"\",\"type\":\"Armor\",\"level\":80,\"rarity\":\"Exotic\",\"vendor_value\":330,\"default_skin\":95,\"game_types\":[\"Activity\",\"Wvw\",\"Dungeon\",\"Pve\"],\"flags\":[\"HideSuffix\",\"SoulBindOnUse\"],\"restrictions\":[],\"id\":123,\"chat_link\":\"[&AgF7AAAA]\",\"icon\":\"https://render.guildwars2.com/file/65A0C7367206E6CE4EC7C8CBE07EABAE0191BFBA/561548.png\",\"details\":{\"type\":\"Helm\",\"weight_class\":\"Medium\",\"defense\":97,\"infusion_slots\":[],\"infix_upgrade\":{\"attributes\":[{\"attribute\":\"Healing\",\"modifier\":60},{\"attribute\":\"Power\",\"modifier\":43},{\"attribute\":\"Toughness\",\"modifier\":43}]},\"suffix_item_id\":24696,\"secondary_suffix_item_id\":\"\"}},{\"name\":\"Berserkerhafte Verstärkte Schuppen-Stiefel des Rudels\",\"description\":\"\",\"type\":\"Armor\",\"level\":74,\"rarity\":\"Masterwork\",\"vendor_value\":122,\"default_skin\":74,\"game_types\":[\"Activity\",\"Wvw\",\"Dungeon\",\"Pve\"],\"flags\":[\"SoulBindOnUse\"],\"restrictions\":[],\"id\":456,\"chat_link\":\"[&AgHIAQAA]\",\"icon\":\"https://render.guildwars2.com/file/17C9516D0F0B2EBA616ED794C00F59411E931702/61014.png\",\"details\":{\"type\":\"Boots\",\"weight_class\":\"Heavy\",\"defense\":133,\"infusion_slots\":[],\"infix_upgrade\":{\"attributes\":[{\"attribute\":\"Power\",\"modifier\":33},{\"attribute\":\"Precision\",\"modifier\":23},{\"attribute\":\"CritDamage\",\"modifier\":23}]},\"suffix_item_id\":24700,\"secondary_suffix_item_id\":\"\"}}]"
+
+        when:
+        def items = tradingPost.listItems([ 123, 456 ])
+
+        then:
+        items.size() == 2
+        items.get(0).itemId == 123
+        items.get(0).name == "Zhos Maske"
+        items.get(0).iconUrl == "https://render.guildwars2.com/file/65A0C7367206E6CE4EC7C8CBE07EABAE0191BFBA/561548.png"
+        items.get(1).itemId == 456
+        items.get(1).name == "Berserkerhafte Verstärkte Schuppen-Stiefel des Rudels"
+        items.get(1).iconUrl == "https://render.guildwars2.com/file/17C9516D0F0B2EBA616ED794C00F59411E931702/61014.png"
+    }
+
+    def listItemsWithSingleItem() {
+        given:
+        apiClient.get(TradingPost.URL_ITEMS + "?ids=123") >> "[{\"name\":\"Zhos Maske\",\"description\":\"\",\"type\":\"Armor\",\"level\":80,\"rarity\":\"Exotic\",\"vendor_value\":330,\"default_skin\":95,\"game_types\":[\"Activity\",\"Wvw\",\"Dungeon\",\"Pve\"],\"flags\":[\"HideSuffix\",\"SoulBindOnUse\"],\"restrictions\":[],\"id\":123,\"chat_link\":\"[&AgF7AAAA]\",\"icon\":\"https://render.guildwars2.com/file/65A0C7367206E6CE4EC7C8CBE07EABAE0191BFBA/561548.png\",\"details\":{\"type\":\"Helm\",\"weight_class\":\"Medium\",\"defense\":97,\"infusion_slots\":[],\"infix_upgrade\":{\"attributes\":[{\"attribute\":\"Healing\",\"modifier\":60},{\"attribute\":\"Power\",\"modifier\":43},{\"attribute\":\"Toughness\",\"modifier\":43}]},\"suffix_item_id\":24696,\"secondary_suffix_item_id\":\"\"}}]"
+
+        when:
+        def items = tradingPost.listItems([ 123 ])
+
+        then:
+        items.size() == 1
+        items.get(0).itemId == 123
+        items.get(0).name == "Zhos Maske"
+        items.get(0).iconUrl == "https://render.guildwars2.com/file/65A0C7367206E6CE4EC7C8CBE07EABAE0191BFBA/561548.png"
+    }
 }

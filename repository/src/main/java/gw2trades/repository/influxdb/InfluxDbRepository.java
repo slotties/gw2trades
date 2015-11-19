@@ -1,6 +1,7 @@
 package gw2trades.repository.influxdb;
 
 import gw2trades.repository.api.ItemRepository;
+import gw2trades.repository.api.model.Item;
 import gw2trades.repository.api.model.ItemListing;
 import gw2trades.repository.api.model.ItemListings;
 import gw2trades.repository.api.model.ListingStatistics;
@@ -41,6 +42,17 @@ public class InfluxDbRepository implements ItemRepository {
 
         InfluxDB influxDB = connectionManager.getConnection();
         influxDB.write(points);
+    }
+
+    @Override
+    public void store(Collection<Item> items) throws IOException {
+        // TODO
+    }
+
+    @Override
+    public Item getItem(int itemId) throws IOException {
+        // TODO
+        return null;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package gw2trades.repository.api;
 
+import gw2trades.repository.api.model.Item;
 import gw2trades.repository.api.model.ItemListings;
 import gw2trades.repository.api.model.ListingStatistics;
 
@@ -17,6 +18,21 @@ public interface ItemRepository {
      * @param timestamp a point on the timeline to store the listings at (important for providing timelines of price changes)
      */
     void store(Collection<ItemListings> listings, long timestamp) throws IOException;
+
+    /**
+     * TODO
+     * @param items
+     * @throws IOException
+     */
+    void store(Collection<Item> items) throws IOException;
+
+    /**
+     * TODO
+     * @param itemId
+     * @return
+     * @throws IOException
+     */
+    Item getItem(int itemId) throws IOException;
 
     /**
      * TODO

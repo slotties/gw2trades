@@ -2,10 +2,7 @@ package gw2trades.repository.filesystem;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gw2trades.repository.api.ItemRepository;
-import gw2trades.repository.api.model.ItemListing;
-import gw2trades.repository.api.model.ItemListings;
-import gw2trades.repository.api.model.ListingStatistics;
-import gw2trades.repository.api.model.PriceStatistics;
+import gw2trades.repository.api.model.*;
 
 import java.io.*;
 import java.util.*;
@@ -19,6 +16,7 @@ public class FilesystemItemRepository implements ItemRepository {
     private File statisticsIndex;
     private File historyDirectory;
     private File dumpDirectory;
+    private File itemDirectory;
 
     private ObjectMapper objectMapper;
 
@@ -28,6 +26,7 @@ public class FilesystemItemRepository implements ItemRepository {
         this.statisticsIndex = new File(this.directory, "stats.index");
         this.historyDirectory = new File(this.directory, "histories");
         this.dumpDirectory = new File(this.directory, "dumps");
+        this.itemDirectory = new File(this.directory, "items");
 
         this.objectMapper = new ObjectMapper();
     }
@@ -79,6 +78,24 @@ public class FilesystemItemRepository implements ItemRepository {
         }
 
         writeStatistics(statisticsIndex);
+    }
+
+    @Override
+    public void store(Collection<Item> items) throws IOException {
+        ensureDirectoryExists(this.itemDirectory);
+
+        for (Item item : items) {
+            File itemFile = new File(this.itemDirectory, Integer.toString(item.getItemId()));
+            this.objectMapper.writeValue(itemFile, item);
+        }
+    }
+
+    @Override
+    public Item getItem(int itemId) throws IOException {
+        File itemFile = new File(this.itemDirectory, Integer.toString(itemId));
+        // TODO: throw exception when unknown?
+
+        return this.objectMapper.readValue(itemFile, Item.class);
     }
 
     private Map<Integer, ListingStatistics> readStatistics() throws IOException {

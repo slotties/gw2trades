@@ -2,14 +2,11 @@ package gw2trades.importer;
 
 import gw2trades.importer.dao.TradingPost;
 import gw2trades.repository.api.ItemRepository;
+import gw2trades.repository.api.model.Item;
 import gw2trades.repository.api.model.ItemListings;
 import gw2trades.repository.filesystem.FilesystemItemRepository;
-import gw2trades.repository.influxdb.InfluxDbConnectionManager;
-import gw2trades.repository.influxdb.InfluxDbRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.ConfigurationFactory;
-import org.influxdb.InfluxDB;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,13 +51,17 @@ public class Importer {
         int batches = (int) Math.ceil((float) itemIds.size() / (float) batchSize);
         for (int i = 0; i < batches; i++) {
             LOGGER.info("Pulling batch {} of {} (total {} items)...\n", i, batches, itemIds.size());
-
             // TODO: implement parallel processing to improve speed
             List<Integer> itemIdBatch = itemIds.subList(i * batchSize, Math.min(itemIds.size() - 1, (i + 1) * batchSize));
-            List<ItemListings> listings = tradingPost.listings(itemIdBatch);
 
-            LOGGER.info("Writing into repository ...");
+            List<ItemListings> listings = tradingPost.listings(itemIdBatch);
+            List<Item> items = tradingPost.listItems(itemIdBatch);
+
+            LOGGER.info("Writing listings into repository ...");
             repository.store(listings, System.currentTimeMillis());
+
+            LOGGER.info("Writing items into repository ...");
+            repository.store(items);
         }
     }
 /*

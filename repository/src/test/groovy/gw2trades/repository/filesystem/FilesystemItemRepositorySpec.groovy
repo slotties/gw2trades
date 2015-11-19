@@ -1,6 +1,7 @@
 package gw2trades.repository.filesystem
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import gw2trades.repository.api.model.Item
 import gw2trades.repository.api.model.ItemListing
 import gw2trades.repository.api.model.ItemListings
 import gw2trades.repository.api.model.ListingStatistics
@@ -419,5 +420,56 @@ class FilesystemItemRepositorySpec extends Specification {
         then:
         assert stats != null
         assert stats == expectedStats
+    }
+
+    def storeItem() {
+        given:
+        def item = new Item(
+                itemId: 123,
+                name: "foo",
+                iconUrl: "http://foo"
+        )
+
+        def mapper = new ObjectMapper()
+
+        when:
+        this.repository.store([ item ])
+
+        then:
+        def itemFile = new File(this.tempDir, "items/123")
+        assert itemFile.exists()
+
+        def storedItem = mapper.readValue(itemFile, Item.class)
+        assert storedItem.itemId == item.itemId
+        assert storedItem.name == item.name
+        assert storedItem.iconUrl == item.iconUrl
+    }
+
+    def getItem() {
+        given:
+        def item123 = new Item(
+                itemId: 123,
+                name: "foo",
+                iconUrl: "http://foo"
+        )
+        def item456 = new Item(
+                itemId: 456,
+                name: "bar",
+                iconUrl: "http://bar"
+        )
+
+        when:
+        this.repository.store([ item123, item456 ])
+        def storedItem123 = repository.getItem(123)
+        def storedItem456 = repository.getItem(456)
+
+        then:
+        assert storedItem123.itemId == item123.itemId
+        assert storedItem123.name == item123.name
+        assert storedItem123.iconUrl == item123.iconUrl
+
+        assert storedItem456.itemId == item456.itemId
+        assert storedItem456.name == item456.name
+        assert storedItem456.iconUrl == item456.iconUrl
     }
 }
