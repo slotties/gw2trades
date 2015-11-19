@@ -1,3 +1,17 @@
+/*
+    TODO: use sass
+
+    Colors:
+    http://paletton.com/#uid=7010J0kr2p6hjvVm7s7tAkrA0fp
+
+    color | normal | bright | dark
+    red C8231F FE7875 7B0300
+    blue 1C5181 527EA5 052C4F
+    green 189D21 5CC863 006106
+    yellow C8821F FEC575 7B4800
+
+*/
+
 .currency-gold {
     background: url('../images/coin_gold.png') center right no-repeat;
 }
@@ -33,13 +47,25 @@
 
 .gw2-history-buyers {
     fill: none;
-    stroke: #AA4643;
+    stroke: #C8231F;
     stroke-width: 2px;
+}
+.gw2-history-buyers-avg {
+    fill: none;
+    stroke: #FE7875;
+    stroke-width: 2px;
+    opacity: 0.5;
 }
 .gw2-history-sellers {
     fill: none;
-    stroke: #337ab7;
+    stroke: #1C5181;
     stroke-width: 2px;
+}
+.gw2-history-sellers-avg {
+    fill: none;
+    stroke: #527EA5;
+    stroke-width: 2px;
+    opacity: 0.5;
 }
 .gw2-history-profit {
     fill: none;
@@ -69,5 +95,5 @@ a:focus,
 .pagination>li>a,
 .pagination>li>a:hover,
 .pagination>li>a:focus {
-    color: #C8241F;
+    color: #C8231F;
 }
