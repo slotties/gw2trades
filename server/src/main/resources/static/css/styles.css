@@ -101,3 +101,11 @@ a:focus,
 .pagination>li>a:focus {
     color: #C8231F;
 }
+
+.text-sellers {
+    color: #1C5181;
+}
+
+.text-buyers {
+    color: #C8231F;
+}
