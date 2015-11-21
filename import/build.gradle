@@ -1,0 +1,11 @@
+dependencies {
+    compile project(':repository')
+
+    compile 'com.fasterxml.jackson.core:jackson-core:2.4.6'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.6'
+    compile 'org.yaml:snakeyaml:1.16'
+    compile 'org.apache.logging.log4j:log4j-api:2.4.1'
+    compile 'org.apache.logging.log4j:log4j-core:2.4.1'
+    compile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    compile 'cglib:cglib-nodep:3.1'
+}

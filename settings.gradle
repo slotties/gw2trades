@@ -1,0 +1,3 @@
+rootProject.name = 'gw2trades-root'
+
+include 'repository', 'import', 'server'

@@ -1,0 +1,30 @@
+allprojects {
+    group = 'com.github.slotties.gw2trades'
+    version = '0.1-SNAPSHOT'
+}
+
+def javaLangLevel = 1.8
+
+allprojects {
+    apply plugin: 'idea'
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'groovy'
+
+    sourceCompatibility = javaLangLevel
+    targetCompatibility = javaLangLevel
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+idea {
+    project {
+        jdkName = javaLangLevel
+        languageLevel = javaLangLevel
+    }
+}
