@@ -1,5 +1,8 @@
 # Build
 target
+build
+.gradle
+/gradle
 
 # IntelliJ
 .idea
