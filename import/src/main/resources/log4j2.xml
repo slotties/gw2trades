@@ -6,6 +6,8 @@
         </console>
     </appenders>
     <loggers>
+        <logger name="gw2trades.importer.http.ApiClient" level="debug"/>
+
         <root level="info">
             <appenderRef ref="console"/>
         </root>
