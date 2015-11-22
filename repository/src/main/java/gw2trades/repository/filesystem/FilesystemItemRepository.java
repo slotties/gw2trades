@@ -6,6 +6,8 @@ import gw2trades.repository.api.model.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Stefan Lotties (slotties@gmail.com)
@@ -20,6 +22,8 @@ public class FilesystemItemRepository implements ItemRepository {
 
     private ObjectMapper objectMapper;
 
+    private Lock writeLock;
+
     public FilesystemItemRepository(File directory) {
         this.directory = directory;
 
@@ -29,6 +33,8 @@ public class FilesystemItemRepository implements ItemRepository {
         this.itemDirectory = new File(this.directory, "items");
 
         this.objectMapper = new ObjectMapper();
+
+        this.writeLock = new ReentrantLock();
     }
 
     @Override
@@ -66,27 +72,37 @@ public class FilesystemItemRepository implements ItemRepository {
 
     @Override
     public void store(Collection<ItemListings> listings, long timestamp) throws IOException {
-        Map<Integer, ListingStatistics> statisticsIndex = readStatistics();
+        writeLock.lock();
+        try {
+            Map<Integer, ListingStatistics> statisticsIndex = readStatistics();
 
-        for (ItemListings listing : listings) {
-            ListingStatistics stats = createStatistics(listing);
-            stats.setTimestamp(timestamp);
+            for (ItemListings listing : listings) {
+                ListingStatistics stats = createStatistics(listing);
+                stats.setTimestamp(timestamp);
 
-            appendHistory(stats, timestamp);
-            writeFullListing(listing, timestamp);
-            statisticsIndex.put(listing.getItemId(), stats);
+                appendHistory(stats, timestamp);
+                // writeFullListing(listing, timestamp);
+                statisticsIndex.put(listing.getItemId(), stats);
+            }
+
+            writeStatistics(statisticsIndex);
+        } finally {
+            writeLock.unlock();
         }
-
-        writeStatistics(statisticsIndex);
     }
 
     @Override
     public void store(Collection<Item> items) throws IOException {
-        ensureDirectoryExists(this.itemDirectory);
+        writeLock.lock();
+        try {
+            ensureDirectoryExists(this.itemDirectory);
 
-        for (Item item : items) {
-            File itemFile = new File(this.itemDirectory, Integer.toString(item.getItemId()));
-            this.objectMapper.writeValue(itemFile, item);
+            for (Item item : items) {
+                File itemFile = new File(this.itemDirectory, Integer.toString(item.getItemId()));
+                this.objectMapper.writeValue(itemFile, item);
+            }
+        } finally {
+            writeLock.unlock();
         }
     }
 

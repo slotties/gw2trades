@@ -20,8 +20,8 @@ public final class Config {
             Object valueObj = subConfig.get(key[i]);
             if (i == key.length - 1) {
                 // We got to the leaf, so we expect a String.
-                if (valueObj instanceof String) {
-                    return (String) valueObj;
+                if (valueObj != null && !(valueObj instanceof Map)) {
+                    return valueObj.toString();
                 } else {
                     throw new IllegalArgumentException();
                 }

@@ -31,7 +31,7 @@ public class Main {
         Importer importer = new Importer(config, tradingPost);
         try {
             importer.execute();
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOGGER.error("Could not import: {}", e.getMessage(), e);
             System.exit(1);
         }
