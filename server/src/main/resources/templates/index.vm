@@ -33,7 +33,7 @@
     <tr>
         <td>
             <a href="/details/${stats.item.itemId}.html">
-                ${stats.item.name}
+                ${stats.item.name} (${stats.item.level})
             </a>
         </td>
         <td>#price(${stats.statistics.buyStatistics.maxPrice})</td>

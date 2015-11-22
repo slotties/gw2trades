@@ -14,6 +14,8 @@ public class Item {
     @JsonProperty("icon")
     private String iconUrl;
 
+    private int level;
+
     public String getName() {
         return name;
     }
@@ -36,6 +38,14 @@ public class Item {
 
     public void setIconUrl(String iconUrl) {
         this.iconUrl = iconUrl;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 
     @Override
