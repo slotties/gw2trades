@@ -24,7 +24,6 @@ dependencies {
 
     compile 'com.fasterxml.jackson.core:jackson-core:2.4.6'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.6'
-    compile 'org.yaml:snakeyaml:1.16'
     compile 'org.apache.logging.log4j:log4j-api:2.4.1'
     compile 'org.apache.logging.log4j:log4j-core:2.4.1'
     compile 'org.springframework.boot:spring-boot-starter:1.2.7.RELEASE'
@@ -32,6 +31,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-velocity'
     compile 'org.springframework.boot:spring-boot-starter-log4j2'
 
+    testCompile "org.codehaus.groovy:groovy-all:2.4.1"
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
-    testCompile 'cglib:cglib-nodep:3.1'
+    testRuntime 'cglib:cglib-nodep:3.1'
 }
