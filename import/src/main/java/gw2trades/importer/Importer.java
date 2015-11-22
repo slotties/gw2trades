@@ -50,7 +50,7 @@ public class Importer {
         int batchSize = 50;
         int batches = (int) Math.ceil((float) itemIds.size() / (float) batchSize);
         for (int i = 0; i < batches; i++) {
-            LOGGER.info("Pulling batch {} of {} (total {} items)...\n", i, batches, itemIds.size());
+            LOGGER.info("Pulling batch {} of {} (total {} items)...", i, batches, itemIds.size());
             // TODO: implement parallel processing to improve speed
             List<Integer> itemIdBatch = itemIds.subList(i * batchSize, Math.min(itemIds.size() - 1, (i + 1) * batchSize));
 
