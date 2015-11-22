@@ -9,3 +9,10 @@
 #macro(indexPagerLink $page)?page=${page}&orderBy=$!{orderBy}&orderDir=$!{orderDir}#end
 
 #macro(orderLink $whenOrderBy)?page=$!{currentPage}&orderBy=${whenOrderBy}#if($whenOrderBy == $orderBy && $orderDir=="asc")&orderDir=desc#else&orderDir=asc#end#end
+#macro(orderIcon $whenOrderBy)
+    #if($orderBy == $whenOrderBy && $orderDir == 'asc')
+        <i class="glyphicon glyphicon-arrow-down"></i>
+    #elseif($orderBy == $whenOrderBy)
+        <i class="glyphicon glyphicon-arrow-up"></i>
+    #end
+#end

@@ -12,10 +12,22 @@
     </tr>
     <tr>
         <th>Item</th>
-        <th><a href="#orderLink("highestBidder")">Highest bidder</a></th>
-        <th><a href="#orderLink("avgBidder")">Average price</a></th>
-        <th><a href="#orderLink("lowestSeller")">Lowest seller</a></th>
-        <th><a href="#orderLink("avgSeller")">Average price</a></th>
+        <th>
+            <a href="#orderLink("highestBidder")">Highest bidder</a>
+            #orderIcon('highestBidder')
+        </th>
+        <th>
+            <a href="#orderLink("avgBidder")">Average price</a>
+            #orderIcon('avgBidder')
+        </th>
+        <th>
+            <a href="#orderLink("lowestSeller")">Lowest seller</a>
+            #orderIcon('lowestSeller')
+        </th>
+        <th>
+            <a href="#orderLink("avgSeller")">Average price</a>
+            #orderIcon('avgSeller')
+        </th>
     </tr>
 #foreach($stats in $listingStatistics)
     <tr>
