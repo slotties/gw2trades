@@ -5,6 +5,7 @@ import gw2trades.repository.api.model.Item;
 import gw2trades.repository.api.model.ListingStatistics;
 import gw2trades.server.frontend.sorters.*;
 import gw2trades.server.model.ItemListingStatistics;
+import gw2trades.server.model.SeoMeta;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -57,6 +58,7 @@ public class IndexController {
                 .map(stats -> new ItemListingStatistics(itemOrNull(stats.getItemId()), stats))
                 .collect(Collectors.toList());
 
+        model.addObject("seoMeta", new SeoMeta("List of all items"));
         model.addObject("view", "index");
         model.addObject("lastPage", lastPage);
         model.addObject("currentPage", page);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.api.model.Item;
 import gw2trades.repository.api.model.ListingStatistics;
+import gw2trades.server.model.SeoMeta;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +41,10 @@ public class DetailsController {
 
         Item item = itemRepository.getItem(itemId);
 
+        SeoMeta seoMeta = new SeoMeta("Details for " + item.getName());
+        seoMeta.setImageUrl(item.getIconUrl());
+
+        model.addObject("seoMeta", seoMeta);
         model.addObject("item", item);
         model.addObject("latestStats", latestStats);
         model.addObject("history", this.objectMapper.writeValueAsString(history));

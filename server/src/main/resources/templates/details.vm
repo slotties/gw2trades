@@ -1,3 +1,18 @@
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org/",
+    "@type": "Product",
+    "name": "${item.name}",
+    "image": "${item.iconUrl}",
+    "mpn": "925872",
+    "offers": {
+        "@type": "Offer",
+        "priceCurrency": "Guild Wars 2 Coins",
+        "price": "${latestStats.sellStatistics.minPrice}"
+    }
+}
+</script>
+
 <div class="page-header">
     <h1>
         <img src="${item.iconUrl}"> ${item.name} (${item.level})

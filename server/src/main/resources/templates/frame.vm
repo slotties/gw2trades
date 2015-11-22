@@ -1,8 +1,18 @@
 <!DOCTYPE html!>
 <html>
     <head>
-    ## TODO: seo props
-        <title>List of all items</title>
+        <title>${seoMeta.title}</title>
+        <meta property="og:title" content="${seoMeta.title}">
+        <meta property="og:site_name" content="Guild Wars 2 Trades">
+        #* TODO: url
+        <meta property="og:url" content="blub">
+        *#
+        <meta property="og:description" content="${seoMeta.title}">
+        #if($seoMeta.imageUrl)
+        <meta property="og:image" content="${seoMeta.imageUrl}">
+        #end
+        <meta property="og:type" content="website">
+        <meta property="og:locale" content="en_US">
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
