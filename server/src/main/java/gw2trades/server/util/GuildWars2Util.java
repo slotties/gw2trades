@@ -12,13 +12,17 @@ public class GuildWars2Util {
     }
 
     public int profit(int buyingPrice, int sellingPrice) {
-        int fixCosts = (int) Math.floor((float) sellingPrice * 0.15f);
+        int fixCosts = (int) Math.floor(((float) sellingPrice) * 0.15f);
         int profit = (sellingPrice - buyingPrice) - fixCosts;
 
         return profit;
     }
 
     public String wikiName(String itemName) {
+        if (itemName == null) {
+            return null;
+        }
+
         String escapedItemName = itemName.replace(' ', '_');
         escapedItemName = StringEscapeUtils.escapeHtml(escapedItemName);
 
