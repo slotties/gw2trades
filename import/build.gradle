@@ -6,6 +6,21 @@ dependencies {
     compile 'org.yaml:snakeyaml:1.16'
     compile 'org.apache.logging.log4j:log4j-api:2.4.1'
     compile 'org.apache.logging.log4j:log4j-core:2.4.1'
-    compile 'org.spockframework:spock-core:1.0-groovy-2.4'
-    compile 'cglib:cglib-nodep:3.1'
+
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    testRuntime 'cglib:cglib-nodep:3.1'
+}
+
+apply plugin: 'distribution'
+distributions {
+    main {
+        baseName = 'gw2trades-importer'
+        contents {
+            from { 'src/main/resources' }
+            into("lib") {
+                from(jar)
+                from(project.configurations.runtime)
+            }
+        }
+    }
 }
