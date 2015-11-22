@@ -3,10 +3,7 @@ package gw2trades.server.frontend;
 import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.api.model.Item;
 import gw2trades.repository.api.model.ListingStatistics;
-import gw2trades.server.frontend.sorters.BuyersByAveragePrice;
-import gw2trades.server.frontend.sorters.BuyersByMaxPrice;
-import gw2trades.server.frontend.sorters.ReverseComparator;
-import gw2trades.server.frontend.sorters.SellersByAveragePrice;
+import gw2trades.server.frontend.sorters.*;
 import gw2trades.server.model.ItemListingStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -93,7 +90,7 @@ public class IndexController {
                 cmp = new BuyersByAveragePrice();
                 break;
             case "lowestSeller":
-                cmp = new BuyersByMaxPrice();
+                cmp = new SellersByMinPrice();
                 break;
             case "avgSeller":
                 cmp = new SellersByAveragePrice();
