@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 public class ApiClient {
     private static final Logger LOGGER = LogManager.getLogger(ApiClient.class);
 
-
     /**
      * Returns the response body of a given URL.
      * @param urlStr the URL to call
