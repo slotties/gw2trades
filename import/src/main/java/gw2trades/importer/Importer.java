@@ -20,27 +20,13 @@ public class Importer {
 
     private TradingPost tradingPost;
     private Config config;
-    private String databaseName;
 
     public Importer(Config config, TradingPost tradingPost) {
         this.config = config;
         this.tradingPost = tradingPost;
-
-        this.databaseName = config.required("influxdb", "dbName");
     }
 
     public void execute() throws IOException {
-        /*
-        InfluxDbConnectionManager connectionManager = new InfluxDbConnectionManager(
-                config.required("influxdb", "url"),
-                config.optional("influxdb", "user").orElse(""),
-                config.optional("influxdb", "pass").orElse("")
-        );
-        setupDatabase(connectionManager);
-
-        ItemRepository repository = new InfluxDbRepository(connectionManager);
-        */
-
         File dataDir = new File(config.required("filesystem", "dir"));
         LOGGER.info("Importing into {} ...\n", dataDir.getAbsolutePath());
         ItemRepository repository = new FilesystemItemRepository(dataDir);
@@ -64,12 +50,4 @@ public class Importer {
             repository.store(items);
         }
     }
-/*
-    private void setupDatabase(InfluxDbConnectionManager influxDbConnectionManager) {
-        InfluxDB influxDb = influxDbConnectionManager.getConnection();
-        influxDb.deleteDatabase("gw2trades");
-        // FIXME: check if database exists
-        influxDb.createDatabase("gw2trades");
-    }
-*/
 }
