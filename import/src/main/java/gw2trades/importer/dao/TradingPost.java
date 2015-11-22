@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
  * @author Stefan Lotties (slotties@gmail.com)
  */
 public class TradingPost {
-    static final String URL_COMMERCE_LISTINGS = "https://api.guildwars2.com/v2/commerce/listings";
-    static final String URL_ITEMS = "https://api.guildwars2.com/v2/items";
+    private static final String URL_COMMERCE_LISTINGS = "https://api.guildwars2.com/v2/commerce/listings";
+    private static final String URL_ITEMS = "https://api.guildwars2.com/v2/items";
 
     private ApiClient apiClient;
     private ObjectMapper objectMapper;
