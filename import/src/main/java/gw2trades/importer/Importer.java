@@ -27,6 +27,8 @@ public class Importer {
     }
 
     public void execute() throws IOException {
+        long t0 = System.currentTimeMillis();
+
         File dataDir = new File(config.required("filesystem", "dir"));
         LOGGER.info("Importing into {} ...\n", dataDir.getAbsolutePath());
         ItemRepository repository = new FilesystemItemRepository(dataDir);
@@ -49,5 +51,8 @@ public class Importer {
             LOGGER.info("Writing items into repository ...");
             repository.store(items);
         }
+
+        long t1 = System.currentTimeMillis();
+        LOGGER.info("Imported the trading post within {} ms.", t1 - t0);
     }
 }
