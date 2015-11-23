@@ -15,9 +15,9 @@
 
 <div class="page-header">
     <h1>
-        <img src="${item.iconUrl}"> ${item.name} (${item.level})
-        <a href="http://wiki-en.guildwars2.com/wiki/${gw2.wikiName($item.name)}"><img src="/static/images/gw2wiki.jpg"></a>
-        <a href="https://gw2treasures.com/item/${latestStats.itemId}"><img src="/static/images/gw2treasures.png"></a>
+        <img alt="Item icon" src="${item.iconUrl}"> ${item.name} <span title="Level requirements">(${item.level})</span>
+        <a href="http://wiki-en.guildwars2.com/wiki/${gw2.wikiName($item.name)}"><img alt="gw2wiki" title="Link to the official Guild Wars 2 Wiki" src="/static/images/gw2wiki.jpg"></a>
+        <a href="https://gw2treasures.com/item/${latestStats.itemId}"><img alt="gw2treasures" title="Link to gw2treasures.com for further item information" src="/static/images/gw2treasures.png"></a>
     </h1>
     <h3>
         Profit: #price($gw2.profit($latestStats.buyStatistics.maxPrice, $latestStats.sellStatistics.minPrice))
@@ -33,19 +33,19 @@
             <tr>
                 <th>Highest bidder</th>
                 <td>#price(${latestStats.buyStatistics.maxPrice})</td>
-            <tr>
+            </tr>
             <tr>
                 <th>Average bidder</th>
                 <td>#price($mathtool.floor($latestStats.buyStatistics.average))</td>
-            <tr>
+            </tr>
             <tr>
                 <th>Lowest bidder</th>
                 <td>#price($mathtool.floor($latestStats.buyStatistics.minPrice))</td>
-            <tr>
+            </tr>
             <tr>
                 <th>Amount of bidders</th>
                 <td>${latestStats.buyStatistics.totalAmount}</td>
-            <tr>
+            </tr>
         </table>
     </div>
     <div class="col-md-6">
@@ -56,19 +56,19 @@
             <tr>
                 <th>Lowest seller</th>
                 <td>#price(${latestStats.sellStatistics.minPrice})</td>
-            <tr>
+            </tr>
             <tr>
                 <th>Average seller</th>
                 <td>#price($mathtool.floor($latestStats.sellStatistics.average))</td>
-            <tr>
+            </tr>
             <tr>
                 <th>Highest seller</th>
                 <td>#price($mathtool.floor($latestStats.sellStatistics.maxPrice))</td>
-            <tr>
+            </tr>
             <tr>
                 <th>Amount of sellers</th>
                 <td>${latestStats.sellStatistics.totalAmount}</td>
-            <tr>
+            </tr>
         </table>
     </div>
 </div>
