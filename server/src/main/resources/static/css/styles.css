@@ -77,6 +77,21 @@
     stroke-width: 2px;
 }
 
+.gw2-history-buyers-focus {
+    fill: none;
+    stroke: #C8231F;
+}
+.gw2-history-sellers-focus {
+    fill: none;
+    stroke: #1C5181;
+}
+.gw2-history-tooltip {
+    position: absolute;
+    border: 1px solid #C8231F;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 4px;
+}
+
 .gw2-charts-overlay {
     fill: none;
     pointer-events: all;

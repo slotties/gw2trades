@@ -13,13 +13,15 @@
             Math.max(d.buyStatistics.maxPrice, d.sellStatistics.minPrice),
             Math.max(d.buyStatistics.average, d.sellStatistics.average)
         );
-    });
+    }),
+    bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
 
     var x = d3.time.scale()
         .range([0, width])
         .domain([
             // TODO: scala depending on the selected time frame
-            new Date(data[data.length - 1].timestamp - (7 * 24 * 60 * 60 * 1000)),
+            // new Date(data[data.length - 1].timestamp - (7 * 24 * 60 * 60 * 1000)),
+            new Date(data[data.length - 1].timestamp - (2 * 60 * 60 * 1000)),
             new Date(data[data.length - 1].timestamp)
         ]);
 
@@ -89,11 +91,84 @@
         .attr("class", "gw2-history-buyers-avg")
         .attr("d", buyersAvg);
 
+    var verticalLine = svg.append("div")
+        .attr("class", "remove")
+        .style("position", "absolute")
+        .style("z-index", "19")
+        .style("width", "1px")
+        .style("height", "380px")
+        .style("top", "10px")
+        .style("bottom", "30px")
+        .style("left", "0px")
+        .style("background", "#fff");
+
+    var buyersMaxPriceCircle = svg.append("g")
+        .attr("class", "gw2-history-buyers-focus")
+        .style("display", "none");
+    buyersMaxPriceCircle.append("circle").attr("r", 3);
+
+    var buyersAvgPriceCircle = svg.append("g")
+        .attr("class", "gw2-history-buyers-focus")
+        .style("display", "none");
+    buyersAvgPriceCircle.append("circle").attr("r", 3);
+
+    var sellersMinPriceCircle = svg.append("g")
+        .attr("class", "gw2-history-sellers-focus")
+        .style("display", "none");
+    sellersMinPriceCircle.append("circle").attr("r", 3);
+
+    var sellersAvgPriceCircle = svg.append("g")
+        .attr("class", "gw2-history-sellers-focus")
+        .style("display", "none");
+    sellersAvgPriceCircle.append("circle").attr("r", 3);
+
+    var tooltip = d3.select('body').append('div')
+        .attr("class", "gw2-history-tooltip");
+
     svg.append("rect")
         .attr("class", "gw2-charts-overlay")
         .attr("width", width)
-        .attr("height", height);
+        .attr("height", height)
+        .on("mouseover", function() {
+            buyersMaxPriceCircle.style("display", null);
+            buyersAvgPriceCircle.style("display", null);
+            sellersMinPriceCircle.style("display", null);
+            sellersAvgPriceCircle.style("display", null);
+            tooltip.style('display', null);
+        })
+        .on("mouseout", function() {
+            buyersMaxPriceCircle.style("display", "none");
+            buyersAvgPriceCircle.style("display", "none");
+            sellersMinPriceCircle.style("display", "none");
+            sellersAvgPriceCircle.style("display", "none");
+            tooltip.style('display', 'none');
+        })
+        .on("mousemove", function() {
+            var x0 = x.invert(d3.mouse(this)[0]),
+                    i = bisectDate(data, x0, 1),
+                    d0 = data[i - 1],
+                    d1 = data[i],
+                    d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
 
+            buyersMaxPriceCircle.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.buyStatistics.maxPrice) + ")");
+            buyersAvgPriceCircle.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.buyStatistics.average) + ")");
+            sellersMinPriceCircle.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.sellStatistics.minPrice) + ")");
+            sellersAvgPriceCircle.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.sellStatistics.average) + ")");
+
+            // TODO: use fancy price presentation
+            var html =
+                'Highest bidder: ' + d.buyStatistics.maxPrice + '<br>' +
+                'Average bidder: ' + d.buyStatistics.average + '<br>' +
+                'Lowest seller: ' + d.sellStatistics.minPrice + '<br>' +
+                'Average seller: ' + d.sellStatistics.average;
+
+            // TODO: display tooltip on the right side of the cursor in case we move too far to the left
+            tooltip.html(html);
+            tooltip.style("left", (d3.event.pageX - tooltip.property('clientWidth') - 30) + "px")
+                    .style("top", (d3.event.pageY - (tooltip.property('clientHeight') / 2)) + "px");
+        });
+
+    // TODO: outsource basic components such as lines or focus circles
     // TODO: mouse-over
     // TODO: load data per xhr
     // TODO: legend
