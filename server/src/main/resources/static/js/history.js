@@ -208,7 +208,8 @@
                 d.buyStatistics.totalAmount,
                 d.sellStatistics.totalAmount
         );
-    });
+    }),
+    bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
 
     var x = d3.time.scale()
         .range([0, width])
@@ -237,10 +238,6 @@
         .scale(y)
         .orient("left");
 
-    var sellers = d3.svg.line()
-        .x(function(d) { return x(d.timestamp); })
-        .y(function(d) { return y(d.sellStatistics.totalAmount); });
-
     var buyers  = d3.svg.line()
         .x(function(d) { return x(d.timestamp); })
         .y(function(d) { return y(d.buyStatistics.totalAmount); });
@@ -251,6 +248,23 @@
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+    var sellers = new gw2charts.Line({
+        svg: svg,
+        data: data,
+        xFn: function(d) { return x(d.timestamp); },
+        yFn: function(d) { return y(d.sellStatistics.totalAmount); },
+        cls: 'gw2-history-sellers',
+        focusCls: 'gw2-history-sellers-focus'
+    });
+    var buyers = new gw2charts.Line({
+        svg: svg,
+        data: data,
+        xFn: function(d) { return x(d.timestamp); },
+        yFn: function(d) { return y(d.buyStatistics.totalAmount); },
+        cls: 'gw2-history-buyers',
+        focusCls: 'gw2-history-buyers-focus'
+    });
+
     svg.append("g")
         .attr("class", "gw2-charts-x gw2-charts-axis")
         .attr("transform", "translate(0," + height + ")")
@@ -260,19 +274,28 @@
         .attr("class", "gw2-charts-y gw2-charts-axis")
         .call(yAxis);
 
-    svg.append("path")
-        .datum(data)
-        .attr("class", "gw2-history-sellers")
-        .attr("d", sellers);
-    svg.append("path")
-        .datum(data)
-        .attr("class", "gw2-history-buyers")
-        .attr("d", buyers);
-
     svg.append("rect")
         .attr("class", "gw2-charts-overlay")
         .attr("width", width)
-        .attr("height", height);
+        .attr("height", height)
+        .on("mouseover", function() {
+            sellers.showHighlight();
+            buyers.showHighlight();
+        })
+        .on("mouseout", function() {
+            sellers.hideHighlight();
+            buyers.hideHighlight();
+        })
+        .on("mousemove", function() {
+            var x0 = x.invert(d3.mouse(this)[0]),
+                    i = bisectDate(data, x0, 1),
+                    d0 = data[i - 1],
+                    d1 = data[i],
+                    d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
+
+            sellers.highlight(x(d.timestamp), y(d.sellStatistics.totalAmount));
+            buyers.highlight(x(d.timestamp), y(d.buyStatistics.totalAmount));
+        });
 
     // TODO: mouse-over
     // TODO: load data per xhr
