@@ -41,9 +41,44 @@
         this.element.style.display = 'none';
     };
 
+    var createTimeAxis = function(width, fromTimestamp, toTimestamp) {
+        var scale = d3.time.scale()
+            .range([0, width])
+            .domain([ fromTimestamp, toTimestamp ]);
+
+        var tickFormat = d3.time.format.multi([
+            ["%H:%M", function(d) { return d.getHours(); }],
+            ["%e %b", function(d) { return true; }]
+        ]);
+
+        var axis = d3.svg.axis()
+            .scale(scale)
+            .orient("bottom")
+            .tickFormat(tickFormat)
+            .ticks(d3.time.hours, 8);
+
+        return {
+            scale: scale,
+            axis: axis
+        };
+    };
+
+    var bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
+    var selectDataPoint = function(data, eventHandler, scale) {
+        var x0 = scale.invert(d3.mouse(eventHandler)[0]),
+            i = bisectDate(data, x0, 1),
+            d0 = data[i - 1],
+            d1 = data[i],
+            d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
+
+        return d;
+    };
+
     window.gw2charts = {
         Line: line,
-        Tooltip: tooltip
+        Tooltip: tooltip,
+        createTimeAxis: createTimeAxis,
+        selectDataPoint: selectDataPoint
     };
 })();
 
@@ -62,32 +97,20 @@
             Math.max(d.buyStatistics.maxPrice, d.sellStatistics.minPrice),
             Math.max(d.buyStatistics.average, d.sellStatistics.average)
         );
-    }),
-    bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
+    });
 
-    var x = d3.time.scale()
-        .range([0, width])
-        .domain([
+    var timeAxis = gw2charts.createTimeAxis(width,
             // TODO: scala depending on the selected time frame
             // new Date(data[data.length - 1].timestamp - (7 * 24 * 60 * 60 * 1000)),
             new Date(data[data.length - 1].timestamp - (2 * 60 * 60 * 1000)),
             new Date(data[data.length - 1].timestamp)
-        ]);
+        );
+
+    var x = timeAxis.scale;
 
     var y = d3.scale.linear()
         .range([height, 0])
         .domain([ 0, maxPrice * 1.1 ]);
-
-    var xTickFormat = d3.time.format.multi([
-        ["%H:%M", function(d) { return d.getHours(); }],
-        ["%e %b", function(d) { return true; }]
-    ]);
-
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom")
-        .tickFormat(xTickFormat)
-        .ticks(d3.time.hours, 8);
 
     var yAxis = d3.svg.axis()
         .scale(y)
@@ -135,7 +158,7 @@
     svg.append("g")
         .attr("class", "gw2-charts-x gw2-charts-axis")
         .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+        .call(timeAxis.axis);
     svg.append("g")
         .attr("class", "gw2-charts-y gw2-charts-axis")
         .call(yAxis);
@@ -172,11 +195,7 @@
             tooltip.hide();
         })
         .on("mousemove", function() {
-            var x0 = x.invert(d3.mouse(this)[0]),
-                    i = bisectDate(data, x0, 1),
-                    d0 = data[i - 1],
-                    d1 = data[i],
-                    d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
+            var d = gw2charts.selectDataPoint(data, this, timeAxis.scale);
 
             buyersMaxPrice.highlight(x(d.timestamp), y(d.buyStatistics.maxPrice));
             buyersAvgPrice.highlight(x(d.timestamp), y(d.buyStatistics.average));
@@ -211,36 +230,20 @@
     }),
     bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
 
-    var x = d3.time.scale()
-        .range([0, width])
-        .domain([
+    var timeAxis = gw2charts.createTimeAxis(width,
             // TODO: scala depending on the selected time frame
             new Date(data[data.length - 1].timestamp - (7 * 24 * 60 * 60 * 1000)),
             new Date(data[data.length - 1].timestamp)
-        ]);
+        );
+    var x = timeAxis.scale;
 
     var y = d3.scale.linear()
         .range([height, 0])
         .domain([ 0, totalAmount * 1.1 ]);
 
-    var xTickFormat = d3.time.format.multi([
-        ["%H:%M", function(d) { return d.getHours(); }],
-        ["%e %b", function(d) { return true; }]
-    ]);
-
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom")
-        .tickFormat(xTickFormat)
-        .ticks(d3.time.hours, 8);
-
     var yAxis = d3.svg.axis()
         .scale(y)
         .orient("left");
-
-    var buyers  = d3.svg.line()
-        .x(function(d) { return x(d.timestamp); })
-        .y(function(d) { return y(d.buyStatistics.totalAmount); });
 
     var svg = d3.select("#supplyHistory").append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -268,7 +271,7 @@
     svg.append("g")
         .attr("class", "gw2-charts-x gw2-charts-axis")
         .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+        .call(timeAxis.axis);
 
     svg.append("g")
         .attr("class", "gw2-charts-y gw2-charts-axis")
@@ -287,12 +290,7 @@
             buyers.hideHighlight();
         })
         .on("mousemove", function() {
-            var x0 = x.invert(d3.mouse(this)[0]),
-                    i = bisectDate(data, x0, 1),
-                    d0 = data[i - 1],
-                    d1 = data[i],
-                    d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
-
+            var d = gw2charts.selectDataPoint(data, this, timeAxis.scale);
             sellers.highlight(x(d.timestamp), y(d.sellStatistics.totalAmount));
             buyers.highlight(x(d.timestamp), y(d.buyStatistics.totalAmount));
         });
