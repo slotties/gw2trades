@@ -1,3 +1,5 @@
+// TODO: load data per xhr
+
 (function() {
     var line = function(conf) {
         this.line = d3.svg.line().x(conf.xFn).y(conf.yFn);
@@ -11,6 +13,13 @@
             .style("display", "none");
 
         this.focusCircle.append("circle").attr("r", 3);
+
+        conf.svg.append("text")
+        		.attr("transform", "translate(" + conf.labelX + "," + conf.labelY + ")")
+        		.attr("dy", ".35em")
+        		.attr('class', conf.cls)
+        		.attr("text-anchor", "start")
+        		.text(conf.label);
     };
     line.prototype.hideHighlight = function() {
         this.focusCircle.style("display", "none");
@@ -85,7 +94,7 @@
 (function() {
     var margin = {
         top: 20,
-        right: 50,
+        right: 150,
         bottom: 30,
         left: 50
     },
@@ -127,6 +136,9 @@
         data: data,
         xFn: function(d) { return x(d.timestamp); },
         yFn: function(d) { return y(d.sellStatistics.minPrice); },
+        labelX: width + 4,
+        labelY: y(data[data.length - 1].sellStatistics.minPrice),
+        label: 'Lowest sellers',
         cls: "gw2-history-sellers",
         focusCls: "gw2-history-sellers-focus"
     });
@@ -135,6 +147,9 @@
         data: data,
         xFn: function(d) { return x(d.timestamp); },
         yFn: function(d) { return y(d.sellStatistics.average); },
+        labelX: width + 4,
+        labelY: y(data[data.length - 1].sellStatistics.average),
+        label: 'Avg. sellers',
         cls: "gw2-history-sellers-avg",
         focusCls: "gw2-history-sellers-focus"
     });
@@ -143,6 +158,9 @@
         data: data,
         xFn: function(d) { return x(d.timestamp); },
         yFn: function(d) { return y(d.buyStatistics.maxPrice); },
+        labelX: width + 4,
+        labelY: y(data[data.length - 1].buyStatistics.maxPrice),
+        label: 'Highest buyers',
         cls: "gw2-history-buyers",
         focusCls: "gw2-history-buyers-focus"
     });
@@ -151,6 +169,9 @@
         data: data,
         xFn: function(d) { return x(d.timestamp); },
         yFn: function(d) { return y(d.buyStatistics.average); },
+        labelX: width + 4,
+        labelY: y(data[data.length - 1].buyStatistics.average),
+        label: 'Avg. buyers',
         cls: "gw2-history-buyers-avg",
         focusCls: "gw2-history-buyers-focus"
     });
@@ -193,18 +214,12 @@
 
             tooltip.show(d3.event.pageX, d3.event.pageY, d);
         });
-
-    // TODO: load data per xhr
-    // TODO: legend
-    // TODO: line namings
-    // TODO: "mini-map"/long term timeline
-    // TODO: some orientational lines
 })();
 
 (function() {
     var margin = {
         top: 20,
-        right: 50,
+        right: 150,
         bottom: 30,
         left: 50
     },
@@ -245,6 +260,9 @@
         data: data,
         xFn: function(d) { return x(d.timestamp); },
         yFn: function(d) { return y(d.sellStatistics.totalAmount); },
+        labelX: width + 4,
+        labelY: y(data[data.length - 1].sellStatistics.totalAmount),
+        label: 'Selles',
         cls: 'gw2-history-sellers',
         focusCls: 'gw2-history-sellers-focus'
     });
@@ -253,6 +271,9 @@
         data: data,
         xFn: function(d) { return x(d.timestamp); },
         yFn: function(d) { return y(d.buyStatistics.totalAmount); },
+        labelX: width + 4,
+        labelY: y(data[data.length - 1].buyStatistics.totalAmount),
+        label: 'Buyers',
         cls: 'gw2-history-buyers',
         focusCls: 'gw2-history-buyers-focus'
     });
@@ -283,11 +304,4 @@
             sellers.highlight(x(d.timestamp), y(d.sellStatistics.totalAmount));
             buyers.highlight(x(d.timestamp), y(d.buyStatistics.totalAmount));
         });
-
-    // TODO: mouse-over
-    // TODO: load data per xhr
-    // TODO: legend
-    // TODO: line namings
-    // TODO: "mini-map"/long term timeline
-    // TODO: some orientational lines
 })();

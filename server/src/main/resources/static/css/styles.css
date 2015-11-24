@@ -49,27 +49,43 @@
     display: none;
 }
 
-.gw2-history-buyers {
+path.gw2-history-buyers {
     fill: none;
     stroke: #C8231F;
     stroke-width: 2px;
 }
-.gw2-history-buyers-avg {
+text.gw2-history-buyers {
+    fill: #C8231F;
+    font-weight: bold;
+}
+path.gw2-history-buyers-avg {
     fill: none;
     stroke: #FE7875;
     stroke-width: 2px;
     opacity: 0.5;
 }
-.gw2-history-sellers {
+text.gw2-history-buyers-avg {
+    fill: #FE7875;
+    font-weight: bold;
+}
+path.gw2-history-sellers {
     fill: none;
     stroke: #1C5181;
     stroke-width: 2px;
 }
-.gw2-history-sellers-avg {
+text.gw2-history-sellers {
+    fill: #1C5181;
+    font-weight: bold;
+}
+path.gw2-history-sellers-avg {
     fill: none;
     stroke: #527EA5;
     stroke-width: 2px;
     opacity: 0.5;
+}
+text.gw2-history-sellers-avg {
+    fill: #527EA5;
+    font-weight: bold;
 }
 .gw2-history-profit {
     fill: none;
