@@ -124,3 +124,8 @@ a:focus,
 .text-buyers {
     color: #C8231F;
 }
+
+.item-icon-mini {
+    width: 32px;
+    height: 32px;
+}

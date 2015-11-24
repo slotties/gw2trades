@@ -32,6 +32,7 @@
 #foreach($stats in $listingStatistics)
     <tr>
         <td>
+            <img src="${stats.item.iconUrl}" alt="Icon" title="${stats.item.name}" class="item-icon-mini">
             <a href="/details/${stats.item.itemId}.html">
                 ${stats.item.name} (${stats.item.level})
             </a>
