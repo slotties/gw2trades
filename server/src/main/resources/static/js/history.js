@@ -36,10 +36,10 @@
     };
     tooltip.prototype.show = function(x, y, dataPoint) {
         if (x && y && dataPoint) {
-            this.element.querySelector('.highest-bidder-value').innerHTML = dataPoint.buyStatistics.maxPrice;
-            this.element.querySelector('.avg-bidder-value').innerHTML = dataPoint.buyStatistics.average;
-            this.element.querySelector('.lowest-seller-value').innerHTML = dataPoint.sellStatistics.minPrice;
-            this.element.querySelector('.avg-seller-value').innerHTML = dataPoint.sellStatistics.average;
+            this.element.querySelector('.highest-bidder-value').innerHTML = renderCoins(dataPoint.buyStatistics.maxPrice);
+            this.element.querySelector('.avg-bidder-value').innerHTML = renderCoins(dataPoint.buyStatistics.average);
+            this.element.querySelector('.lowest-seller-value').innerHTML = renderCoins(dataPoint.sellStatistics.minPrice);
+            this.element.querySelector('.avg-seller-value').innerHTML = renderCoins(dataPoint.sellStatistics.average);
             this.element.style.left = (x  - this.element.clientWidth - 30) + "px";
             this.element.style.top = (y  - (this.element.clientHeight / 2)) + "px";
         } else {
@@ -81,6 +81,26 @@
             d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
 
         return d;
+    };
+
+    var renderCoins = function(coins) {
+        coins = Math.floor(coins);
+        var copper = coins % 100;
+        coins = Math.floor(coins / 100.0);
+        var silver = coins % 100;
+        coins = Math.floor(coins / 100.0);
+        var gold = coins;
+
+        var html = '';
+        if (gold > 0) {
+            html += '<span class="currency-gold">' + gold + '</span>';
+        }
+        if (silver > 0) {
+            html += '<span class="currency-silver">' + silver + '</span>';
+        }
+        html += '<span class="currency-copper">' + copper + '</span>';
+
+        return html;
     };
 
     window.gw2charts = {
