@@ -163,17 +163,6 @@
         .attr("class", "gw2-charts-y gw2-charts-axis")
         .call(yAxis);
 
-    var verticalLine = svg.append("div")
-        .attr("class", "remove")
-        .style("position", "absolute")
-        .style("z-index", "19")
-        .style("width", "1px")
-        .style("height", "380px")
-        .style("top", "10px")
-        .style("bottom", "30px")
-        .style("left", "0px")
-        .style("background", "#fff");
-
     var tooltip = new gw2charts.Tooltip(document.getElementById('priceHistoryTooltip'));
 
     svg.append("rect")
