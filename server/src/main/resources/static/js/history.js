@@ -223,7 +223,7 @@
         bottom: 30,
         left: 50
     },
-    width = d3.select("#priceHistory")[0][0].clientWidth - margin.left - margin.right,
+    width = d3.select("#supplyHistory")[0][0].clientWidth - margin.left - margin.right,
     height = 400 - margin.top - margin.bottom,
     data = gw2historyData,
     totalAmount = d3.max(data, function(d) {
