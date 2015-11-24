@@ -29,9 +29,9 @@
 .currency-gold,
 .currency-silver,
 .currency-copper {
-    padding-right: 24px;
+    padding-right: 20px;
+    margin-right: 4px;
     display: inline-block;
-    width: 48px;
     text-align: right;
 }
 
