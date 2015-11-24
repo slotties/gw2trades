@@ -1,4 +1,53 @@
 (function() {
+    var line = function(conf) {
+        this.line = d3.svg.line().x(conf.xFn).y(conf.yFn);
+        this.path = conf.svg.append("path")
+            .datum(conf.data)
+            .attr("class", conf.cls)
+            .attr("d", this.line);
+
+        this.focusCircle = conf.svg.append("g")
+            .attr("class", conf.focusCls)
+            .style("display", "none");
+
+        this.focusCircle.append("circle").attr("r", 3);
+    };
+    line.prototype.hideHighlight = function() {
+        this.focusCircle.style("display", "none");
+    };
+    line.prototype.showHighlight = function() {
+        this.focusCircle.style("display", null);
+    };
+    line.prototype.highlight = function(x, y) {
+        this.focusCircle.attr("transform", "translate(" + x + "," + y + ")");
+    };
+
+    var tooltip = function(element) {
+        this.element = element;
+    };
+    tooltip.prototype.show = function(x, y, dataPoint) {
+        if (x && y && dataPoint) {
+            this.element.querySelector('.highest-bidder-value').innerHTML = dataPoint.buyStatistics.maxPrice;
+            this.element.querySelector('.avg-bidder-value').innerHTML = dataPoint.buyStatistics.average;
+            this.element.querySelector('.lowest-seller-value').innerHTML = dataPoint.sellStatistics.minPrice;
+            this.element.querySelector('.avg-seller-value').innerHTML = dataPoint.sellStatistics.average;
+            this.element.style.left = (x  - this.element.clientWidth - 30) + "px";
+            this.element.style.top = (y  - (this.element.clientHeight / 2)) + "px";
+        } else {
+        this.element.style.display = '';
+        }
+    };
+    tooltip.prototype.hide = function() {
+        this.element.style.display = 'none';
+    };
+
+    window.gw2charts = {
+        Line: line,
+        Tooltip: tooltip
+    };
+})();
+
+(function() {
     var margin = {
         top: 20,
         right: 50,
@@ -30,7 +79,6 @@
         .domain([ 0, maxPrice * 1.1 ]);
 
     var xTickFormat = d3.time.format.multi([
-        ["%I:%M", function(d) { return d.getMinutes(); }],
         ["%H:%M", function(d) { return d.getHours(); }],
         ["%e %b", function(d) { return true; }]
     ]);
@@ -45,51 +93,52 @@
         .scale(y)
         .orient("left");
 
-    var sellers = d3.svg.line()
-        .x(function(d) { return x(d.timestamp); })
-        .y(function(d) { return y(d.sellStatistics.minPrice); });
-    var sellersAvg = d3.svg.line()
-        .x(function(d) { return x(d.timestamp); })
-        .y(function(d) { return y(d.sellStatistics.average); });
-
-    var buyers  = d3.svg.line()
-        .x(function(d) { return x(d.timestamp); })
-        .y(function(d) { return y(d.buyStatistics.maxPrice); });
-    var buyersAvg  = d3.svg.line()
-        .x(function(d) { return x(d.timestamp); })
-        .y(function(d) { return y(d.buyStatistics.average); });
-
     var svg = d3.select("#priceHistory").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+    var sellersMinPrice = new gw2charts.Line({
+        svg: svg,
+        data: data,
+        xFn: function(d) { return x(d.timestamp); },
+        yFn: function(d) { return y(d.sellStatistics.minPrice); },
+        cls: "gw2-history-sellers",
+        focusCls: "gw2-history-sellers-focus"
+    });
+    var sellersAvgPrice = new gw2charts.Line({
+        svg: svg,
+        data: data,
+        xFn: function(d) { return x(d.timestamp); },
+        yFn: function(d) { return y(d.sellStatistics.average); },
+        cls: "gw2-history-sellers-avg",
+        focusCls: "gw2-history-sellers-focus"
+    });
+    var buyersMaxPrice = new gw2charts.Line({
+        svg: svg,
+        data: data,
+        xFn: function(d) { return x(d.timestamp); },
+        yFn: function(d) { return y(d.buyStatistics.maxPrice); },
+        cls: "gw2-history-buyers",
+        focusCls: "gw2-history-buyers-focus"
+    });
+    var buyersAvgPrice = new gw2charts.Line({
+        svg: svg,
+        data: data,
+        xFn: function(d) { return x(d.timestamp); },
+        yFn: function(d) { return y(d.buyStatistics.average); },
+        cls: "gw2-history-buyers-avg",
+        focusCls: "gw2-history-buyers-focus"
+    });
+
     svg.append("g")
         .attr("class", "gw2-charts-x gw2-charts-axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
-
     svg.append("g")
         .attr("class", "gw2-charts-y gw2-charts-axis")
         .call(yAxis);
-
-    svg.append("path")
-        .datum(data)
-        .attr("class", "gw2-history-sellers")
-        .attr("d", sellers);
-    svg.append("path")
-        .datum(data)
-        .attr("class", "gw2-history-buyers")
-        .attr("d", buyers);
-    svg.append("path")
-        .datum(data)
-        .attr("class", "gw2-history-sellers-avg")
-        .attr("d", sellersAvg);
-    svg.append("path")
-        .datum(data)
-        .attr("class", "gw2-history-buyers-avg")
-        .attr("d", buyersAvg);
 
     var verticalLine = svg.append("div")
         .attr("class", "remove")
@@ -102,46 +151,25 @@
         .style("left", "0px")
         .style("background", "#fff");
 
-    var buyersMaxPriceCircle = svg.append("g")
-        .attr("class", "gw2-history-buyers-focus")
-        .style("display", "none");
-    buyersMaxPriceCircle.append("circle").attr("r", 3);
-
-    var buyersAvgPriceCircle = svg.append("g")
-        .attr("class", "gw2-history-buyers-focus")
-        .style("display", "none");
-    buyersAvgPriceCircle.append("circle").attr("r", 3);
-
-    var sellersMinPriceCircle = svg.append("g")
-        .attr("class", "gw2-history-sellers-focus")
-        .style("display", "none");
-    sellersMinPriceCircle.append("circle").attr("r", 3);
-
-    var sellersAvgPriceCircle = svg.append("g")
-        .attr("class", "gw2-history-sellers-focus")
-        .style("display", "none");
-    sellersAvgPriceCircle.append("circle").attr("r", 3);
-
-    var tooltip = d3.select('body').append('div')
-        .attr("class", "gw2-history-tooltip");
+    var tooltip = new gw2charts.Tooltip(document.getElementById('priceHistoryTooltip'));
 
     svg.append("rect")
         .attr("class", "gw2-charts-overlay")
         .attr("width", width)
         .attr("height", height)
         .on("mouseover", function() {
-            buyersMaxPriceCircle.style("display", null);
-            buyersAvgPriceCircle.style("display", null);
-            sellersMinPriceCircle.style("display", null);
-            sellersAvgPriceCircle.style("display", null);
-            tooltip.style('display', null);
+            buyersMaxPrice.showHighlight();
+            buyersAvgPrice.showHighlight();
+            sellersMinPrice.showHighlight();
+            sellersAvgPrice.showHighlight();
+            tooltip.show();
         })
         .on("mouseout", function() {
-            buyersMaxPriceCircle.style("display", "none");
-            buyersAvgPriceCircle.style("display", "none");
-            sellersMinPriceCircle.style("display", "none");
-            sellersAvgPriceCircle.style("display", "none");
-            tooltip.style('display', 'none');
+            buyersMaxPrice.hideHighlight();
+            buyersAvgPrice.hideHighlight();
+            sellersMinPrice.hideHighlight();
+            sellersAvgPrice.hideHighlight();
+            tooltip.hide();
         })
         .on("mousemove", function() {
             var x0 = x.invert(d3.mouse(this)[0]),
@@ -150,26 +178,14 @@
                     d1 = data[i],
                     d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0;
 
-            buyersMaxPriceCircle.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.buyStatistics.maxPrice) + ")");
-            buyersAvgPriceCircle.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.buyStatistics.average) + ")");
-            sellersMinPriceCircle.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.sellStatistics.minPrice) + ")");
-            sellersAvgPriceCircle.attr("transform", "translate(" + x(d.timestamp) + "," + y(d.sellStatistics.average) + ")");
+            buyersMaxPrice.highlight(x(d.timestamp), y(d.buyStatistics.maxPrice));
+            buyersAvgPrice.highlight(x(d.timestamp), y(d.buyStatistics.average));
+            sellersMinPrice.highlight(x(d.timestamp), y(d.sellStatistics.minPrice));
+            sellersAvgPrice.highlight(x(d.timestamp), y(d.sellStatistics.average));
 
-            // TODO: use fancy price presentation
-            var html =
-                'Highest bidder: ' + d.buyStatistics.maxPrice + '<br>' +
-                'Average bidder: ' + d.buyStatistics.average + '<br>' +
-                'Lowest seller: ' + d.sellStatistics.minPrice + '<br>' +
-                'Average seller: ' + d.sellStatistics.average;
-
-            // TODO: display tooltip on the right side of the cursor in case we move too far to the left
-            tooltip.html(html);
-            tooltip.style("left", (d3.event.pageX - tooltip.property('clientWidth') - 30) + "px")
-                    .style("top", (d3.event.pageY - (tooltip.property('clientHeight') / 2)) + "px");
+            tooltip.show(d3.event.pageX, d3.event.pageY, d);
         });
 
-    // TODO: outsource basic components such as lines or focus circles
-    // TODO: mouse-over
     // TODO: load data per xhr
     // TODO: legend
     // TODO: line namings
@@ -207,7 +223,6 @@
         .domain([ 0, totalAmount * 1.1 ]);
 
     var xTickFormat = d3.time.format.multi([
-        ["%I:%M", function(d) { return d.getMinutes(); }],
         ["%H:%M", function(d) { return d.getHours(); }],
         ["%e %b", function(d) { return true; }]
     ]);

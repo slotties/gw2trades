@@ -73,6 +73,19 @@
     </div>
 </div>
 
+<div id="priceHistoryTooltip" class="gw2-history-tooltip" style="display: none;">
+    <span class="tooltip-seller-avg">Average seller:</span>
+    <span class="avg-seller-value"></span>
+    <br>
+    <span class="tooltip-seller">Lowest seller:</span>
+    <span class="lowest-seller-value"></span>
+    <br>
+    <span class="tooltip-bidder">Highest buyer:</span>
+    <span class="highest-bidder-value"></span>
+    <br>
+    <span class="tooltip-bidder-avg">Average buyer:</span>
+    <span class="avg-bidder-value"></span>
+</div>
 <div id="priceHistory"></div>
 <div id="supplyHistory"></div>
 

@@ -91,6 +91,25 @@
     background-color: rgba(255, 255, 255, 0.8);
     padding: 4px;
 }
+.gw2-history-tooltip span {
+    margin-right: 4px;
+}
+.gw2-history-tooltip .tooltip-seller-avg {
+    color: #527EA5;
+    font-weight: bold;
+}
+.gw2-history-tooltip .tooltip-seller {
+    color: #1C5181;
+    font-weight: bold;
+}
+.gw2-history-tooltip .tooltip-bidder {
+    color: #C8231F;
+    font-weight: bold;
+}
+.gw2-history-tooltip .tooltip-bidder-avg {
+    color: #FE7875;
+    font-weight: bold;
+}
 
 .gw2-charts-overlay {
     fill: none;
