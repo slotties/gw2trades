@@ -94,7 +94,7 @@
 </div>
 <div id="priceHistory">
 </div>
-<div id="supplyHistory"></div>
+<div id="supplyDemand"></div>
 
 <script src="//d3js.org/d3.v3.min.js"></script>
 <script>
