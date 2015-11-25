@@ -103,10 +103,7 @@
         return html;
     };
 
-    var chart = function(element, itemId, determineScaleFn) {
-        this.determineScaleFn = determineScaleFn;
-        this.itemId = itemId;
-
+    var chart = function(element) {
         var margin = {
             top: 20,
             right: 150,
@@ -214,22 +211,6 @@
 
         this.data = data;
     };
-    chart.prototype.loadData = function(itemId, fromTs, toTs) {
-        var self = this,
-            fromDate = renderDate(fromTs),
-            toDate = renderDate(toTs);
-
-        d3.json('/api/history/' + itemId + '?from=' + fromDate + '&to=' + toDate, function(err, data) {
-            var yScale = self.determineScaleFn(data);
-            self.update(data, [ new Date(fromTs), new Date(toTs) ], yScale);
-        });
-    };
-
-    var renderDate = function(ts) {
-        var isoStr = new Date(ts).toISOString();
-        // Cut off the milliseconds and timezone.
-        return isoStr.substring(0, isoStr.length - 5);
-    };
 
     window.gw2charts = {
         Line: line,
@@ -241,43 +222,56 @@
 })();
 
 (function() {
-    var chart = new gw2charts.Chart(d3.select("#priceHistory"), gw2scope.itemId, function(data) {
+    var renderDate = function(date) {
+        var isoStr = date.toISOString();
+        // Cut off the milliseconds and timezone.
+        return isoStr.substring(0, isoStr.length - 5);
+    },
+    yScalePriceHistoryFn = function(data) {
         var maxPrice = d3.max(data, function(d) {
             return Math.max(
                 Math.max(d.buyStatistics.maxPrice, d.sellStatistics.minPrice),
                 Math.max(d.buyStatistics.average, d.sellStatistics.average)
-            );
-        });
+                );
+            });
 
         return [ 0, maxPrice * 1.1 ];
-    });
-    chart.add({
-        yFn: function(d, y) { return y(d.sellStatistics.minPrice); },
-        label: 'Lowest sellers',
-        cls: "gw2-history-sellers",
-        focusCls: "gw2-history-sellers-focus"
-    });
-    chart.add({
-        yFn: function(d, y) { return y(d.sellStatistics.average); },
-        label: 'Avg. sellers',
-        cls: "gw2-history-sellers-avg",
-        focusCls: "gw2-history-sellers-focus"
-    });
-    chart.add({
-        yFn: function(d, y) { return y(d.buyStatistics.maxPrice); },
-        label: 'Highest buyers',
-        cls: "gw2-history-buyers",
-        focusCls: "gw2-history-buyers-focus"
-    });
-    chart.add({
-        yFn: function(d, y) { return y(d.buyStatistics.average); },
-        label: 'Avg. buyers',
-        cls: "gw2-history-buyers-avg",
-        focusCls: "gw2-history-buyers-focus"
-    });
+    },
+    createPriceHistoryChart = function() {
+        var chart = new gw2charts.Chart(d3.select("#priceHistory"));
+        chart.add({
+            yFn: function(d, y) { return y(d.sellStatistics.minPrice); },
+            label: 'Lowest sellers',
+            cls: "gw2-history-sellers",
+            focusCls: "gw2-history-sellers-focus"
+        });
+        chart.add({
+            yFn: function(d, y) { return y(d.sellStatistics.average); },
+            label: 'Avg. sellers',
+            cls: "gw2-history-sellers-avg",
+            focusCls: "gw2-history-sellers-focus"
+        });
+        chart.add({
+            yFn: function(d, y) { return y(d.buyStatistics.maxPrice); },
+            label: 'Highest buyers',
+            cls: "gw2-history-buyers",
+            focusCls: "gw2-history-buyers-focus"
+        });
+        chart.add({
+            yFn: function(d, y) { return y(d.buyStatistics.average); },
+            label: 'Avg. buyers',
+            cls: "gw2-history-buyers-avg",
+            focusCls: "gw2-history-buyers-focus"
+        });
+
+        return chart;
+    };
+
+    var priceHistory = createPriceHistoryChart();
 
     var onTimeselectorClick = function(btn) {
         var offset = btn.getAttribute('data-offset').split(/([0-9]*)/g),
+            to = new Date(),
             from = new Date();
 
         // offset should look like this now: [ "", "1", "d" ] or [ "", "13", "m", "37", "d" ]
@@ -295,8 +289,15 @@
             }
         }
 
-        chart.loadData(chart.itemId, from.getTime(), new Date().getTime());
+        var fromStr = renderDate(from),
+            toStr = renderDate(to);
+
+        d3.json('/api/history/' + gw2scope.itemId + '?from=' + fromStr + '&to=' + toStr, function(err, data) {
+            var yScale = yScalePriceHistoryFn(data);
+            priceHistory.update(data, [ from, to ], yScale);
+        });
     };
+
     var timeframeSelectors = document.getElementById("chart-timeframe-selectors").querySelectorAll('button[data-offset]');
     for (var i = 0; i < timeframeSelectors.length; i++) {
         timeframeSelectors[i].addEventListener('click', function() {
