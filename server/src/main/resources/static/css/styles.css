@@ -45,10 +45,6 @@
     shape-rendering: crispEdges;
 }
 
-.gw2-charts-x.gw2-charts-axis path {
-    display: none;
-}
-
 path.gw2-history-buyers {
     fill: none;
     stroke: #C8231F;
