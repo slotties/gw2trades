@@ -2,46 +2,7 @@
 // TODO: bring back tooltips
 
 (function() {
-    var tooltip = function(element) {
-        this.element = element;
-    };
-    tooltip.prototype.show = function(x, y, dataPoint) {
-        if (x && y && dataPoint) {
-            this.element.querySelector('.highest-bidder-value').innerHTML = renderCoins(dataPoint.buyStatistics.maxPrice);
-            this.element.querySelector('.avg-bidder-value').innerHTML = renderCoins(dataPoint.buyStatistics.average);
-            this.element.querySelector('.lowest-seller-value').innerHTML = renderCoins(dataPoint.sellStatistics.minPrice);
-            this.element.querySelector('.avg-seller-value').innerHTML = renderCoins(dataPoint.sellStatistics.average);
-            this.element.style.left = (x  - this.element.clientWidth - 30) + "px";
-            this.element.style.top = (y  - (this.element.clientHeight / 2)) + "px";
-        } else {
-        this.element.style.display = '';
-        }
-    };
-    tooltip.prototype.hide = function() {
-        this.element.style.display = 'none';
-    };
-
     var bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
-
-    var renderCoins = function(coins) {
-        coins = Math.floor(coins);
-        var copper = coins % 100;
-        coins = Math.floor(coins / 100.0);
-        var silver = coins % 100;
-        coins = Math.floor(coins / 100.0);
-        var gold = coins;
-
-        var html = '';
-        if (gold > 0) {
-            html += '<span class="currency-gold">' + gold + '</span>';
-        }
-        if (silver > 0) {
-            html += '<span class="currency-silver">' + silver + '</span>';
-        }
-        html += '<span class="currency-copper">' + copper + '</span>';
-
-        return html;
-    };
 
     var chart = function(element) {
         var margin = {
@@ -87,11 +48,17 @@
                 self.lines.forEach(function(line) {
                     line.focus.style("display", null);
                 });
+                if (self.tooltip) {
+                    d3.select(self.tooltip.element).style('display', null);
+                }
             })
             .on("mouseout", function() {
                 self.lines.forEach(function(line) {
                     line.focus.style("display", "none");
                 });
+                if (self.tooltip) {
+                    d3.select(self.tooltip.element).style('display', 'none');
+                }
             })
             .on("mousemove", function() {
                 if (!self.data || self.data.length < 2) {
@@ -107,10 +74,21 @@
                 self.lines.forEach(function(line) {
                     line.focus.attr("transform", "translate(" + x + "," + line.yFn(d, self.y) + ")");
                 });
+                if (self.tooltip) {
+                    self.tooltip.updateFn(self.tooltip.element, d);
+                    self.tooltip.element.style.left = (d3.event.pageX - self.tooltip.element.clientWidth - 30) + "px";
+                    self.tooltip.element.style.top = (d3.event.pageY - (self.tooltip.element.clientHeight / 2)) + "px";
+                }
             });
 
         this.svg = svg;
         this.lines = [];
+    };
+    chart.prototype.setupTooltip = function(element, updateFn) {
+        this.tooltip = {
+            element: element,
+            updateFn: updateFn
+        };
     };
     chart.prototype.add = function(conf) {
         var x = this.x,
@@ -166,13 +144,31 @@
     };
 
     window.gw2charts = {
-        Tooltip: tooltip,
         Chart: chart
     };
 })();
 
 (function() {
-    var renderDate = function(date) {
+    var renderCoins = function(coins) {
+        coins = Math.floor(coins);
+        var copper = coins % 100;
+        coins = Math.floor(coins / 100.0);
+        var silver = coins % 100;
+        coins = Math.floor(coins / 100.0);
+        var gold = coins;
+
+        var html = '';
+        if (gold > 0) {
+            html += '<span class="currency-gold">' + gold + '</span>';
+        }
+        if (silver > 0) {
+            html += '<span class="currency-silver">' + silver + '</span>';
+        }
+        html += '<span class="currency-copper">' + copper + '</span>';
+
+        return html;
+    },
+    renderDate = function(date) {
         var isoStr = date.toISOString();
         // Cut off the milliseconds and timezone.
         return isoStr.substring(0, isoStr.length - 5);
@@ -196,6 +192,12 @@
         });
 
         return [ 0, totalAmount ];
+    },
+    updatePriceHistoryTooltip = function(element, data) {
+        element.querySelector('.highest-bidder-value').innerHTML = renderCoins(data.buyStatistics.maxPrice);
+        element.querySelector('.avg-bidder-value').innerHTML = renderCoins(data.buyStatistics.average);
+        element.querySelector('.lowest-seller-value').innerHTML = renderCoins(data.sellStatistics.minPrice);
+        element.querySelector('.avg-seller-value').innerHTML = renderCoins(data.sellStatistics.average);
     },
     createPriceHistoryChart = function() {
         var chart = new gw2charts.Chart(d3.select("#priceHistory"));
@@ -223,6 +225,7 @@
             cls: "gw2-history-buyers-avg",
             focusCls: "gw2-history-buyers-focus"
         });
+        chart.setupTooltip(document.getElementById('priceHistoryTooltip'), updatePriceHistoryTooltip);
 
         return chart;
     },
