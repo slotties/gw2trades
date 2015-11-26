@@ -283,6 +283,12 @@
             yScale = yScaleSupplyDemandFn(data);
             supplyDemand.update(data, [ from, to ], yScale);
         });
+
+        var activeButtons = document.getElementById("chart-timeframe-selectors").querySelectorAll('button.active');
+        for (var i = 0; i < activeButtons.length; i++) {
+            activeButtons[i].className = activeButtons[i].className.replace(/active/, '');
+        }
+        btn.className += ' active';
     };
 
     var timeframeSelectors = document.getElementById("chart-timeframe-selectors").querySelectorAll('button[data-offset]'),
