@@ -1,5 +1,3 @@
-## TODO: aria labels
-
 <nav>
     <ul class="pagination">
         <li class="#if($currentPage == 1)disabled#end">
