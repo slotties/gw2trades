@@ -121,40 +121,36 @@
             },
             line = d3.svg.line().x(this.xFn).y(yFnWrapper),
             path = this.svg.append("path").attr("class", conf.cls)
-            focusCircle = this.svg.append("g").attr("class", conf.focusCls).style("display", "none");
+            focusCircle = this.svg.append("g").attr("class", conf.focusCls).style("display", "none"),
+            lineLabel = this.svg.append("text").attr("dy", ".35em").attr('class', conf.cls).attr("text-anchor", "start").text(conf.label);
 
         focusCircle.append("circle").attr("r", 3);
-
-        // FIXME: fix line labels
-        /*
-        var lineLabel = this.svg.append("text")
-        		.attr("transform", "translate(" + conf.labelX + "," + conf.labelY + ")")
-        		.attr("dy", ".35em")
-        		.attr('class', conf.cls)
-        		.attr("text-anchor", "start")
-        		.text(conf.label);
-        */
 
         this.lines.push({
             line: line,
             path: path,
             focus: focusCircle,
+            lineLabel, lineLabel,
             yFn: conf.yFn
         });
     };
     chart.prototype.update = function(data, xRange, yRange) {
+        this.data = data;
+
         this.x.domain(xRange);
         this.y.domain(yRange);
 
-        var svg = this.svg.transition();
-        svg.select(".gw2-charts-x").duration(750).call(this.xAxis);
-        svg.select(".gw2-charts-y").duration(750).call(this.yAxis);
+        var svg = this.svg.transition(),
+            lastDataPoint = this.data[this.data.length - 1],
+            self = this;
+
+        svg.select(".gw2-charts-x").call(this.xAxis);
+        svg.select(".gw2-charts-y").call(this.yAxis);
 
         this.lines.forEach(function(line) {
             line.path.attr('d', line.line(data));
+            line.lineLabel.attr("transform", "translate(" + (self.x(lastDataPoint.timestamp) + 10) + "," + line.yFn(lastDataPoint, self.y) + ")");
         });
-
-        this.data = data;
     };
 
     window.gw2charts = {
