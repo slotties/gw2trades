@@ -90,11 +90,11 @@ text.gw2-history-sellers-avg {
 }
 
 .gw2-history-buyers-focus {
-    fill: none;
+    fill: #C8231F;
     stroke: #C8231F;
 }
 .gw2-history-sellers-focus {
-    fill: none;
+    fill: #1C5181;
     stroke: #1C5181;
 }
 .gw2-history-tooltip {
