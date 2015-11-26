@@ -1,5 +1,4 @@
 "use strict";
-// TODO: fix high density x axis
 // TODO: bring back tooltips
 
 (function() {
@@ -137,6 +136,19 @@
     chart.prototype.update = function(data, xRange, yRange) {
         this.data = data;
 
+        var timeDelta = xRange[1].getTime() - xRange[0].getTime(),
+            // an approx. delta of days is sufficient here
+            daysDelta = timeDelta / (24 * 60 * 60 * 1000);
+
+        if (daysDelta > 30) {
+            this.xAxis.ticks(d3.time.days, 7);
+        } else if (daysDelta > 10) {
+            this.xAxis.ticks(d3.time.days, 1);
+        } else if (daysDelta > 2) {
+            this.xAxis.ticks(d3.time.hours, 8);
+        } else {
+            this.xAxis.ticks(d3.time.hours, 1);
+        }
         this.x.domain(xRange);
         this.y.domain(yRange);
 
