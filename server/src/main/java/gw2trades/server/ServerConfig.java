@@ -42,8 +42,15 @@ public class ServerConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // FIXME: just on dev environment
-        initDevelopmentResourceHandler(registry);
+        if (environment.getProperty("resources.disableCaching", Boolean.class, false)) {
+            initDevelopmentResourceHandler(registry);
+        } else {
+            initProductionResourceHandler(registry);
+        }
+    }
+
+    private void initProductionResourceHandler(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
     }
 
     private void initDevelopmentResourceHandler(ResourceHandlerRegistry registry) {
