@@ -4,9 +4,6 @@
         <title>${seoMeta.title}</title>
         <meta property="og:title" content="${seoMeta.title}">
         <meta property="og:site_name" content="Guild Wars 2 Trades">
-        #* TODO: url
-        <meta property="og:url" content="blub">
-        *#
         <meta property="og:description" content="${seoMeta.title}">
         #if($seoMeta.imageUrl)
         <meta property="og:image" content="${seoMeta.imageUrl}">
