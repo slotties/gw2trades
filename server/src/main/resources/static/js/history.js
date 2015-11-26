@@ -1,4 +1,3 @@
-// TODO: load data per xhr
 // TODO: bring back labels
 // TODO: fix high density x axis
 // TODO: bring back tooltips
@@ -100,7 +99,7 @@
                     return;
                 }
                 var x0 = self.x.invert(d3.mouse(this)[0]),
-                    i = bisectDate(self.data, x0, 1),
+                    i = Math.min(self.data.length - 1, bisectDate(self.data, x0, 1)),
                     d0 = self.data[i - 1],
                     d1 = self.data[i],
                     d = x0 - d0.timestamp > d1.timestamp - x0 ? d1 : d0,
@@ -272,10 +271,18 @@
         });
     };
 
-    var timeframeSelectors = document.getElementById("chart-timeframe-selectors").querySelectorAll('button[data-offset]');
+    var timeframeSelectors = document.getElementById("chart-timeframe-selectors").querySelectorAll('button[data-offset]'),
+        initialTimeframeSelector;
     for (var i = 0; i < timeframeSelectors.length; i++) {
+        if (timeframeSelectors[i].getAttribute('data-initial') === 'true') {
+            initialTimeframeSelector = timeframeSelectors[i];
+        }
         timeframeSelectors[i].addEventListener('click', function() {
             onTimeselectorClick(this);
         });
     };
+
+    if (initialTimeframeSelector) {
+        onTimeselectorClick(initialTimeframeSelector);
+    }
 })();
