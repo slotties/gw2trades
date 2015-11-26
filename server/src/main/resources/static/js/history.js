@@ -1,4 +1,4 @@
-// TODO: bring back labels
+"use strict";
 // TODO: fix high density x axis
 // TODO: bring back tooltips
 
@@ -115,12 +115,12 @@
     };
     chart.prototype.add = function(conf) {
         var x = this.x,
-            y = this.y;
+            y = this.y,
             yFnWrapper = function(d) {
                 return conf.yFn(d, y);
             },
             line = d3.svg.line().x(this.xFn).y(yFnWrapper),
-            path = this.svg.append("path").attr("class", conf.cls)
+            path = this.svg.append("path").attr("class", conf.cls),
             focusCircle = this.svg.append("g").attr("class", conf.focusCls).style("display", "none"),
             lineLabel = this.svg.append("text").attr("dy", ".35em").attr('class', conf.cls).attr("text-anchor", "start").text(conf.label);
 
