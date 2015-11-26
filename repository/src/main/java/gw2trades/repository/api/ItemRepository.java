@@ -43,6 +43,14 @@ public interface ItemRepository {
 
     /**
      * TODO
+     * @param  query
+     * @return
+     * @throws IOException
+     */
+    Collection<ListingStatistics> queryStatistics(Query query) throws IOException;
+
+    /**
+     * TODO
      * @param itemId
      * @param fromTimestamp
      * @param toTimestamp

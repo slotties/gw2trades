@@ -1,6 +1,7 @@
 package gw2trades.repository.filesystem
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import gw2trades.repository.api.Query
 import gw2trades.repository.api.model.Item
 import gw2trades.repository.api.model.ItemListing
 import gw2trades.repository.api.model.ItemListings
@@ -473,5 +474,39 @@ class FilesystemItemRepositorySpec extends Specification {
         assert storedItem456.itemId == item456.itemId
         assert storedItem456.name == item456.name
         assert storedItem456.iconUrl == item456.iconUrl
+    }
+
+    def queryStatistics() {
+        given:
+        def item123 = new Item(
+                itemId: 123,
+                name: "foo",
+                iconUrl: "http://foo"
+        )
+        def item456 = new Item(
+                itemId: 456,
+                name: "bar",
+                iconUrl: "http://bar"
+        )
+        def listings123 = new ItemListings(
+                itemId: 123,
+                buys: [new ItemListing(unitPrice: 1, quantity: 1)],
+                sells: [new ItemListing(unitPrice: 10, quantity: 10)]
+        )
+        def listings456 = new ItemListings(
+                itemId: 456,
+                buys: [new ItemListing(unitPrice: 2, quantity: 2)],
+                sells: [new ItemListing(unitPrice: 20, quantity: 20)]
+        )
+
+        this.repository.store([ item123, item456 ])
+        this.repository.store([ listings123, listings456 ], System.currentTimeMillis())
+
+        when:
+        def results = repository.queryStatistics(new Query( name: "foo" ))
+
+        then:
+        assert results.size() == 1
+        assert results.iterator().next().itemId == 123
     }
 }

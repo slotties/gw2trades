@@ -2,6 +2,7 @@ package gw2trades.repository.filesystem;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gw2trades.repository.api.ItemRepository;
+import gw2trades.repository.api.Query;
 import gw2trades.repository.api.model.*;
 
 import java.io.*;
@@ -111,7 +112,34 @@ public class FilesystemItemRepository implements ItemRepository {
         File itemFile = new File(this.itemDirectory, Integer.toString(itemId));
         // TODO: throw exception when unknown?
 
-        return this.objectMapper.readValue(itemFile, Item.class);
+        if (itemFile.exists()) {
+            return this.objectMapper.readValue(itemFile, Item.class);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Collection<ListingStatistics> queryStatistics(Query query) throws IOException {
+        Map<Integer, ListingStatistics> allStats = readStatistics();
+        Collection<ListingStatistics> stats = new ArrayList<>();
+
+        for (Map.Entry<Integer, ListingStatistics> stat : allStats.entrySet()) {
+            Item item = getItem(stat.getKey());
+            if (item != null && matchesQuery(item, stat.getValue(), query)) {
+                stats.add(stat.getValue());
+            }
+        }
+
+        return stats;
+    }
+
+    private boolean matchesQuery(Item item, ListingStatistics stats, Query query) {
+        if (query.getName() != null && (item.getName() == null || !item.getName().toLowerCase().contains(query.getName().toLowerCase()))) {
+            return false;
+        }
+
+        return true;
     }
 
     private Map<Integer, ListingStatistics> readStatistics() throws IOException {

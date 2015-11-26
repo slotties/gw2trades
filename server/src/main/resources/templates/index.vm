@@ -1,5 +1,25 @@
 <div class="page-header">
-    <h1>All items</h1>
+    <h1>
+        #if ($query)
+            Listing items found (<a href="/index.html">list all</a>)
+        #else
+            Listing all items
+        #end
+    </h1>
+</div>
+
+<div class="row">
+    <form method="GET">
+        <div class="col-lg-6">
+            <div class="input-group">
+                <span class="input-group-addon">Name:</span>
+                <input name="name" type="text" class="form-control" placeholder="Name">
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <button type="submit" class="btn btn-default">Search</button>
+        </div>
+    </form>
 </div>
 
 #parse("/pager.vm")

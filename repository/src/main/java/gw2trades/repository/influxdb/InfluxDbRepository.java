@@ -1,6 +1,7 @@
 package gw2trades.repository.influxdb;
 
 import gw2trades.repository.api.ItemRepository;
+import gw2trades.repository.api.Query;
 import gw2trades.repository.api.model.Item;
 import gw2trades.repository.api.model.ItemListing;
 import gw2trades.repository.api.model.ItemListings;
@@ -58,6 +59,11 @@ public class InfluxDbRepository implements ItemRepository {
     @Override
     public Collection<ListingStatistics> listStatistics() throws IOException {
         // TODO
+        return null;
+    }
+
+    @Override
+    public Collection<ListingStatistics> queryStatistics(Query query) throws IOException {
         return null;
     }
 

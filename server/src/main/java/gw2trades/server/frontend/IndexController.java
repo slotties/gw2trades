@@ -1,6 +1,7 @@
 package gw2trades.server.frontend;
 
 import gw2trades.repository.api.ItemRepository;
+import gw2trades.repository.api.Query;
 import gw2trades.repository.api.model.Item;
 import gw2trades.repository.api.model.ListingStatistics;
 import gw2trades.server.frontend.sorters.*;
@@ -15,7 +16,10 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -32,7 +36,8 @@ public class IndexController {
     public ModelAndView index(
             @RequestParam(required = false) String orderBy,
             @RequestParam(required = false) String orderDir,
-            @RequestParam(defaultValue = "1") int page) throws IOException {
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) String name) throws IOException {
 
         if (page < 1) {
             return new ModelAndView(new RedirectView("/index.html?page=1"));
@@ -40,13 +45,9 @@ public class IndexController {
 
         ModelAndView model = new ModelAndView("frame");
 
-        List<ListingStatistics> allStats = new ArrayList<>(itemRepository.listStatistics());
-        if (StringUtils.hasText(orderBy) && StringUtils.hasText(orderDir)) {
-            Comparator<ListingStatistics> cmp = resolveComparator(orderBy, orderDir);
-            if (cmp != null) {
-                allStats.sort(cmp);
-            }
-        }
+        Query query = createQuery(name);
+        List<ListingStatistics> allStats = new ArrayList<>(getStatistics(query));
+        sort(allStats, orderBy, orderDir);
 
         int lastPage = (int) Math.ceil((float) allStats.size() / (float) this.pageSize);
 
@@ -65,8 +66,36 @@ public class IndexController {
         model.addObject("listingStatistics", itemListingStats);
         model.addObject("orderBy", orderBy);
         model.addObject("orderDir", orderDir);
+        model.addObject("query", query);
 
         return model;
+    }
+
+    private Query createQuery(String name) {
+        Query query = null;
+        if (name != null) {
+            query = new Query();
+            query.setName(name);
+        }
+
+        return query;
+    }
+
+    private Collection<ListingStatistics> getStatistics(Query query) throws IOException {
+        if (query != null) {
+            return this.itemRepository.queryStatistics(query);
+        } else {
+            return this.itemRepository.listStatistics();
+        }
+    }
+
+    private void sort(List<ListingStatistics> stats, String orderBy, String orderDir) {
+        if (StringUtils.hasText(orderBy) && StringUtils.hasText(orderDir)) {
+            Comparator<ListingStatistics> cmp = resolveComparator(orderBy, orderDir);
+            if (cmp != null) {
+                stats.sort(cmp);
+            }
+        }
     }
 
     private Item itemOrNull(int itemId) {
