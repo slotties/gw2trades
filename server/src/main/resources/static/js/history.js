@@ -1,5 +1,4 @@
 "use strict";
-// TODO: bring back tooltips
 
 (function() {
     var bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
@@ -24,7 +23,7 @@
         this.xFn = function(d) { return self.x(d.timestamp); };
 
         this.y = d3.scale.linear().range([height, 0]);
-        this.yAxis = d3.svg.axis().scale(this.y).orient("left");
+        this.yAxis = d3.svg.axis().scale(this.y).orient("left").ticks(7);
 
         var svg = element.append("svg")
             .attr("width", width + margin.left + margin.right)
@@ -39,6 +38,9 @@
         svg.append("g")
             .attr("class", "gw2-charts-y gw2-charts-axis")
             .call(this.yAxis);
+
+        this.yGrid = d3.svg.axis().scale(this.y).orient("left").ticks(7).tickSize(-width, 0, 0).tickFormat("");
+        svg.append("g").attr("class", "grid").call(this.yGrid);
 
         svg.append("rect")
             .attr("class", "gw2-charts-overlay")
@@ -136,6 +138,7 @@
 
         svg.select(".gw2-charts-x").call(this.xAxis);
         svg.select(".gw2-charts-y").call(this.yAxis);
+        svg.select('.grid').call(this.yGrid);
 
         this.lines.forEach(function(line) {
             line.path.attr('d', line.line(data));
