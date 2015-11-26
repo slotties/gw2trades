@@ -2,10 +2,12 @@ package gw2trades.server;
 
 import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.filesystem.FilesystemItemRepository;
+import org.apache.catalina.filters.RemoteAddrFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.velocity.VelocityProperties;
+import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.view.velocity.EmbeddedVelocityViewResolver;
 import org.springframework.context.annotation.Bean;
@@ -71,5 +73,26 @@ public class ServerConfig extends WebMvcConfigurerAdapter {
         EmbeddedVelocityViewResolver resolver = new EmbeddedVelocityViewResolver();
         this.properties.applyToViewResolver(resolver);
         return resolver;
+    }
+
+    @Bean
+    public FilterRegistrationBean localHostOnlyFilter() {
+        RemoteAddrFilter filter = new RemoteAddrFilter();
+        filter.setAllow("127\\.\\d+\\.\\d+\\.\\d+|::1|0:0:0:0:0:0:0:1");
+
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(filter);
+        registration.addUrlPatterns("/env");
+        registration.addUrlPatterns("/metrics");
+        registration.addUrlPatterns("/dump");
+        registration.addUrlPatterns("/configprops");
+        registration.addUrlPatterns("/mappings");
+        registration.addUrlPatterns("/autoconfig");
+        registration.addUrlPatterns("/health");
+        registration.addUrlPatterns("/trace");
+        registration.addUrlPatterns("/beans");
+        registration.addUrlPatterns("/info");
+
+        return registration;
     }
 }
