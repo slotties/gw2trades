@@ -34,7 +34,7 @@
         <td>
             <img src="${stats.item.iconUrl}" alt="Icon" title="${stats.item.name}" class="item-icon-mini">
             <a href="/details/${stats.item.itemId}.html">
-                ${stats.item.name} (${stats.item.level})
+                ${stats.item.name} #if($stats.item.level > 0)(${stats.item.level})#end
             </a>
         </td>
         <td>#price(${stats.statistics.buyStatistics.maxPrice})</td>
