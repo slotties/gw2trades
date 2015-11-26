@@ -3,33 +3,55 @@
 (function() {
     var bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
 
-    var chart = function(element) {
+    var splitCoins = function(coins) {
+        coins = Math.floor(coins);
+        var copper = coins % 100;
+        coins = Math.floor(coins / 100.0);
+        var silver = coins % 100;
+        coins = Math.floor(coins / 100.0);
+        var gold = coins;
+
+        return {
+            gold: gold,
+            silver: silver,
+            copper: copper
+        };
+    };
+
+    var chart = function(element, yAxisLabelFormatter) {
         var margin = {
             top: 20,
             right: 150,
             bottom: 30,
-            left: 50
+            left: 0
         },
         width = element[0][0].clientWidth - margin.left - margin.right,
         height = 400 - margin.top - margin.bottom,
-        tickFormat = d3.time.format.multi([
+        timeTickFormat = d3.time.format.multi([
                 ["%H:%M", function(d) { return d.getHours(); }],
                 ["%e %b", function(d) { return true; }]
             ]),
         self = this;
-
-        this.x = d3.time.scale().range([0, width]);
-        this.xAxis = d3.svg.axis().scale(this.x).orient("bottom").tickFormat(tickFormat).ticks(d3.time.hours, 8);
-        this.xFn = function(d) { return self.x(d.timestamp); };
-
-        this.y = d3.scale.linear().range([height, 0]);
-        this.yAxis = d3.svg.axis().scale(this.y).orient("left").ticks(7);
 
         var svg = element.append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        this.x = d3.time.scale().range([0, width]);
+        this.xAxis = d3.svg.axis().scale(this.x).orient("bottom").tickFormat(timeTickFormat).ticks(d3.time.hours, 8);
+        this.xFn = function(d) { return self.x(d.timestamp); };
+
+        this.y = d3.scale.linear().range([height, 0]);
+        // First the grid, then the axis. Otherwise the grid will lay over the axis.
+        this.yGrid = d3.svg.axis().scale(this.y).orient("left").ticks(7).tickSize(-width, 0, 0).tickFormat("");
+        svg.append("g").attr("class", "grid").call(this.yGrid);
+
+        this.yAxis = d3.svg.axis().scale(this.y).orient("right").ticks(7);
+        if (yAxisLabelFormatter) {
+            this.yAxis.tickFormat(yAxisLabelFormatter);
+        }
 
         svg.append("g")
             .attr("class", "gw2-charts-x gw2-charts-axis")
@@ -38,9 +60,6 @@
         svg.append("g")
             .attr("class", "gw2-charts-y gw2-charts-axis")
             .call(this.yAxis);
-
-        this.yGrid = d3.svg.axis().scale(this.y).orient("left").ticks(7).tickSize(-width, 0, 0).tickFormat("");
-        svg.append("g").attr("class", "grid").call(this.yGrid);
 
         svg.append("rect")
             .attr("class", "gw2-charts-overlay")
@@ -137,37 +156,36 @@
             self = this;
 
         svg.select(".gw2-charts-x").call(this.xAxis);
-        svg.select(".gw2-charts-y").call(this.yAxis);
+        svg.select(".gw2-charts-y").transition().call(this.yAxis).call(function(selection) {
+            selection.selectAll('text').attr('transform', 'translate(0, -8)');
+        });
         svg.select('.grid').call(this.yGrid);
 
         this.lines.forEach(function(line) {
             line.path.attr('d', line.line(data));
-            line.lineLabel.attr("transform", "translate(" + (self.x(lastDataPoint.timestamp) + 10) + "," + line.yFn(lastDataPoint, self.y) + ")");
+            if (lastDataPoint) {
+                line.lineLabel.attr("transform", "translate(" + (self.x(lastDataPoint.timestamp) + 10) + "," + line.yFn(lastDataPoint, self.y) + ")");
+            }
         });
     };
 
     window.gw2charts = {
-        Chart: chart
+        Chart: chart,
+        splitCoins: splitCoins
     };
 })();
 
 (function() {
     var renderCoins = function(coins) {
-        coins = Math.floor(coins);
-        var copper = coins % 100;
-        coins = Math.floor(coins / 100.0);
-        var silver = coins % 100;
-        coins = Math.floor(coins / 100.0);
-        var gold = coins;
-
+        var coinsObj = gw2charts.splitCoins(coins);
         var html = '';
-        if (gold > 0) {
-            html += '<span class="currency-gold">' + gold + '</span>';
+        if (coinsObj.gold > 0) {
+            html += '<span class="currency-gold">' + coinsObj.gold + '</span>';
         }
-        if (silver > 0) {
-            html += '<span class="currency-silver">' + silver + '</span>';
+        if (coinsObj.silver > 0) {
+            html += '<span class="currency-silver">' + coinsObj.silver + '</span>';
         }
-        html += '<span class="currency-copper">' + copper + '</span>';
+        html += '<span class="currency-copper">' + coinsObj.copper + '</span>';
 
         return html;
     },
@@ -196,6 +214,20 @@
 
         return [ 0, totalAmount ];
     },
+    priceTickFormat = function(d) {
+        var coins = gw2charts.splitCoins(d),
+            str = '';
+
+        if (coins.gold > 0) {
+            str += coins.gold + 'g ';
+        }
+        if (coins.silver > 0) {
+            str += coins.silver + 's ';
+        }
+        str += coins.copper + 'c';
+
+        return str;
+    },
     updatePriceHistoryTooltip = function(element, data) {
         element.querySelector('.highest-bidder-value').innerHTML = renderCoins(data.buyStatistics.maxPrice);
         element.querySelector('.avg-bidder-value').innerHTML = renderCoins(data.buyStatistics.average);
@@ -203,7 +235,7 @@
         element.querySelector('.avg-seller-value').innerHTML = renderCoins(data.sellStatistics.average);
     },
     createPriceHistoryChart = function() {
-        var chart = new gw2charts.Chart(d3.select("#priceHistory"));
+        var chart = new gw2charts.Chart(d3.select("#priceHistory"), priceTickFormat);
         chart.add({
             yFn: function(d, y) { return y(d.sellStatistics.minPrice); },
             label: 'Lowest sellers',

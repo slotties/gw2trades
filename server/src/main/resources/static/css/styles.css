@@ -175,3 +175,7 @@ a:focus,
 .grid path {
       stroke-width: 0;
 }
+
+.gw2-charts-y .tick line {
+    display: none;
+}
