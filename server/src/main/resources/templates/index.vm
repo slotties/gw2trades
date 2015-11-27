@@ -31,7 +31,10 @@
         <th colspan="2">Sell</th>
     </tr>
     <tr>
-        <th>Item</th>
+        <th>
+            <a href="#orderLink("name")">Item</a>
+            #orderIcon('name')
+        </th>
         <th>
             <a href="#orderLink("highestBidder")">Highest bidder</a>
             #orderIcon('highestBidder')

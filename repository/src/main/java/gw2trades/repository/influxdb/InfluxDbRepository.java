@@ -6,12 +6,14 @@ import gw2trades.repository.api.Query;
 import gw2trades.repository.api.model.*;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.*;
-import org.apache.lucene.index.*;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.BytesRef;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
@@ -94,25 +96,20 @@ public class InfluxDbRepository implements ItemRepository {
     public Collection<ListingStatistics> listStatistics(Order order, int fromPage, int toPage) throws IOException {
         IndexSearcher searcher = new IndexSearcher(this.indexReader);
 
-        QueryParser parser = new QueryParser("*", new StandardAnalyzer());
-        try {
-            org.apache.lucene.search.Query query = parser.parse("*");
+        MatchAllDocsQuery query = new MatchAllDocsQuery();
+        Sort sort = createSort(order);
 
-            Sort sort = createSort(order);
-            TopDocs docs = sort != null ? searcher.search(query, Integer.MAX_VALUE, sort) : searcher.search(query, Integer.MAX_VALUE);
-            Collection<ListingStatistics> allStats = new ArrayList<>();
-            // TODO: paging
-            for (ScoreDoc scoreDoc : docs.scoreDocs) {
-                Document doc = searcher.doc(scoreDoc.doc);
-                ListingStatistics stats = toStatistics(doc);
+        TopDocs docs = sort != null ? searcher.search(query, Integer.MAX_VALUE, sort) : searcher.search(query, Integer.MAX_VALUE);
+        Collection<ListingStatistics> allStats = new ArrayList<>();
+        // TODO: paging
+        for (ScoreDoc scoreDoc : docs.scoreDocs) {
+            Document doc = searcher.doc(scoreDoc.doc);
+            ListingStatistics stats = toStatistics(doc);
 
-                allStats.add(stats);
-            }
-
-            return allStats;
-        } catch (ParseException e) {
-            throw new IOException(e);
+            allStats.add(stats);
         }
+
+        return allStats;
     }
 
     private Sort createSort(Order order) {
@@ -203,6 +200,8 @@ public class InfluxDbRepository implements ItemRepository {
     private Document createStatsDoc(Item item, PriceStatistics buys, PriceStatistics sells) {
         Document doc = new Document();
         doc.add(new Field("name", item.getName(), textField));
+        doc.add(new SortedDocValuesField("name", new BytesRef(item.getName())));
+
         doc.add(new Field("iconUrl", item.getIconUrl(), textField));
         doc.add(new IntField("level", item.getLevel(), IntField.TYPE_STORED));
         doc.add(new IntField("itemId", item.getItemId(), IntField.TYPE_STORED));
@@ -210,12 +209,18 @@ public class InfluxDbRepository implements ItemRepository {
         // TODO: average
 
         doc.add(new IntField("buys_min", buys.getMinPrice(), IntField.TYPE_STORED));
+        doc.add(new NumericDocValuesField("buys_min", buys.getMinPrice()));
         doc.add(new IntField("buys_max", buys.getMaxPrice(), IntField.TYPE_STORED));
+        doc.add(new NumericDocValuesField("buys_max", buys.getMinPrice()));
         doc.add(new IntField("buys_total", buys.getTotalAmount(), IntField.TYPE_STORED));
+        doc.add(new NumericDocValuesField("buys_total", buys.getMinPrice()));
 
         doc.add(new IntField("sells_min", sells.getMinPrice(), IntField.TYPE_STORED));
+        doc.add(new NumericDocValuesField("sells_min", buys.getMinPrice()));
         doc.add(new IntField("sells_max", sells.getMaxPrice(), IntField.TYPE_STORED));
+        doc.add(new NumericDocValuesField("sells_max", buys.getMinPrice()));
         doc.add(new IntField("sells_total", sells.getTotalAmount(), IntField.TYPE_STORED));
+        doc.add(new NumericDocValuesField("sells_total", buys.getMinPrice()));
 
         return doc;
     }
