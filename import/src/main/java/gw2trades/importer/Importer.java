@@ -81,7 +81,6 @@ public class Importer {
                     LOGGER.error("Could not import item ids {}", chunk, e);
                 }
             });
-            break;
         }
 
         executorService.shutdown();
