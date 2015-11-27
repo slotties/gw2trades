@@ -1,11 +1,16 @@
 package gw2trades.repository.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Objects;
 
 /**
  * @author Stefan Lotties (slotties@gmail.com)
  */
 public class ListingStatistics {
+    @JsonIgnore
+    private Item item;
+
     private int itemId;
     private long timestamp;
     private PriceStatistics buyStatistics;
@@ -41,6 +46,14 @@ public class ListingStatistics {
 
     public void setSellStatistics(PriceStatistics sellStatistics) {
         this.sellStatistics = sellStatistics;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
+    public Item getItem() {
+        return item;
     }
 
     @Override

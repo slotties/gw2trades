@@ -81,15 +81,13 @@ public class Importer {
                     LOGGER.error("Could not import item ids {}", chunk, e);
                 }
             });
+            break;
         }
 
         executorService.shutdown();
         executorService.awaitTermination(10, TimeUnit.MINUTES);
 
-        LOGGER.info("Writing items into repository ...");
-        repository.store(allItems.values());
-
-        LOGGER.info("Writing listings into repository ...");
+        LOGGER.info("Writing everything into repository ...");
         repository.store(allListings.values(), System.currentTimeMillis());
 
         repository.close();

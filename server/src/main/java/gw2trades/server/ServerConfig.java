@@ -1,7 +1,8 @@
 package gw2trades.server;
 
 import gw2trades.repository.api.ItemRepository;
-import gw2trades.repository.filesystem.FilesystemItemRepository;
+import gw2trades.repository.influxdb.InfluxDbConnectionManager;
+import gw2trades.repository.influxdb.InfluxDbRepository;
 import org.apache.catalina.filters.RemoteAddrFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 
 /**
@@ -35,11 +37,17 @@ public class ServerConfig extends WebMvcConfigurerAdapter {
     private VelocityProperties properties;
 
     @Bean
-    public ItemRepository itemRepository() {
-        File directory = new File(this.environment.getProperty("repo.fs.dir"));
-        LOGGER.info("Using {} as filesystem repository directory.", directory.getAbsolutePath());
+    public ItemRepository itemRepository() throws IOException {
+        InfluxDbConnectionManager connectionManager = new InfluxDbConnectionManager(
+                this.environment.getProperty("influx.url"),
+                this.environment.getProperty("influx.user"),
+                this.environment.getProperty("influx.pass")
+        );
 
-        return new FilesystemItemRepository(directory);
+        String indexDir = this.environment.getProperty("index.dir");
+        LOGGER.info("Using {} as index directory.", indexDir);
+
+        return new InfluxDbRepository(connectionManager, indexDir);
     }
 
     @Override

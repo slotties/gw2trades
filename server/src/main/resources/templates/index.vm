@@ -57,10 +57,10 @@
                 ${stats.item.name} #if($stats.item.level > 0)(${stats.item.level})#end
             </a>
         </td>
-        <td>#price(${stats.statistics.buyStatistics.maxPrice})</td>
-        <td>#price($mathtool.floor($stats.statistics.buyStatistics.average))</td>
-        <td>#price(${stats.statistics.sellStatistics.minPrice})</td>
-        <td>#price($mathtool.floor($stats.statistics.sellStatistics.average))</td>
+        <td>#price(${stats.buyStatistics.maxPrice})</td>
+        <td>#price($mathtool.floor($stats.buyStatistics.average))</td>
+        <td>#price(${stats.sellStatistics.minPrice})</td>
+        <td>#price($mathtool.floor($stats.sellStatistics.average))</td>
     </tr>
 #end
 </table>

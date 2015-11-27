@@ -21,13 +21,6 @@ public interface ItemRepository {
     void store(Collection<ItemListings> listings, long timestamp) throws IOException;
 
     /**
-     * Stores all given items.
-     * @param items items
-     * @throws IOException in case the repository could not be written
-     */
-    void store(Collection<Item> items) throws IOException;
-
-    /**
      * Returns an item by its ID.
      * @param itemId an item ID
      * @return null when the item was not found
@@ -40,7 +33,7 @@ public interface ItemRepository {
      * @return an unordered collection of statistics
      * @throws IOException in case the repository could not be written
      */
-    Collection<ListingStatistics> listStatistics() throws IOException;
+    Collection<ListingStatistics> listStatistics(Order order, int fromPage, int toPage) throws IOException;
 
     /**
      * Queries for statistics.

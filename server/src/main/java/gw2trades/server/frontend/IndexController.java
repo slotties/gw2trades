@@ -1,6 +1,7 @@
 package gw2trades.server.frontend;
 
 import gw2trades.repository.api.ItemRepository;
+import gw2trades.repository.api.Order;
 import gw2trades.repository.api.Query;
 import gw2trades.repository.api.model.Item;
 import gw2trades.repository.api.model.ListingStatistics;
@@ -46,8 +47,8 @@ public class IndexController {
         ModelAndView model = new ModelAndView("frame");
 
         Query query = createQuery(name);
-        List<ListingStatistics> allStats = new ArrayList<>(getStatistics(query));
-        sort(allStats, orderBy, orderDir);
+        Order order = orderBy != null ?  Order.by(orderBy, !"asc".equals(orderDir)) : null;
+        List<ListingStatistics> allStats = new ArrayList<>(getStatistics(query, order));
 
         int lastPage = (int) Math.ceil((float) allStats.size() / (float) this.pageSize);
 
@@ -55,15 +56,11 @@ public class IndexController {
         int to = Math.min(allStats.size(), from + pageSize);
         allStats = allStats.subList(from, to);
 
-        List<ItemListingStatistics> itemListingStats = allStats.stream()
-                .map(stats -> new ItemListingStatistics(itemOrNull(stats.getItemId()), stats))
-                .collect(Collectors.toList());
-
         model.addObject("seoMeta", new SeoMeta("List of all items"));
         model.addObject("view", "index");
         model.addObject("lastPage", lastPage);
         model.addObject("currentPage", page);
-        model.addObject("listingStatistics", itemListingStats);
+        model.addObject("listingStatistics", allStats);
         model.addObject("orderBy", orderBy);
         model.addObject("orderDir", orderDir);
         model.addObject("query", query);
@@ -81,32 +78,11 @@ public class IndexController {
         return query;
     }
 
-    private Collection<ListingStatistics> getStatistics(Query query) throws IOException {
+    private Collection<ListingStatistics> getStatistics(Query query, Order order) throws IOException {
         if (query != null) {
             return this.itemRepository.queryStatistics(query);
         } else {
-            return this.itemRepository.listStatistics();
-        }
-    }
-
-    private void sort(List<ListingStatistics> stats, String orderBy, String orderDir) {
-        if (StringUtils.hasText(orderBy) && StringUtils.hasText(orderDir)) {
-            Comparator<ListingStatistics> cmp = resolveComparator(orderBy, orderDir);
-            if (cmp != null) {
-                stats.sort(cmp);
-            }
-        }
-    }
-
-    private Item itemOrNull(int itemId) {
-        try {
-            return itemRepository.getItem(itemId);
-        } catch (IOException e) {
-            Item item = new Item();
-            item.setItemId(itemId);
-            item.setName("BAD_ITEM");
-            item.setIconUrl("javascript:void(0);");
-            return item;
+            return this.itemRepository.listStatistics(order, 0, pageSize);
         }
     }
 

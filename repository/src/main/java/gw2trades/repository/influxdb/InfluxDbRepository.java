@@ -1,15 +1,15 @@
 package gw2trades.repository.influxdb;
 
 import gw2trades.repository.api.ItemRepository;
+import gw2trades.repository.api.Order;
 import gw2trades.repository.api.Query;
 import gw2trades.repository.api.model.*;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.FieldType;
-import org.apache.lucene.index.IndexOptions;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.document.*;
+import org.apache.lucene.index.*;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.influxdb.InfluxDB;
@@ -18,6 +18,7 @@ import org.influxdb.dto.Point;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -29,46 +30,29 @@ import java.util.List;
 public class InfluxDbRepository implements ItemRepository {
     private InfluxDbConnectionManager connectionManager;
 
-    private IndexWriter itemIndexWriter;
-    private IndexWriter latestStatisticsIndexWriter;
+    private String indexDir;
+    private IndexReader indexReader;
 
     private FieldType textField;
-    private FieldType numberField;
 
     public InfluxDbRepository(InfluxDbConnectionManager connectionManager, String indexDir) throws IOException {
         this.connectionManager = connectionManager;
 
-        textField = new FieldType();
-        textField.setStored(true);
-        textField.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS);
-        textField.setTokenized(true);
+        textField = StringField.TYPE_STORED;
 
-        numberField = new FieldType();
-        numberField.setStored(true);
-        numberField.setNumericType(FieldType.NumericType.INT);
+        this.indexDir = indexDir;
 
-        openItemIndex(indexDir);
-        openStatisticsIndex(indexDir);
+        this.indexReader = DirectoryReader.open(FSDirectory.open(Paths.get(indexDir)));
     }
 
-    private void openItemIndex(String indexDir) throws IOException {
+    private IndexWriter openIndexWriter() throws IOException {
         // TODO: correct analyzers
-        Directory directory = FSDirectory.open(Paths.get(indexDir, "items"));
+        Directory directory = FSDirectory.open(Paths.get(indexDir));
         StandardAnalyzer analyzer = new StandardAnalyzer();
         IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
         iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
 
-        this.itemIndexWriter = new IndexWriter(directory, iwc);
-    }
-
-    private void openStatisticsIndex(String indexDir) throws IOException {
-        // TODO: correct analyzers
-        Directory directory = FSDirectory.open(Paths.get(indexDir, "statistics"));
-        StandardAnalyzer analyzer = new StandardAnalyzer();
-        IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-        iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
-
-        this.latestStatisticsIndexWriter = new IndexWriter(directory, iwc);
+        return new IndexWriter(directory, iwc);
     }
 
     @Override
@@ -79,6 +63,7 @@ public class InfluxDbRepository implements ItemRepository {
                 .consistency(InfluxDB.ConsistencyLevel.ALL)
                 .build();
 
+        IndexWriter indexWriter = openIndexWriter();
         for (ItemListings listing : listings) {
             PriceStatistics buys = createStatistics(listing.getBuys());
             PriceStatistics sells = createStatistics(listing.getSells());
@@ -89,27 +74,14 @@ public class InfluxDbRepository implements ItemRepository {
             points.point(sellsPoint);
 
             Document doc = createStatsDoc(listing.getItem(), buys, sells);
-            this.latestStatisticsIndexWriter.addDocument(doc);
+            indexWriter.addDocument(doc);
         }
 
         InfluxDB influxDB = connectionManager.getConnection();
         influxDB.write(points);
 
-        this.latestStatisticsIndexWriter.commit();
-    }
-
-    @Override
-    public void store(Collection<Item> items) throws IOException {
-        for (Item item : items) {
-            Document doc = new Document();
-            doc.add(new Field("name", item.getName(), textField));
-            doc.add(new Field("iconUrl", item.getIconUrl(), textField));
-            doc.add(new Field("itemId", Integer.toString(item.getItemId()), numberField));
-            doc.add(new Field("level", Integer.toString(item.getLevel()), numberField));
-            this.itemIndexWriter.addDocument(doc);
-        }
-
-        this.itemIndexWriter.commit();
+        indexWriter.commit();
+        indexWriter.close();
     }
 
     @Override
@@ -119,9 +91,63 @@ public class InfluxDbRepository implements ItemRepository {
     }
 
     @Override
-    public Collection<ListingStatistics> listStatistics() throws IOException {
-        // TODO
-        return null;
+    public Collection<ListingStatistics> listStatistics(Order order, int fromPage, int toPage) throws IOException {
+        IndexSearcher searcher = new IndexSearcher(this.indexReader);
+
+        QueryParser parser = new QueryParser("*", new StandardAnalyzer());
+        try {
+            org.apache.lucene.search.Query query = parser.parse("*");
+
+            Sort sort = createSort(order);
+            TopDocs docs = sort != null ? searcher.search(query, Integer.MAX_VALUE, sort) : searcher.search(query, Integer.MAX_VALUE);
+            Collection<ListingStatistics> allStats = new ArrayList<>();
+            // TODO: paging
+            for (ScoreDoc scoreDoc : docs.scoreDocs) {
+                Document doc = searcher.doc(scoreDoc.doc);
+                ListingStatistics stats = toStatistics(doc);
+
+                allStats.add(stats);
+            }
+
+            return allStats;
+        } catch (ParseException e) {
+            throw new IOException(e);
+        }
+    }
+
+    private Sort createSort(Order order) {
+        if (order == null) {
+            return null;
+        }
+
+        String luceneField;
+        SortField.Type fieldType;
+
+        switch (order.getField()) {
+            case "name":
+                luceneField = "name";
+                fieldType = SortField.Type.STRING;
+                break;
+            case "highestBidder":
+                luceneField = "buys_max";
+                fieldType = SortField.Type.INT;
+                break;
+            case "lowestSeller":
+                luceneField = "sells_min";
+                fieldType = SortField.Type.INT;
+                break;
+            default:
+                luceneField = null;
+                fieldType = null;
+                break;
+            // TODO: averages
+        }
+
+        if (luceneField == null) {
+            return null;
+        }
+
+        return new Sort(new SortField(luceneField, fieldType, order.isDescending()));
     }
 
     @Override
@@ -143,23 +169,53 @@ public class InfluxDbRepository implements ItemRepository {
 
     @Override
     public void close() throws IOException {
-        this.itemIndexWriter.close();
-        this.latestStatisticsIndexWriter.close();
+        indexReader.close();
+    }
+
+    private ListingStatistics toStatistics(Document doc) {
+        ListingStatistics stats = new ListingStatistics();
+        stats.setItemId(Integer.valueOf(doc.get("itemId")));
+
+        Item item = new Item();
+        item.setItemId(stats.getItemId());
+        item.setLevel(Integer.valueOf(doc.get("level")));
+        item.setIconUrl(doc.get("iconUrl"));
+        item.setName(doc.get("name"));
+        stats.setItem(item);
+
+        PriceStatistics buys = new PriceStatistics();
+        buys.setMinPrice(Integer.valueOf(doc.get("buys_min")));
+        buys.setMaxPrice(Integer.valueOf(doc.get("buys_max")));
+        buys.setTotalAmount(Integer.valueOf(doc.get("buys_total")));
+        // TODO: avg
+
+        PriceStatistics sells = new PriceStatistics();
+        sells.setMinPrice(Integer.valueOf(doc.get("sells_min")));
+        sells.setMaxPrice(Integer.valueOf(doc.get("sells_max")));
+        sells.setTotalAmount(Integer.valueOf(doc.get("sells_total")));
+
+        stats.setBuyStatistics(buys);
+        stats.setSellStatistics(sells);
+
+        return stats;
     }
 
     private Document createStatsDoc(Item item, PriceStatistics buys, PriceStatistics sells) {
         Document doc = new Document();
         doc.add(new Field("name", item.getName(), textField));
-        doc.add(new Field("itemId", Integer.toString(item.getItemId()), numberField));
+        doc.add(new Field("iconUrl", item.getIconUrl(), textField));
+        doc.add(new IntField("level", item.getLevel(), IntField.TYPE_STORED));
+        doc.add(new IntField("itemId", item.getItemId(), IntField.TYPE_STORED));
+
         // TODO: average
 
-        doc.add(new Field("buys_min", Integer.toString(buys.getMinPrice()), numberField));
-        doc.add(new Field("buys_max", Integer.toString(buys.getMaxPrice()), numberField));
-        doc.add(new Field("buys_total", Integer.toString(buys.getTotalAmount()), numberField));
+        doc.add(new IntField("buys_min", buys.getMinPrice(), IntField.TYPE_STORED));
+        doc.add(new IntField("buys_max", buys.getMaxPrice(), IntField.TYPE_STORED));
+        doc.add(new IntField("buys_total", buys.getTotalAmount(), IntField.TYPE_STORED));
 
-        doc.add(new Field("sells_min", Integer.toString(sells.getMinPrice()), numberField));
-        doc.add(new Field("sells_max", Integer.toString(sells.getMaxPrice()), numberField));
-        doc.add(new Field("sells_total", Integer.toString(sells.getTotalAmount()), numberField));
+        doc.add(new IntField("sells_min", sells.getMinPrice(), IntField.TYPE_STORED));
+        doc.add(new IntField("sells_max", sells.getMaxPrice(), IntField.TYPE_STORED));
+        doc.add(new IntField("sells_total", sells.getTotalAmount(), IntField.TYPE_STORED));
 
         return doc;
     }
