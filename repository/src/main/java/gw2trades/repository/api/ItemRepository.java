@@ -3,6 +3,7 @@ package gw2trades.repository.api;
 import gw2trades.repository.api.model.Item;
 import gw2trades.repository.api.model.ItemListings;
 import gw2trades.repository.api.model.ListingStatistics;
+import gw2trades.repository.api.model.SearchResult;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -33,7 +34,7 @@ public interface ItemRepository {
      * @return an unordered collection of statistics
      * @throws IOException in case the repository could not be written
      */
-    Collection<ListingStatistics> listStatistics(Order order, int fromPage, int toPage) throws IOException;
+    SearchResult<ListingStatistics> listStatistics(Order order, int fromPage, int toPage) throws IOException;
 
     /**
      * Queries for statistics.

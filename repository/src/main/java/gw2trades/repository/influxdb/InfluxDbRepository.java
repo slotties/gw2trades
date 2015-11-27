@@ -93,23 +93,23 @@ public class InfluxDbRepository implements ItemRepository {
     }
 
     @Override
-    public Collection<ListingStatistics> listStatistics(Order order, int fromPage, int toPage) throws IOException {
+    public SearchResult<ListingStatistics> listStatistics(Order order, int fromIdx, int toIdx) throws IOException {
         IndexSearcher searcher = new IndexSearcher(this.indexReader);
 
         MatchAllDocsQuery query = new MatchAllDocsQuery();
         Sort sort = createSort(order);
 
         TopDocs docs = sort != null ? searcher.search(query, Integer.MAX_VALUE, sort) : searcher.search(query, Integer.MAX_VALUE);
-        Collection<ListingStatistics> allStats = new ArrayList<>();
+        List<ListingStatistics> allStats = new ArrayList<>();
         // TODO: paging
-        for (ScoreDoc scoreDoc : docs.scoreDocs) {
-            Document doc = searcher.doc(scoreDoc.doc);
+        for (int i = fromIdx; i < toIdx; i++) {
+            Document doc = searcher.doc(docs.scoreDocs[i].doc);
             ListingStatistics stats = toStatistics(doc);
 
             allStats.add(stats);
         }
 
-        return allStats;
+        return new SearchResult<>(allStats, docs.totalHits);
     }
 
     private Sort createSort(Order order) {
