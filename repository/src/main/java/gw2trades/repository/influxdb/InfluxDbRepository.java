@@ -117,34 +117,29 @@ public class InfluxDbRepository implements ItemRepository {
             return null;
         }
 
-        String luceneField;
-        SortField.Type fieldType;
+        SortField sortField;
 
         switch (order.getField()) {
             case "name":
-                luceneField = "name";
-                fieldType = SortField.Type.STRING;
+                sortField = new SortField("name", SortField.Type.STRING, order.isDescending());
                 break;
             case "highestBidder":
-                luceneField = "buys_max";
-                fieldType = SortField.Type.INT;
+                sortField = new SortedNumericSortField("buys_max", SortField.Type.INT, order.isDescending());
                 break;
             case "lowestSeller":
-                luceneField = "sells_min";
-                fieldType = SortField.Type.INT;
+                sortField = new SortedNumericSortField("sells_min", SortField.Type.INT, order.isDescending());
                 break;
             default:
-                luceneField = null;
-                fieldType = null;
+                sortField = null;
                 break;
             // TODO: averages
         }
 
-        if (luceneField == null) {
+        if (sortField == null) {
             return null;
         }
 
-        return new Sort(new SortField(luceneField, fieldType, order.isDescending()));
+        return new Sort(sortField);
     }
 
     @Override
@@ -211,16 +206,16 @@ public class InfluxDbRepository implements ItemRepository {
         doc.add(new IntField("buys_min", buys.getMinPrice(), IntField.TYPE_STORED));
         doc.add(new NumericDocValuesField("buys_min", buys.getMinPrice()));
         doc.add(new IntField("buys_max", buys.getMaxPrice(), IntField.TYPE_STORED));
-        doc.add(new NumericDocValuesField("buys_max", buys.getMinPrice()));
+        doc.add(new NumericDocValuesField("buys_max", buys.getMaxPrice()));
         doc.add(new IntField("buys_total", buys.getTotalAmount(), IntField.TYPE_STORED));
-        doc.add(new NumericDocValuesField("buys_total", buys.getMinPrice()));
+        doc.add(new NumericDocValuesField("buys_total", buys.getTotalAmount()));
 
         doc.add(new IntField("sells_min", sells.getMinPrice(), IntField.TYPE_STORED));
-        doc.add(new NumericDocValuesField("sells_min", buys.getMinPrice()));
+        doc.add(new NumericDocValuesField("sells_min", sells.getMinPrice()));
         doc.add(new IntField("sells_max", sells.getMaxPrice(), IntField.TYPE_STORED));
-        doc.add(new NumericDocValuesField("sells_max", buys.getMinPrice()));
+        doc.add(new NumericDocValuesField("sells_max", sells.getMaxPrice()));
         doc.add(new IntField("sells_total", sells.getTotalAmount(), IntField.TYPE_STORED));
-        doc.add(new NumericDocValuesField("sells_total", buys.getMinPrice()));
+        doc.add(new NumericDocValuesField("sells_total", sells.getTotalAmount()));
 
         return doc;
     }
