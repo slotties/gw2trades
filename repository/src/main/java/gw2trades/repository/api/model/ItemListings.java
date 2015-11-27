@@ -13,6 +13,8 @@ public class ItemListings {
     private List<ItemListing> buys;
     private List<ItemListing> sells;
 
+    private Item item;
+
     public List<ItemListing> getSells() {
         return sells;
     }
@@ -35,5 +37,13 @@ public class ItemListings {
 
     public int getItemId() {
         return itemId;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
+    public Item getItem() {
+        return item;
     }
 }

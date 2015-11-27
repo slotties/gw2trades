@@ -67,4 +67,6 @@ public interface ItemRepository {
      * @throws IOException in case the repository could not be written
      */
     ListingStatistics latestStatistics(int itemId) throws IOException;
+
+    void close() throws IOException;
 }
