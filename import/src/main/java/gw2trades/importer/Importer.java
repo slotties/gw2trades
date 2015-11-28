@@ -97,8 +97,10 @@ public class Importer {
 
     private void setupDatabase(InfluxDbConnectionManager influxDbConnectionManager) {
         InfluxDB influxDb = influxDbConnectionManager.getConnection();
-        influxDb.deleteDatabase("gw2trades");
-        // FIXME: check if database exists
-        influxDb.createDatabase("gw2trades");
+        try {
+            influxDb.createDatabase("gw2trades");
+        } catch (Exception e) {
+            LOGGER.info("Database exists already.");
+        }
     }
 }

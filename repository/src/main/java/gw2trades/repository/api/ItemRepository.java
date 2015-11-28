@@ -1,6 +1,5 @@
 package gw2trades.repository.api;
 
-import gw2trades.repository.api.model.Item;
 import gw2trades.repository.api.model.ItemListings;
 import gw2trades.repository.api.model.ListingStatistics;
 import gw2trades.repository.api.model.SearchResult;

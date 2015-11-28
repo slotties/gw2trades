@@ -4,6 +4,8 @@ import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.api.Order;
 import gw2trades.repository.api.Query;
 import gw2trades.repository.api.model.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.*;
 import org.apache.lucene.index.*;
@@ -14,12 +16,16 @@ import org.apache.lucene.util.BytesRef;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
+import org.influxdb.dto.QueryResult;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This repository implementation writes data into an Influx DB. Every item receives its own series.
@@ -27,6 +33,9 @@ import java.util.List;
  * @author Stefan Lotties (slotties@gmail.com)
  */
 public class InfluxDbRepository implements ItemRepository {
+    private static final Logger LOGGER = LogManager.getLogger(InfluxDbRepository.class);
+
+    private static final String INFLUX_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     private static final FieldType DOUBLE_FIELD_TYPE_STORED_SORTED = new FieldType();
 
     static {
@@ -83,10 +92,12 @@ public class InfluxDbRepository implements ItemRepository {
         }
 
         InfluxDB influxDB = connectionManager.getConnection();
-        influxDB.write(points);
-
-        indexWriter.commit();
-        indexWriter.close();
+        try {
+            influxDB.write(points);
+            indexWriter.commit();
+        } finally {
+            indexWriter.close();
+        }
     }
 
     @Override
@@ -169,8 +180,66 @@ public class InfluxDbRepository implements ItemRepository {
 
     @Override
     public List<ListingStatistics> getHistory(int itemId, long fromTimestamp, long toTimestamp) throws IOException {
-        // TODO
-        return null;
+        InfluxDB influxDB = connectionManager.getConnection();
+        org.influxdb.dto.Query query = new org.influxdb.dto.Query(
+                "select time, " +
+                        "buys_avg, buys_max, buys_min, buys_total, " +
+                        "sells_avg, sells_max, sells_min, sells_total, " +
+                        "profit " +
+                        "from item_" + itemId,
+                "gw2trades"
+        );
+        QueryResult results = influxDB.query(query);
+        List<ListingStatistics> allStats = new ArrayList<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(INFLUX_DATE_FORMAT);
+
+        for (QueryResult.Result result : results.getResults()) {
+            for (QueryResult.Series series : result.getSeries()) {
+                List<List<Object>> values = series.getValues();
+                List<ListingStatistics> seriesStats = values.stream()
+                        .map(obj -> {
+                            PriceStatistics buys = new PriceStatistics();
+                            PriceStatistics sells = new PriceStatistics();
+                            ListingStatistics stats = new ListingStatistics();
+                            stats.setBuyStatistics(buys);
+                            stats.setSellStatistics(sells);
+
+                            stats.setItemId(itemId);
+                            try {
+                                stats.setTimestamp(dateFormat.parse((String) obj.get(0)).getTime());
+                            } catch (ParseException e) {
+                                LOGGER.warn("Could not parse date string {}", obj.get(0), e);
+                            }
+
+                            buys.setAverage(influxDouble(obj.get(1)));
+                            buys.setMaxPrice(influxInt(obj.get(2)));
+                            buys.setMinPrice(influxInt(obj.get(3)));
+                            buys.setTotalAmount(influxInt(obj.get(4)));
+
+                            sells.setAverage(influxDouble(obj.get(5)));
+                            sells.setMaxPrice(influxInt(obj.get(6)));
+                            sells.setMinPrice(influxInt(obj.get(7)));
+                            sells.setTotalAmount(influxInt(obj.get(8)));
+
+                            stats.setProfit(influxInt(obj.get(9)));
+
+                            return stats;
+                        })
+                        .collect(Collectors.toList());
+
+                allStats.addAll(seriesStats);
+            }
+        }
+
+        return allStats;
+    }
+
+    private double influxDouble(Object v) {
+        return ((Number) v).doubleValue();
+    }
+
+    private int influxInt(Object v) {
+        return ((Number) v).intValue();
     }
 
     @Override

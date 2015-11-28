@@ -4,6 +4,7 @@ dependencies {
     compile 'org.apache.lucene:lucene-core:5.3.1'
     compile 'org.apache.lucene:lucene-analyzers-common:5.3.1'
     compile 'org.apache.lucene:lucene-queryparser:5.3.1'
+    compile 'org.apache.logging.log4j:log4j-api:2.4.1'
 
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
     testCompile 'commons-io:commons-io:2.4'
