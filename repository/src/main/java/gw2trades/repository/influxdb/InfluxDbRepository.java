@@ -181,8 +181,16 @@ public class InfluxDbRepository implements ItemRepository {
 
     @Override
     public ListingStatistics latestStatistics(int itemId) throws IOException {
-        // TODO
-        return null;
+        IndexSearcher searcher = new IndexSearcher(this.indexReader);
+
+        TermQuery query = new TermQuery(new Term("itemId", Integer.toString(itemId)));
+        TopDocs docs = searcher.search(query, 1);
+        if (docs.totalHits < 1) {
+            return null;
+        }
+
+        Document doc = searcher.doc(docs.scoreDocs[0].doc);
+        return toStatistics(doc);
     }
 
     @Override
@@ -228,7 +236,7 @@ public class InfluxDbRepository implements ItemRepository {
 
         doc.add(new StringField("iconUrl", item.getIconUrl(), Field.Store.YES));
         doc.add(new IntField("level", item.getLevel(), IntField.TYPE_STORED));
-        doc.add(new IntField("itemId", item.getItemId(), IntField.TYPE_STORED));
+        doc.add(new StringField("itemId", Integer.toString(item.getItemId()), Field.Store.YES));
 
         doc.add(new IntField("buys_min", buys.getMinPrice(), IntField.TYPE_STORED));
         doc.add(new NumericDocValuesField("buys_min", buys.getMinPrice()));
