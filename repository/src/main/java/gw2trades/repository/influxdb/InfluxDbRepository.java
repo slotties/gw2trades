@@ -90,12 +90,6 @@ public class InfluxDbRepository implements ItemRepository {
     }
 
     @Override
-    public Item getItem(int itemId) throws IOException {
-        // TODO
-        return null;
-    }
-
-    @Override
     public SearchResult<ListingStatistics> listStatistics(Query query, Order order, int fromIdx, int toIdx) throws IOException {
         IndexSearcher searcher = new IndexSearcher(this.indexReader);
 

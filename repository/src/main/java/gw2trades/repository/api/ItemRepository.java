@@ -22,14 +22,6 @@ public interface ItemRepository {
     void store(Collection<ItemListings> listings, long timestamp) throws IOException;
 
     /**
-     * Returns an item by its ID.
-     * @param itemId an item ID
-     * @return null when the item was not found
-     * @throws IOException in case the repository could not be written
-     */
-    Item getItem(int itemId) throws IOException;
-
-    /**
      * Returns all statistics.
      * @return an unordered collection of statistics
      * @throws IOException in case the repository could not be written
