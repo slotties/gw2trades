@@ -6,10 +6,7 @@ import gw2trades.repository.api.Query;
 import gw2trades.repository.api.model.*;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.*;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.*;
 import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -30,20 +27,25 @@ import java.util.List;
  * @author Stefan Lotties (slotties@gmail.com)
  */
 public class InfluxDbRepository implements ItemRepository {
+    private static final FieldType DOUBLE_FIELD_TYPE_STORED_SORTED = new FieldType();
+    static {
+        DOUBLE_FIELD_TYPE_STORED_SORTED.setTokenized(true);
+        DOUBLE_FIELD_TYPE_STORED_SORTED.setOmitNorms(true);
+        DOUBLE_FIELD_TYPE_STORED_SORTED.setIndexOptions(IndexOptions.DOCS);
+        DOUBLE_FIELD_TYPE_STORED_SORTED.setNumericType(FieldType.NumericType.DOUBLE);
+        DOUBLE_FIELD_TYPE_STORED_SORTED.setStored(true);
+        DOUBLE_FIELD_TYPE_STORED_SORTED.setDocValuesType(DocValuesType.NUMERIC);
+        DOUBLE_FIELD_TYPE_STORED_SORTED.freeze();
+    }
+
     private InfluxDbConnectionManager connectionManager;
 
     private String indexDir;
     private IndexReader indexReader;
 
-    private FieldType textField;
-
     public InfluxDbRepository(InfluxDbConnectionManager connectionManager, String indexDir) throws IOException {
         this.connectionManager = connectionManager;
-
-        textField = StringField.TYPE_STORED;
-
         this.indexDir = indexDir;
-
         this.indexReader = DirectoryReader.open(FSDirectory.open(Paths.get(indexDir)));
     }
 
@@ -70,10 +72,8 @@ public class InfluxDbRepository implements ItemRepository {
             PriceStatistics buys = createStatistics(listing.getBuys());
             PriceStatistics sells = createStatistics(listing.getSells());
 
-            Point buysPoint = createPoint(listing.getItemId(), "buys", buys);
-            Point sellsPoint = createPoint(listing.getItemId(), "sells", sells);
-            points.point(buysPoint);
-            points.point(sellsPoint);
+            Point dataPoint = createPoint(listing.getItem(), buys, sells);
+            points.point(dataPoint);
 
             Document doc = createStatsDoc(listing.getItem(), buys, sells);
             indexWriter.addDocument(doc);
@@ -101,7 +101,6 @@ public class InfluxDbRepository implements ItemRepository {
 
         TopDocs docs = sort != null ? searcher.search(query, Integer.MAX_VALUE, sort) : searcher.search(query, Integer.MAX_VALUE);
         List<ListingStatistics> allStats = new ArrayList<>();
-        // TODO: paging
         for (int i = fromIdx; i < toIdx; i++) {
             Document doc = searcher.doc(docs.scoreDocs[i].doc);
             ListingStatistics stats = toStatistics(doc);
@@ -129,10 +128,15 @@ public class InfluxDbRepository implements ItemRepository {
             case "lowestSeller":
                 sortField = new SortedNumericSortField("sells_min", SortField.Type.INT, order.isDescending());
                 break;
+            case "avgBidder":
+                sortField = new SortedNumericSortField("buys_avg", SortField.Type.DOUBLE, order.isDescending());
+                break;
+            case "avgSeller":
+                sortField = new SortedNumericSortField("sells_avg", SortField.Type.DOUBLE, order.isDescending());
+                break;
             default:
                 sortField = null;
                 break;
-            // TODO: averages
         }
 
         if (sortField == null) {
@@ -179,12 +183,13 @@ public class InfluxDbRepository implements ItemRepository {
         buys.setMinPrice(Integer.valueOf(doc.get("buys_min")));
         buys.setMaxPrice(Integer.valueOf(doc.get("buys_max")));
         buys.setTotalAmount(Integer.valueOf(doc.get("buys_total")));
-        // TODO: avg
+        buys.setAverage(Double.valueOf(doc.get("buys_avg")));
 
         PriceStatistics sells = new PriceStatistics();
         sells.setMinPrice(Integer.valueOf(doc.get("sells_min")));
         sells.setMaxPrice(Integer.valueOf(doc.get("sells_max")));
         sells.setTotalAmount(Integer.valueOf(doc.get("sells_total")));
+        sells.setAverage(Double.valueOf(doc.get("sells_avg")));
 
         stats.setBuyStatistics(buys);
         stats.setSellStatistics(sells);
@@ -194,14 +199,12 @@ public class InfluxDbRepository implements ItemRepository {
 
     private Document createStatsDoc(Item item, PriceStatistics buys, PriceStatistics sells) {
         Document doc = new Document();
-        doc.add(new Field("name", item.getName(), textField));
+        doc.add(new StringField("name", item.getName(), Field.Store.YES));
         doc.add(new SortedDocValuesField("name", new BytesRef(item.getName())));
 
-        doc.add(new Field("iconUrl", item.getIconUrl(), textField));
+        doc.add(new StringField("iconUrl", item.getIconUrl(), Field.Store.YES));
         doc.add(new IntField("level", item.getLevel(), IntField.TYPE_STORED));
         doc.add(new IntField("itemId", item.getItemId(), IntField.TYPE_STORED));
-
-        // TODO: average
 
         doc.add(new IntField("buys_min", buys.getMinPrice(), IntField.TYPE_STORED));
         doc.add(new NumericDocValuesField("buys_min", buys.getMinPrice()));
@@ -209,6 +212,7 @@ public class InfluxDbRepository implements ItemRepository {
         doc.add(new NumericDocValuesField("buys_max", buys.getMaxPrice()));
         doc.add(new IntField("buys_total", buys.getTotalAmount(), IntField.TYPE_STORED));
         doc.add(new NumericDocValuesField("buys_total", buys.getTotalAmount()));
+        doc.add(new DoubleField("buys_avg", buys.getAverage(), DOUBLE_FIELD_TYPE_STORED_SORTED));
 
         doc.add(new IntField("sells_min", sells.getMinPrice(), IntField.TYPE_STORED));
         doc.add(new NumericDocValuesField("sells_min", sells.getMinPrice()));
@@ -216,16 +220,23 @@ public class InfluxDbRepository implements ItemRepository {
         doc.add(new NumericDocValuesField("sells_max", sells.getMaxPrice()));
         doc.add(new IntField("sells_total", sells.getTotalAmount(), IntField.TYPE_STORED));
         doc.add(new NumericDocValuesField("sells_total", sells.getTotalAmount()));
+        doc.add(new DoubleField("sells_avg", sells.getAverage(), DOUBLE_FIELD_TYPE_STORED_SORTED));
 
         return doc;
     }
 
-    private Point createPoint(int itemId, String type, PriceStatistics stats) {
-        return Point.measurement("item_" + itemId + "_" + type)
-                .field("minPrice", stats.getMinPrice())
-                .field("maxPrice", stats.getMaxPrice())
-                .field("avgPrice", stats.getAverage())
-                .field("totalItems", stats.getTotalAmount())
+    private Point createPoint(Item item, PriceStatistics buys, PriceStatistics sells) {
+        return Point.measurement("item_" + item.getItemId())
+
+                .field("buys_min", buys.getMinPrice())
+                .field("buys_max", buys.getMaxPrice())
+                .field("buys_avg", buys.getAverage())
+                .field("buys_total", buys.getTotalAmount())
+
+                .field("sells_min", sells.getMinPrice())
+                .field("sells_max", sells.getMaxPrice())
+                .field("sells_avg", sells.getAverage())
+                .field("sells_total", sells.getTotalAmount())
                 .build();
     }
 
