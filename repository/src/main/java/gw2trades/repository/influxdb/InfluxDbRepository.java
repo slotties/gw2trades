@@ -10,7 +10,6 @@ import org.apache.lucene.index.*;
 import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.BytesRef;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
@@ -28,6 +27,7 @@ import java.util.List;
  */
 public class InfluxDbRepository implements ItemRepository {
     private static final FieldType DOUBLE_FIELD_TYPE_STORED_SORTED = new FieldType();
+
     static {
         DOUBLE_FIELD_TYPE_STORED_SORTED.setTokenized(true);
         DOUBLE_FIELD_TYPE_STORED_SORTED.setOmitNorms(true);
@@ -93,15 +93,15 @@ public class InfluxDbRepository implements ItemRepository {
     }
 
     @Override
-    public SearchResult<ListingStatistics> listStatistics(Order order, int fromIdx, int toIdx) throws IOException {
+    public SearchResult<ListingStatistics> listStatistics(Query query, Order order, int fromIdx, int toIdx) throws IOException {
         IndexSearcher searcher = new IndexSearcher(this.indexReader);
 
-        MatchAllDocsQuery query = new MatchAllDocsQuery();
+        org.apache.lucene.search.Query luceneQuery = createLuceneQuery(query);
         Sort sort = createSort(order);
 
-        TopDocs docs = sort != null ? searcher.search(query, Integer.MAX_VALUE, sort) : searcher.search(query, Integer.MAX_VALUE);
+        TopDocs docs = sort != null ? searcher.search(luceneQuery, Integer.MAX_VALUE, sort) : searcher.search(luceneQuery, Integer.MAX_VALUE);
         List<ListingStatistics> allStats = new ArrayList<>();
-        for (int i = fromIdx; i < toIdx; i++) {
+        for (int i = fromIdx; i < toIdx && i < docs.scoreDocs.length; i++) {
             Document doc = searcher.doc(docs.scoreDocs[i].doc);
             ListingStatistics stats = toStatistics(doc);
 
@@ -109,6 +109,27 @@ public class InfluxDbRepository implements ItemRepository {
         }
 
         return new SearchResult<>(allStats, docs.totalHits);
+    }
+
+    private org.apache.lucene.search.Query createLuceneQuery(Query query) {
+        org.apache.lucene.search.Query luceneQuery = null;
+        if (query != null) {
+            if (query.getName() != null && !query.getName().trim().isEmpty()) {
+                String[] words = query.getName().split(" ");
+                BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
+                for (String word : words) {
+                    booleanQuery.add(new TermQuery(new Term("name", word)), BooleanClause.Occur.SHOULD);
+                }
+
+                luceneQuery = booleanQuery.build();
+            }
+        }
+
+        if (luceneQuery == null) {
+            luceneQuery = new MatchAllDocsQuery();
+        }
+
+        return luceneQuery;
     }
 
     private Sort createSort(Order order) {
@@ -144,11 +165,6 @@ public class InfluxDbRepository implements ItemRepository {
         }
 
         return new Sort(sortField);
-    }
-
-    @Override
-    public Collection<ListingStatistics> queryStatistics(Query query) throws IOException {
-        return null;
     }
 
     @Override
@@ -199,8 +215,7 @@ public class InfluxDbRepository implements ItemRepository {
 
     private Document createStatsDoc(Item item, PriceStatistics buys, PriceStatistics sells) {
         Document doc = new Document();
-        doc.add(new StringField("name", item.getName(), Field.Store.YES));
-        doc.add(new SortedDocValuesField("name", new BytesRef(item.getName())));
+        doc.add(new TextField("name", item.getName(), Field.Store.YES));
 
         doc.add(new StringField("iconUrl", item.getIconUrl(), Field.Store.YES));
         doc.add(new IntField("level", item.getLevel(), IntField.TYPE_STORED));

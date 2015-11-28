@@ -34,15 +34,7 @@ public interface ItemRepository {
      * @return an unordered collection of statistics
      * @throws IOException in case the repository could not be written
      */
-    SearchResult<ListingStatistics> listStatistics(Order order, int fromPage, int toPage) throws IOException;
-
-    /**
-     * Queries for statistics.
-     * @param  query a query, must not be null
-     * @return all statistics matching the given query, never null.
-     * @throws IOException in case the repository could not be written
-     */
-    Collection<ListingStatistics> queryStatistics(Query query) throws IOException;
+    SearchResult<ListingStatistics> listStatistics(Query query, Order order, int fromPage, int toPage) throws IOException;
 
     /**
      * Returns the history for an item ordered by its timestamp (oldest to newest).

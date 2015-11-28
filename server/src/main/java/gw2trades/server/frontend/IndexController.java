@@ -71,7 +71,6 @@ public class IndexController {
         int fromPage = (forPage - 1) * this.pageSize;
         int toPage = fromPage + this.pageSize;
 
-        // TODO: delegate query
-        return this.itemRepository.listStatistics(order, fromPage, toPage);
+        return this.itemRepository.listStatistics(query, order, fromPage, toPage);
     }
 }
