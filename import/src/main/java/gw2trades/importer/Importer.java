@@ -42,7 +42,7 @@ public class Importer {
 
         String indexDir = config.required("index", "dir");
 
-        ItemRepository repository = new InfluxDbRepository(connectionManager, indexDir);
+        ItemRepository repository = new InfluxDbRepository(connectionManager, indexDir, false);
 
         int chunkSize = Integer.valueOf(config.required("importer", "chunkSize"));
         int threadCount = Integer.valueOf(config.required("importer", "threads"));

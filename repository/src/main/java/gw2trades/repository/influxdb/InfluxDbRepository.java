@@ -53,10 +53,12 @@ public class InfluxDbRepository implements ItemRepository {
     private String indexDir;
     private IndexReader indexReader;
 
-    public InfluxDbRepository(InfluxDbConnectionManager connectionManager, String indexDir) throws IOException {
+    public InfluxDbRepository(InfluxDbConnectionManager connectionManager, String indexDir, boolean enableReading) throws IOException {
         this.connectionManager = connectionManager;
         this.indexDir = indexDir;
-        this.indexReader = DirectoryReader.open(FSDirectory.open(Paths.get(indexDir)));
+        if (enableReading) {
+            this.indexReader = DirectoryReader.open(FSDirectory.open(Paths.get(indexDir)));
+        }
     }
 
     private IndexWriter openIndexWriter() throws IOException {

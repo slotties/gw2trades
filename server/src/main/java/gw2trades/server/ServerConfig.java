@@ -47,7 +47,7 @@ public class ServerConfig extends WebMvcConfigurerAdapter {
         String indexDir = this.environment.getProperty("index.dir");
         LOGGER.info("Using {} as index directory.", indexDir);
 
-        return new InfluxDbRepository(connectionManager, indexDir);
+        return new InfluxDbRepository(connectionManager, indexDir, true);
     }
 
     @Override
