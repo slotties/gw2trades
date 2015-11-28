@@ -10,6 +10,7 @@ import org.apache.lucene.index.*;
 import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.BytesRef;
 import org.influxdb.InfluxDB;
 import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
@@ -72,10 +73,12 @@ public class InfluxDbRepository implements ItemRepository {
             PriceStatistics buys = createStatistics(listing.getBuys());
             PriceStatistics sells = createStatistics(listing.getSells());
 
-            Point dataPoint = createPoint(listing.getItem(), buys, sells);
+            int profit = sells.getMinPrice() - buys.getMaxPrice();
+
+            Point dataPoint = createPoint(listing.getItem(), buys, sells, profit);
             points.point(dataPoint);
 
-            Document doc = createStatsDoc(listing.getItem(), buys, sells);
+            Document doc = createStatsDoc(listing.getItem(), buys, sells, profit);
             indexWriter.addDocument(doc);
         }
 
@@ -144,16 +147,19 @@ public class InfluxDbRepository implements ItemRepository {
                 sortField = new SortField("name", SortField.Type.STRING, order.isDescending());
                 break;
             case "highestBidder":
-                sortField = new SortedNumericSortField("buys_max", SortField.Type.INT, order.isDescending());
+                sortField = new SortedNumericSortField("buys_max", SortField.Type.INT, !order.isDescending());
                 break;
             case "lowestSeller":
-                sortField = new SortedNumericSortField("sells_min", SortField.Type.INT, order.isDescending());
+                sortField = new SortedNumericSortField("sells_min", SortField.Type.INT, !order.isDescending());
                 break;
             case "avgBidder":
-                sortField = new SortedNumericSortField("buys_avg", SortField.Type.DOUBLE, order.isDescending());
+                sortField = new SortedNumericSortField("buys_avg", SortField.Type.DOUBLE, !order.isDescending());
                 break;
             case "avgSeller":
-                sortField = new SortedNumericSortField("sells_avg", SortField.Type.DOUBLE, order.isDescending());
+                sortField = new SortedNumericSortField("sells_avg", SortField.Type.DOUBLE, !order.isDescending());
+                break;
+            case "profit":
+                sortField = new SortedNumericSortField("profit", SortField.Type.INT, !order.isDescending());
                 break;
             default:
                 sortField = null;
@@ -210,12 +216,15 @@ public class InfluxDbRepository implements ItemRepository {
         stats.setBuyStatistics(buys);
         stats.setSellStatistics(sells);
 
+        stats.setProfit(Integer.valueOf(doc.get("profit")));
+
         return stats;
     }
 
-    private Document createStatsDoc(Item item, PriceStatistics buys, PriceStatistics sells) {
+    private Document createStatsDoc(Item item, PriceStatistics buys, PriceStatistics sells, int profit) {
         Document doc = new Document();
         doc.add(new TextField("name", item.getName(), Field.Store.YES));
+        doc.add(new SortedDocValuesField("name", new BytesRef(item.getName())));
 
         doc.add(new StringField("iconUrl", item.getIconUrl(), Field.Store.YES));
         doc.add(new IntField("level", item.getLevel(), IntField.TYPE_STORED));
@@ -237,10 +246,13 @@ public class InfluxDbRepository implements ItemRepository {
         doc.add(new NumericDocValuesField("sells_total", sells.getTotalAmount()));
         doc.add(new DoubleField("sells_avg", sells.getAverage(), DOUBLE_FIELD_TYPE_STORED_SORTED));
 
+        doc.add(new IntField("profit", profit, IntField.TYPE_STORED));
+        doc.add(new NumericDocValuesField("profit", profit));
+
         return doc;
     }
 
-    private Point createPoint(Item item, PriceStatistics buys, PriceStatistics sells) {
+    private Point createPoint(Item item, PriceStatistics buys, PriceStatistics sells, int profit) {
         return Point.measurement("item_" + item.getItemId())
 
                 .field("buys_min", buys.getMinPrice())
@@ -252,6 +264,9 @@ public class InfluxDbRepository implements ItemRepository {
                 .field("sells_max", sells.getMaxPrice())
                 .field("sells_avg", sells.getAverage())
                 .field("sells_total", sells.getTotalAmount())
+
+                .field("profit", profit)
+
                 .build();
     }
 

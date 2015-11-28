@@ -36,6 +36,10 @@
             #orderIcon('name')
         </th>
         <th>
+            <a href="#orderLink("profit")">Profit</a>
+            #orderIcon('profit')
+        </th>
+        <th>
             <a href="#orderLink("highestBidder")">Highest bidder</a>
             #orderIcon('highestBidder')
         </th>
@@ -60,6 +64,7 @@
                 ${stats.item.name} #if($stats.item.level > 0)(${stats.item.level})#end
             </a>
         </td>
+        <td>#price(${stats.profit})</td>
         <td>#price(${stats.buyStatistics.maxPrice})</td>
         <td>#price($mathtool.floor($stats.buyStatistics.average))</td>
         <td>#price(${stats.sellStatistics.minPrice})</td>

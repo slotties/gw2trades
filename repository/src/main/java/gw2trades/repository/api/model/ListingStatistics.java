@@ -15,6 +15,15 @@ public class ListingStatistics {
     private long timestamp;
     private PriceStatistics buyStatistics;
     private PriceStatistics sellStatistics;
+    private int profit;
+
+    public void setProfit(int profit) {
+        this.profit = profit;
+    }
+
+    public int getProfit() {
+        return profit;
+    }
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
