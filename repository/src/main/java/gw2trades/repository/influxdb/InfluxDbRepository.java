@@ -260,7 +260,9 @@ public class InfluxDbRepository implements ItemRepository {
 
     @Override
     public void close() throws IOException {
-        indexReader.close();
+        if (indexReader != null) {
+            indexReader.close();
+        }
     }
 
     private ListingStatistics toStatistics(Document doc) {
