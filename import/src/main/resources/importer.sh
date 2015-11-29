@@ -3,7 +3,7 @@
 LOG_DIR=$1
 set CLASSPATH=
 
-for i in lib/*; do
+for i in `dirname $0`/lib/*; do
         CLASSPATH=$CLASSPATH:$i
 done
 
