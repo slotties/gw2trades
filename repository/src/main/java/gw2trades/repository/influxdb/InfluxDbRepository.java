@@ -24,6 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,7 @@ public class InfluxDbRepository implements ItemRepository {
     private static final Logger LOGGER = LogManager.getLogger(InfluxDbRepository.class);
 
     private static final String INFLUX_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    private static final String INFLUX_QUERY_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
     private static final FieldType DOUBLE_FIELD_TYPE_STORED_SORTED = new FieldType();
 
     static {
@@ -182,13 +184,17 @@ public class InfluxDbRepository implements ItemRepository {
 
     @Override
     public List<ListingStatistics> getHistory(int itemId, long fromTimestamp, long toTimestamp) throws IOException {
+        SimpleDateFormat influxDateFormat = new SimpleDateFormat(INFLUX_QUERY_DATE_FORMAT);
+
         InfluxDB influxDB = connectionManager.getConnection();
         org.influxdb.dto.Query query = new org.influxdb.dto.Query(
                 "select time, " +
-                        "buys_avg, buys_max, buys_min, buys_total, " +
-                        "sells_avg, sells_max, sells_min, sells_total, " +
-                        "profit " +
-                        "from item_" + itemId,
+                        " buys_avg, buys_max, buys_min, buys_total," +
+                        " sells_avg, sells_max, sells_min, sells_total," +
+                        " profit" +
+                        " from item_" + itemId +
+                        " where time >= '" + influxDateFormat.format(new Date(fromTimestamp)) + "'" +
+                                " and time <= '" + influxDateFormat.format(new Date(toTimestamp)) + "'",
                 "gw2trades"
         );
         QueryResult results = influxDB.query(query);
@@ -196,6 +202,10 @@ public class InfluxDbRepository implements ItemRepository {
         SimpleDateFormat dateFormat = new SimpleDateFormat(INFLUX_DATE_FORMAT);
 
         for (QueryResult.Result result : results.getResults()) {
+            if (result.getSeries() == null) {
+                continue;
+            }
+
             for (QueryResult.Series series : result.getSeries()) {
                 List<List<Object>> values = series.getValues();
                 List<ListingStatistics> seriesStats = values.stream()
