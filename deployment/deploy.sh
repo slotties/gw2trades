@@ -21,5 +21,5 @@ mv $APP_DIR/gw2trades-importer-0.1-SNAPSHOT $APP_DIR/import
 cp -v $APP_DIR/conf/import.yaml $APP_DIR/import/
 chmod u+x $APP_DIR/import/*.sh
 
-rm -rf $A__DIR/server/*
+rm -rf $APP_DIR/server/*
 cp -v $SRC_DIR/server/build/libs/server-$VERSION.jar $APP_DIR/server
