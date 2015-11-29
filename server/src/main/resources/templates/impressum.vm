@@ -1,0 +1,53 @@
+<div class="page-header">
+    <h1>Impressum</h1>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Anbieter / Provider</h3>
+    </div>
+    <div class="panel-body">
+        Stefan Lotties<br>
+        Helmholtzstr. 62<br>
+        50825 K&ooml;ln
+        Deutschland / Germany
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Kontakt / Contact</h3>
+    </div>
+    <div class="panel-body">
+        e-Mail: slotties (at) gmail (punkt) com<br>
+        Website: www.gw2trades.de
+    </div>
+</div>
+
+<div class="page-header">
+    <h1>Datenschutzerkl&auml;rung / Privacy statement</h1>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Deutsch</h3>
+    </div>
+    <div class="panel-body">
+        Der Webserver schreibt Logdateien mit den Zugriffen und den IP-Adressen der Zugreifer. Diese dienen der Fehlersuche im Krisenfall und werden ansonsten nicht ausgewertet.
+        <br>
+        Abgesehen davon werden keine Daten erhoben, gespeichert oder ausgewertet.
+        <br>
+        Die Log-Dateien werden nur sieben Tage aufbewahrt und danach nach bestem Wissen und Gewissen gel&oouml;scht.
+    </div>
+</div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">English</h3>
+    </div>
+    <div class="panel-body">
+        This web server writes access logs containing IP addresses of every user that accesses this web site. These log files are just used for research on problems.
+        <br>
+        Beside these logs no more information are logged.
+        <br>
+        The log files are removed after seven days.
+    </div>
+</div>
