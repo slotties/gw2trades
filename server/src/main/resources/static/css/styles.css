@@ -179,3 +179,7 @@ a:focus,
 .gw2-charts-y .tick line {
     display: none;
 }
+
+.text-profit {
+   color: #189D21;
+}
