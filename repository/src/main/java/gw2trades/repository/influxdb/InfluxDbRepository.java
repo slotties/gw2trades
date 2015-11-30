@@ -59,7 +59,7 @@ public class InfluxDbRepository implements ItemRepository {
         this.connectionManager = connectionManager;
         this.indexDir = indexDir;
         if (enableReading) {
-            this.indexReader = DirectoryReader.open(FSDirectory.open(Paths.get(indexDir)));
+            this.indexReader = openIndexReader();
         }
     }
 
@@ -273,6 +273,16 @@ public class InfluxDbRepository implements ItemRepository {
         if (indexReader != null) {
             indexReader.close();
         }
+    }
+
+    @Override
+    public void reopen() throws IOException {
+        close();
+        this.indexReader = openIndexReader();
+    }
+
+    private IndexReader openIndexReader() throws IOException {
+        return DirectoryReader.open(FSDirectory.open(Paths.get(indexDir)));
     }
 
     private ListingStatistics toStatistics(Document doc) {

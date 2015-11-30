@@ -46,4 +46,6 @@ public interface ItemRepository {
     ListingStatistics latestStatistics(int itemId) throws IOException;
 
     void close() throws IOException;
+
+    void reopen() throws IOException;
 }
