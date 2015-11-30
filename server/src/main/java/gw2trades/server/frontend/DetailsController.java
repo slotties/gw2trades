@@ -1,6 +1,5 @@
 package gw2trades.server.frontend;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.api.model.ListingStatistics;
 import gw2trades.server.model.SeoMeta;
@@ -17,11 +16,12 @@ import java.io.IOException;
  */
 @Controller
 public class DetailsController {
-    @Autowired
     private ItemRepository itemRepository;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    public DetailsController(ItemRepository itemRepository) {
+        this.itemRepository = itemRepository;
+    }
 
     @RequestMapping("/details/{itemId}.html")
     public ModelAndView details(@PathVariable int itemId) throws IOException {

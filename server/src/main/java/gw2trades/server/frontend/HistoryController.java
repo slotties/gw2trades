@@ -18,8 +18,12 @@ import java.util.List;
 public class HistoryController {
     static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
-    @Autowired
     private ItemRepository repository;
+
+    @Autowired
+    public HistoryController(ItemRepository itemRepository) {
+        this.repository = itemRepository;
+    }
 
     @RequestMapping(value = "/api/history/{itemId}", method = RequestMethod.GET)
     public @ResponseBody List<ListingStatistics> list(

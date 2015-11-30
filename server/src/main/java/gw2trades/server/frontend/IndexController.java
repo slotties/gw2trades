@@ -20,10 +20,14 @@ import java.io.IOException;
  */
 @Controller
 public class IndexController {
-    @Autowired
     private ItemRepository itemRepository;
 
     private int pageSize = 10;
+
+    @Autowired
+    public IndexController(ItemRepository itemRepository) {
+        this.itemRepository = itemRepository;
+    }
 
     @RequestMapping("/index.html")
     public ModelAndView index(
