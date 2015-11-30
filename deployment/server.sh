@@ -12,7 +12,7 @@ if [ ! -d "$LOG_DIR" ]; then
     echo "Could not find log directory $LOG_DIR"
     exit 1
 fi
-if [ ! -d "INDEX_DIR" ]; then
+if [ ! -d "$INDEX_DIR" ]; then
     echo "Could not find index directory $INDEX_DIR"
     exit 1
 fi
