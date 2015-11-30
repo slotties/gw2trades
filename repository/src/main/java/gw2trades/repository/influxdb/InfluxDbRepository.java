@@ -369,6 +369,9 @@ public class InfluxDbRepository implements ItemRepository {
         }
 
         int avgPrice = (amountOfPrices == 0) ? 0 : (priceTotal / amountOfPrices);
+        if (minPrice == Integer.MAX_VALUE) {
+            minPrice = 0;
+        }
 
         PriceStatistics stats = new PriceStatistics();
         stats.setAverage(avgPrice);
