@@ -21,3 +21,5 @@ IMPORT_LOG="$LOG_DIR/import_`date +%Y-%m-%d:%H:%M:%S`.log"
 
 echo Logging to $IMPORT_LOG
 bash $IMPORTER_SH "$INDEX_DIR" > $IMPORT_LOG 2>&1
+
+curl "http://localhost/admin/reopenRepository"
