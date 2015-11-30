@@ -3,7 +3,6 @@ package gw2trades.server;
 import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.influxdb.InfluxDbConnectionManager;
 import gw2trades.repository.influxdb.InfluxDbRepository;
-import org.apache.catalina.filters.RemoteAddrFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,16 +89,19 @@ public class ServerConfig extends WebMvcConfigurerAdapter {
 
         FilterRegistrationBean registration = new FilterRegistrationBean();
         registration.setFilter(filter);
-        registration.addUrlPatterns("/env");
-        registration.addUrlPatterns("/metrics");
-        registration.addUrlPatterns("/dump");
-        registration.addUrlPatterns("/configprops");
-        registration.addUrlPatterns("/mappings");
-        registration.addUrlPatterns("/autoconfig");
-        registration.addUrlPatterns("/health");
-        registration.addUrlPatterns("/trace");
-        registration.addUrlPatterns("/beans");
-        registration.addUrlPatterns("/info");
+        registration.addUrlPatterns(
+                "/env",
+                "/metrics",
+                "/dump",
+                "/configprops",
+                "/mappings",
+                "/autoconfig",
+                "/health",
+                "/trace",
+                "/beans",
+                "/info",
+                "/admin/**"
+        );
 
         return registration;
     }
