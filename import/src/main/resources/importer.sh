@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set CLASSPATH=
+CLASSPATH=
 INDEX_DIR=$1
 
 for i in `dirname $0`/lib/*; do
