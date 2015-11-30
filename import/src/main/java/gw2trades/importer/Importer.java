@@ -47,7 +47,7 @@ public class Importer {
         int chunkSize = Integer.valueOf(config.required("importer.chunkSize"));
         int threadCount = Integer.valueOf(config.required("importer.threads"));
 
-        LOGGER.info("Importing with {} threads (each {} chunks)...\n", threadCount, chunkSize);
+        LOGGER.info("Importing with {} threads (each {} chunks) into {}...\n", threadCount, chunkSize, indexDir);
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 
