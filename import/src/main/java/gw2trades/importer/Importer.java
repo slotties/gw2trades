@@ -34,18 +34,18 @@ public class Importer {
 
     public void execute() throws Exception {
         InfluxDbConnectionManager connectionManager = new InfluxDbConnectionManager(
-                config.required("influxdb", "url"),
-                config.optional("influxdb", "user").orElse(""),
-                config.optional("influxdb", "pass").orElse("")
+                config.required("influxdb.url"),
+                config.optional("influxdb.user").orElse(""),
+                config.optional("influxdb.pass").orElse("")
         );
         setupDatabase(connectionManager);
 
-        String indexDir = config.required("index", "dir");
+        String indexDir = config.required("index.dir");
 
         ItemRepository repository = new InfluxDbRepository(connectionManager, indexDir, false);
 
-        int chunkSize = Integer.valueOf(config.required("importer", "chunkSize"));
-        int threadCount = Integer.valueOf(config.required("importer", "threads"));
+        int chunkSize = Integer.valueOf(config.required("importer.chunkSize"));
+        int threadCount = Integer.valueOf(config.required("importer.threads"));
 
         LOGGER.info("Importing with {} threads (each {} chunks)...\n", threadCount, chunkSize);
 

@@ -5,11 +5,10 @@ import gw2trades.importer.dao.TradingPost;
 import gw2trades.importer.http.ApiClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
+import java.util.Properties;
 
 /**
  * The importer pulls data from the Guild Wars 2 API and writes it into the repository used by the server module.
@@ -26,7 +25,7 @@ public class Main {
         tradingPost.setApiClient(apiClient);
         tradingPost.setObjectMapper(objectMapper);
 
-        Config config = readConfig("/import.yaml");
+        Config config = readConfig("/importer.properties");
 
         Importer importer = new Importer(config, tradingPost);
         try {
@@ -38,9 +37,10 @@ public class Main {
     }
 
     private static Config readConfig(String fileName) throws IOException {
-        Yaml yamlConfig = new Yaml();
+        Properties configData = new Properties();
         try (InputStream in = Main.class.getResourceAsStream(fileName)) {
-            Map configData = (Map) yamlConfig.load(in);
+            configData.load(in);
+
             return new Config(configData);
         }
     }

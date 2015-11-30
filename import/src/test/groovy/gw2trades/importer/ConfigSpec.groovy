@@ -12,22 +12,18 @@ class ConfigSpec extends Specification {
     Config config
 
     @Unroll("required: #key")
-    def required(List<String> key, String expectedValue, boolean expectedException) {
+    def required(String key, String expectedValue, boolean expectedException) {
         given:
-        config = new Config([
-                "foo": [
-                        "bar": [
-                                "bla": "blub"
-                        ]
-                ],
-                "hehe": "hrhr"
-        ]);
+        def props = new Properties()
+        props.setProperty("foo", "bar")
+        config = new Config(props)
+        System.setProperty("bla", "blub")
 
         when:
         String value
         boolean encouteredException
         try {
-            value = config.required(key.toArray(new String[key.size()]))
+            value = config.required(key)
             encouteredException = false
         } catch (IllegalArgumentException e) {
             value = null
@@ -39,40 +35,30 @@ class ConfigSpec extends Specification {
         value == expectedValue
 
         where:
-        key                      | expectedValue | expectedException
-        ["foo"]                  | null          | true
-        ["foo", "bar"]           | null          | true
-        ["foo", "bar", "bla"]    | "blub"        | false
-        ["hehe"]                 | "hrhr"        | false
-        ["doesNotExist"]         | null          | true
-        ["does", "not", "exist"] | null          | true
+        key            | expectedValue | expectedException
+        "foo"          | "bar"         | false
+        "bla"          | "blub"        | false
+        "doesNotExist" | null          | true
     }
 
     @Unroll("optional: #key")
-    def optional(List<String> key, String expectedValue) {
+    def optional(String key, String expectedValue) {
         given:
-        config = new Config([
-                "foo": [
-                        "bar": [
-                                "bla": "blub"
-                        ]
-                ],
-                "hehe": "hrhr"
-        ])
+        def props = new Properties()
+        props.setProperty("foo", "bar")
+        config = new Config(props)
+        System.setProperty("bla", "blub")
 
         when:
-        Optional<String> value = config.optional(key.toArray(new String[key.size()]))
+        Optional<String> value = config.optional(key)
 
         then:
         value.orElse(null) == expectedValue
 
         where:
-        key                      | expectedValue
-        ["foo"]                  | null
-        ["foo", "bar"]           | null
-        ["foo", "bar", "bla"]    | "blub"
-        ["hehe"]                 | "hrhr"
-        ["doesNotExist"]         | null
-        ["does", "not", "exist"] | null
+        key       | expectedValue
+        "foo"     | "bar"
+        "foo.bar" | null
+        "bla"     | "blub"
     }
 }

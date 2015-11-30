@@ -2,43 +2,28 @@ package gw2trades.importer;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 
 /**
  * @author Stefan Lotties (slotties@gmail.com)
  */
 public final class Config {
-    private final Map<String, ?> config;
+    private final Properties config;
 
-    public Config(Map<String, ?> config) {
+    public Config(Properties config) {
         this.config = config;
     }
 
-    public String required(String... key) throws IllegalArgumentException {
-        Map<String, ?> subConfig = this.config;
-
-        for (int i = 0; i < key.length; i++) {
-            Object valueObj = subConfig.get(key[i]);
-            if (i == key.length - 1) {
-                // We got to the leaf, so we expect a String.
-                if (valueObj != null && !(valueObj instanceof Map)) {
-                    return valueObj.toString();
-                } else {
-                    throw new IllegalArgumentException();
-                }
-            } else {
-                // We got another sub config and expect a Map.
-                if (valueObj instanceof Map) {
-                    subConfig = (Map) valueObj;
-                } else {
-                    throw new IllegalArgumentException();
-                }
-            }
+    public String required(String key) throws IllegalArgumentException {
+        String value = System.getProperty(key, config.getProperty(key));
+        if (value == null) {
+            throw new IllegalArgumentException();
         }
 
-        throw new IllegalArgumentException();
+        return value;
     }
 
-    public Optional<String> optional(String... key) {
+    public Optional<String> optional(String key) {
         try {
             String value = required(key);
             return Optional.of(value);
