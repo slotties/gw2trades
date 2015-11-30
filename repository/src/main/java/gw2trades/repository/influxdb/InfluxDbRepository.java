@@ -284,6 +284,7 @@ public class InfluxDbRepository implements ItemRepository {
         item.setLevel(Integer.valueOf(doc.get("level")));
         item.setIconUrl(doc.get("iconUrl"));
         item.setName(doc.get("name"));
+        item.setRarity(doc.get("rarity"));
         stats.setItem(item);
 
         PriceStatistics buys = new PriceStatistics();
@@ -310,6 +311,9 @@ public class InfluxDbRepository implements ItemRepository {
         Document doc = new Document();
         doc.add(new TextField("name", item.getName(), Field.Store.YES));
         doc.add(new SortedDocValuesField("name", new BytesRef(item.getName())));
+
+        doc.add(new TextField("rarity", item.getRarity(), Field.Store.YES));
+        doc.add(new SortedDocValuesField("rarity", new BytesRef(item.getRarity())));
 
         doc.add(new StringField("iconUrl", item.getIconUrl(), Field.Store.YES));
         doc.add(new IntField("level", item.getLevel(), IntField.TYPE_STORED));

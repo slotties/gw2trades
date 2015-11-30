@@ -13,7 +13,8 @@ public class Item {
     private int itemId;
     @JsonProperty("icon")
     private String iconUrl;
-
+    @JsonProperty
+    private String rarity;
     private int level;
 
     public String getName() {
@@ -65,5 +66,13 @@ public class Item {
     @Override
     public String toString() {
         return this.itemId + ":" + this.name;
+    }
+
+    public String getRarity() {
+        return rarity;
+    }
+
+    public void setRarity(String rarity) {
+        this.rarity = rarity;
     }
 }
