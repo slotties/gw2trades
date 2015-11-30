@@ -9,16 +9,9 @@ if [ "$SRC_DIR" == "" ] || [ "$APP_DIR" == "" ] || [ "$VERSION" == "" ]; then
     exit 1
 fi
 
-cd $SRC_DIR || exit 1
-echo "Pulling ..."
-git pull
-
-gradle build || exit 1
-
 rm -rf $APP_DIR/import
 unzip $SRC_DIR/import/build/distributions/gw2trades-importer-$VERSION.zip -d $APP_DIR/
 mv $APP_DIR/gw2trades-importer-0.1-SNAPSHOT $APP_DIR/import
-cp -v $APP_DIR/conf/import.yaml $APP_DIR/import/
 chmod u+x $APP_DIR/import/*.sh
 
 rm -rf $APP_DIR/server/*
