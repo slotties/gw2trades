@@ -21,8 +21,6 @@ public class ApiClient {
      * @throws IOException in case the API is not accessible
      */
     public String get(String urlStr) throws IOException {
-        // TODO: implement unmarshalling
-        // TODO: respect response code?
         URL url = new URL(urlStr);
         String str;
 
