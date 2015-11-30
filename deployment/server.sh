@@ -17,7 +17,7 @@ if [ ! -d "$INDEX_DIR" ]; then
     exit 1
 fi
 
-SERVER_LOG="$LOG_DIR/server_`date +%Y-%m-%d:%H:%M:%S`.log"
+SERVER_LOG="$LOG_DIR/server_`date +%Y-%m-%d_%H-%M-%S`.log"
 SERVER_GC_LOG="$LOG_DIR/server_`date +%Y-%m-%d_%H-%M-%S`.gc"
 JAVA_OPTS="-Xms2g -Xmx2g -XX:+PrintGC -XX:+PrintGCDateStamps -Xloggc:$SERVER_GC_LOG -XX:+UseG1GC"
 
