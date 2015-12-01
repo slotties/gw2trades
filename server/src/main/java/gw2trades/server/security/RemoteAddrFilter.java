@@ -1,4 +1,4 @@
-package gw2trades.server;
+package gw2trades.server.security;
 
 import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.comet.CometFilterChain;

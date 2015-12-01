@@ -3,6 +3,7 @@ package gw2trades.server;
 import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.influxdb.InfluxDbConnectionManager;
 import gw2trades.repository.influxdb.InfluxDbRepository;
+import gw2trades.server.security.RemoteAddrFilter;
 import gw2trades.server.security.SecurityHeadersInterceptor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
