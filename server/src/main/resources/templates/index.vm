@@ -1,0 +1,76 @@
+<div class="page-header">
+    <h1>
+        #if ($query)
+            Listing items found (<a href="/index.html">list all</a>)
+        #else
+            Listing all items
+        #end
+    </h1>
+</div>
+
+<div class="row">
+    <form method="GET">
+        <div class="col-lg-6">
+            <div class="input-group">
+                <span class="input-group-addon">Name:</span>
+                <input name="name" type="text" class="form-control" placeholder="Name">
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <button type="submit" class="btn btn-default">Search</button>
+        </div>
+    </form>
+</div>
+
+#parse("pager.vm")
+
+<table class="table table-striped table-bordered table-hover">
+    <tr>
+        <th>&nbsp;</th>
+        <th colspan="2">Buy</th>
+        <th colspan="2">Sell</th>
+    </tr>
+    <tr>
+        <th>
+            <a href="#orderLink("name")">Item</a>
+            #orderIcon('name')
+        </th>
+        <th>
+            <a href="#orderLink("profit")">Profit</a>
+            #orderIcon('profit')
+        </th>
+        <th>
+            <a href="#orderLink("highestBidder")">Highest bidder</a>
+            #orderIcon('highestBidder')
+        </th>
+        <th>
+            <a href="#orderLink("avgBidder")">Average price</a>
+            #orderIcon('avgBidder')
+        </th>
+        <th>
+            <a href="#orderLink("lowestSeller")">Lowest seller</a>
+            #orderIcon('lowestSeller')
+        </th>
+        <th>
+            <a href="#orderLink("avgSeller")">Average price</a>
+            #orderIcon('avgSeller')
+        </th>
+    </tr>
+#foreach($stats in $listingStatistics)
+    <tr>
+        <td>
+            <img src="${stats.item.iconUrl}" alt="Icon" title="${stats.item.name}" class="item-icon-mini">
+            <a href="/details/${stats.item.itemId}.html" class="rarity-${stats.item.rarity.toLowerCase()}">
+                ${stats.item.name} #if($stats.item.level > 0)(${stats.item.level})#end
+            </a>
+        </td>
+        <td>#price(${stats.profit})</td>
+        <td>#price(${stats.buyStatistics.maxPrice})</td>
+        <td>#price($mathtool.floor($stats.buyStatistics.average))</td>
+        <td>#price(${stats.sellStatistics.minPrice})</td>
+        <td>#price($mathtool.floor($stats.sellStatistics.average))</td>
+    </tr>
+#end
+</table>
+
+#parse("pager.vm")

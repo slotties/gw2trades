@@ -1,0 +1,18 @@
+#macro(price $coins)
+    #set($price = $gw2.price($mathtool.abs($coins)))
+    #if($coins < 0)<span class="currency-negative">-</span>#end
+    #if($price.goldCoins > 0)<span class="currency-gold">${price.goldCoins}</span>#end
+    #if($price.silverCoins > 0 || $price.goldCoins > 0)<span class="currency-silver">${price.silverCoins}</span>#end
+    <span class="currency-copper">${price.copperCoins}</span>
+#end
+
+#macro(indexPagerLink $page)?page=${page}&amp;orderBy=$!{orderBy}&amp;orderDir=$!{orderDir}#end
+
+#macro(orderLink $whenOrderBy)?page=$!{currentPage}&amp;orderBy=${whenOrderBy}#if($whenOrderBy == $orderBy && $orderDir=="asc")&amp;orderDir=desc#else&amp;orderDir=asc#end#end
+#macro(orderIcon $whenOrderBy)
+    #if($orderBy == $whenOrderBy && $orderDir == 'asc')
+        <i class="glyphicon glyphicon-arrow-down"></i>
+    #elseif($orderBy == $whenOrderBy)
+        <i class="glyphicon glyphicon-arrow-up"></i>
+    #end
+#end
