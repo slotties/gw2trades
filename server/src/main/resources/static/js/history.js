@@ -93,7 +93,7 @@
                     x = self.x(d.timestamp);
 
                 self.lines.forEach(function(line) {
-                    line.focus.attr("transform", "translate(" + x + "," + line.yFn(d, self.y) + ")");
+                    line.focus.attr("transform", "translate(" + x + "," + self.y(line.yFn(d)) + ")");
                 });
                 if (self.tooltip) {
                     self.tooltip.updateFn(self.tooltip.element, d);
@@ -115,7 +115,7 @@
         var x = this.x,
             y = this.y,
             yFnWrapper = function(d) {
-                return conf.yFn(d, y);
+                return y(conf.yFn(d));
             },
             line = d3.svg.line().x(this.xFn).y(yFnWrapper),
             path = this.svg.append("path").attr("class", conf.cls),
@@ -151,10 +151,38 @@
                 line.focus.style('visibility', 'hidden');
                 line.path.style('visibility', 'hidden');
             }
+
+            line.visible = showLine;
         }
     };
-    chart.prototype.update = function(data, xRange, yRange) {
+    chart.prototype.redrawChart = function(yScaleFn) {
+        if (!this.data) {
+            return;
+        }
+
+        var yScale = yScaleFn(this.data, this.lines);
+        this.y.domain(yScale);
+
+        var svg = this.svg.transition(),
+            lastDataPoint = this.data[this.data.length - 1],
+            self = this;
+
+        svg.select(".gw2-charts-x").call(this.xAxis);
+        svg.select(".gw2-charts-y").transition().call(this.yAxis).call(function(selection) {
+            selection.selectAll('text').attr('transform', 'translate(0, -8)');
+        });
+        svg.select('.grid').call(this.yGrid);
+        this.lines.forEach(function(line) {
+            line.path.attr('d', line.line(self.data));
+            if (lastDataPoint) {
+                line.lineLabel.attr("transform", "translate(" + (self.x(lastDataPoint.timestamp) + 10) + "," + self.y(line.yFn(lastDataPoint)) + ")");
+            }
+        });
+    };
+    chart.prototype.update = function(data, xRange, yRangeFn) {
         this.data = data;
+
+        var yRange = yRangeFn(this.data, this.lines);
 
         var timeDelta = xRange[1].getTime() - xRange[0].getTime(),
             // an approx. delta of days is sufficient here
@@ -172,22 +200,7 @@
         this.x.domain(xRange);
         this.y.domain(yRange);
 
-        var svg = this.svg.transition(),
-            lastDataPoint = this.data[this.data.length - 1],
-            self = this;
-
-        svg.select(".gw2-charts-x").call(this.xAxis);
-        svg.select(".gw2-charts-y").transition().call(this.yAxis).call(function(selection) {
-            selection.selectAll('text').attr('transform', 'translate(0, -8)');
-        });
-        svg.select('.grid').call(this.yGrid);
-
-        this.lines.forEach(function(line) {
-            line.path.attr('d', line.line(data));
-            if (lastDataPoint) {
-                line.lineLabel.attr("transform", "translate(" + (self.x(lastDataPoint.timestamp) + 10) + "," + line.yFn(lastDataPoint, self.y) + ")");
-            }
-        });
+        this.redrawChart(yRangeFn);
     };
 
     window.gw2charts = {
@@ -215,13 +228,16 @@
         // Cut off the milliseconds and timezone.
         return isoStr.substring(0, isoStr.length - 5);
     },
-    yScalePriceHistoryFn = function(data) {
+    yScalePriceHistoryFn = function(data, lines) {
         var maxPrice = d3.max(data, function(d) {
-            return Math.max(
-                Math.max(d.buyStatistics.maxPrice, d.sellStatistics.minPrice),
-                Math.max(d.buyStatistics.average, d.sellStatistics.average)
-                );
-            });
+            var max = 0;
+            for (var i = 0; i < lines.length; i++) {
+                if (lines[i].visible) {
+                    max = Math.max(max, lines[i].yFn(d));
+                }
+            }
+            return max;
+        });
 
         return [ 0, maxPrice * 1.1 ];
     },
@@ -259,28 +275,28 @@
         var chart = new gw2charts.Chart(d3.select("#priceHistory"), priceTickFormat);
         chart.add({
             id: 'min_sellers',
-            yFn: function(d, y) { return y(d.sellStatistics.minPrice); },
+            yFn: function(d) { return d.sellStatistics.minPrice; },
             label: 'Lowest sellers',
             cls: "gw2-history-sellers",
             focusCls: "gw2-history-sellers-focus"
         });
         chart.add({
             id: 'avg_sellers',
-            yFn: function(d, y) { return y(d.sellStatistics.average); },
+            yFn: function(d) { return d.sellStatistics.average; },
             label: 'Avg. sellers',
             cls: "gw2-history-sellers-avg",
             focusCls: "gw2-history-sellers-focus"
         });
         chart.add({
             id: 'max_buyers',
-            yFn: function(d, y) { return y(d.buyStatistics.maxPrice); },
+            yFn: function(d) { return d.buyStatistics.maxPrice; },
             label: 'Highest buyers',
             cls: "gw2-history-buyers",
             focusCls: "gw2-history-buyers-focus"
         });
         chart.add({
             id: 'avg_buyers',
-            yFn: function(d, y) { return y(d.buyStatistics.average); },
+            yFn: function(d) { return d.buyStatistics.average; },
             label: 'Avg. buyers',
             cls: "gw2-history-buyers-avg",
             focusCls: "gw2-history-buyers-focus"
@@ -297,13 +313,13 @@
     createSupplyDemandChart = function() {
         var chart = new gw2charts.Chart(d3.select("#supplyDemand"));
         chart.add({
-            yFn: function(d, y) { return y(d.sellStatistics.totalAmount); },
+            yFn: function(d) { return d.sellStatistics.totalAmount; },
             label: 'Sellers',
             cls: 'gw2-history-sellers',
             focusCls: 'gw2-history-sellers-focus'
         });
         chart.add({
-            yFn: function(d, y) { return y(d.buyStatistics.totalAmount); },
+            yFn: function(d) { return d.buyStatistics.totalAmount; },
             label: 'Buyers',
             cls: 'gw2-history-buyers',
             focusCls: 'gw2-history-buyers-focus'
@@ -339,11 +355,8 @@
             toStr = renderDate(to);
 
         d3.json('/api/history/' + gw2scope.itemId + '?from=' + fromStr + '&to=' + toStr, function(err, data) {
-            var yScale = yScalePriceHistoryFn(data);
-            priceHistory.update(data, [ from, to ], yScale);
-
-            yScale = yScaleSupplyDemandFn(data);
-            supplyDemand.update(data, [ from, to ], yScale);
+            priceHistory.update(data, [ from, to ], yScalePriceHistoryFn);
+            supplyDemand.update(data, [ from, to ], yScaleSupplyDemandFn);
         });
 
         var activeButtons = document.getElementById("chart-timeframe-selectors").querySelectorAll('button.active');
@@ -361,6 +374,7 @@
         }
 
         priceHistory.lineVisibility(btn.getAttribute('data-line'), showLine);
+        priceHistory.redrawChart(yScalePriceHistoryFn);
     };
 
     var timeframeSelectors = document.getElementById("chart-timeframe-selectors").querySelectorAll('button[data-offset]'),
