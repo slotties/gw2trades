@@ -36,7 +36,7 @@ public class AdminController {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String now = sdf.format(new Date());
 
-        mav.addObject("stats", itemRepository.listStatistics(null, null, 0, 5000));
+        mav.addObject("stats", itemRepository.listStatistics(null, null, 0, Integer.MAX_VALUE));
         mav.addObject("now", now);
 
         return mav;
