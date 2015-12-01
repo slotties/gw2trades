@@ -3,6 +3,7 @@ package gw2trades.server;
 import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.influxdb.InfluxDbConnectionManager;
 import gw2trades.repository.influxdb.InfluxDbRepository;
+import gw2trades.server.security.SecurityHeadersInterceptor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -104,5 +106,10 @@ public class ServerConfig extends WebMvcConfigurerAdapter {
         );
 
         return registration;
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new SecurityHeadersInterceptor());
     }
 }
