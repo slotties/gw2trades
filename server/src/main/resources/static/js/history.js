@@ -125,12 +125,33 @@
         focusCircle.append("circle").attr("r", 3);
 
         this.lines.push({
+            id: conf.id,
             line: line,
             path: path,
             focus: focusCircle,
             lineLabel, lineLabel,
             yFn: conf.yFn
         });
+    };
+    chart.prototype.lineVisibility = function(lineId, showLine) {
+        var line;
+        for (var i = 0; i < this.lines.length && !line; i++) {
+            if (this.lines[i].id === lineId) {
+                line = this.lines[i];
+            }
+        }
+
+        if (line) {
+            if (showLine) {
+                line.lineLabel.style('visibility', 'visible');
+                line.focus.style('visibility', 'visible');
+                line.path.style('visibility', 'visible');
+            } else {
+                line.lineLabel.style('visibility', 'hidden');
+                line.focus.style('visibility', 'hidden');
+                line.path.style('visibility', 'hidden');
+            }
+        }
     };
     chart.prototype.update = function(data, xRange, yRange) {
         this.data = data;
@@ -237,30 +258,39 @@
     createPriceHistoryChart = function() {
         var chart = new gw2charts.Chart(d3.select("#priceHistory"), priceTickFormat);
         chart.add({
+            id: 'min_sellers',
             yFn: function(d, y) { return y(d.sellStatistics.minPrice); },
             label: 'Lowest sellers',
             cls: "gw2-history-sellers",
             focusCls: "gw2-history-sellers-focus"
         });
         chart.add({
+            id: 'avg_sellers',
             yFn: function(d, y) { return y(d.sellStatistics.average); },
             label: 'Avg. sellers',
             cls: "gw2-history-sellers-avg",
             focusCls: "gw2-history-sellers-focus"
         });
         chart.add({
+            id: 'max_buyers',
             yFn: function(d, y) { return y(d.buyStatistics.maxPrice); },
             label: 'Highest buyers',
             cls: "gw2-history-buyers",
             focusCls: "gw2-history-buyers-focus"
         });
         chart.add({
+            id: 'avg_buyers',
             yFn: function(d, y) { return y(d.buyStatistics.average); },
             label: 'Avg. buyers',
             cls: "gw2-history-buyers-avg",
             focusCls: "gw2-history-buyers-focus"
         });
         chart.setupTooltip(document.getElementById('priceHistoryTooltip'), updatePriceHistoryTooltip);
+
+        chart.lineVisibility('min_sellers', false);
+        chart.lineVisibility('avg_sellers', false);
+        chart.lineVisibility('max_buyers', false);
+        chart.lineVisibility('avg_buyers', false);
 
         return chart;
     },
@@ -322,6 +352,16 @@
         }
         btn.className += ' active';
     };
+    var onLineSelectorClick = function(btn) {
+        var showLine = btn.className.indexOf('active') < 0;
+        if (showLine) {
+            btn.className += ' active';
+        } else {
+            btn.className = btn.className.replace(/active/, '');
+        }
+
+        priceHistory.lineVisibility(btn.getAttribute('data-line'), showLine);
+    };
 
     var timeframeSelectors = document.getElementById("chart-timeframe-selectors").querySelectorAll('button[data-offset]'),
         initialTimeframeSelector;
@@ -334,7 +374,24 @@
         });
     };
 
+    var lineSelectors = document.getElementById('chart-line-selectors').querySelectorAll('button[data-line]'),
+        initialLineSelectors = [];
+    for (var i = 0; i < lineSelectors.length; i++) {
+        if (lineSelectors[i].getAttribute('data-initial') === 'true') {
+            initialLineSelectors.push(lineSelectors[i]);
+        }
+
+        lineSelectors[i].addEventListener('click', function() {
+            onLineSelectorClick(this);
+        });
+    }
+
     if (initialTimeframeSelector) {
         onTimeselectorClick(initialTimeframeSelector);
+    }
+    if (initialLineSelectors) {
+        for (var i = 0; i < initialLineSelectors.length; i++) {
+            onLineSelectorClick(initialLineSelectors[i]);
+        }
     }
 })();

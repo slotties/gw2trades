@@ -85,14 +85,21 @@
     <span class="tooltip-bidder-avg">Average buyer:</span>
     <span class="avg-bidder-value"></span>
 </div>
-<div class="btn-group" role="group" id="chart-timeframe-selectors">
-    <button type="button" class="btn btn-default" data-offset="1m">1 Month</button>
-    <button type="button" class="btn btn-default" data-offset="7d" data-initial="true">1 Week</button>
-    <button type="button" class="btn btn-default" data-offset="3d">3 Days</button>
-    <button type="button" class="btn btn-default" data-offset="1d">Today</button>
+<div class="btn-toolbar" role="toolbar">
+    <div class="btn-group" role="group" id="chart-timeframe-selectors">
+        <button type="button" class="btn btn-default" data-offset="1m">1 Month</button>
+        <button type="button" class="btn btn-default" data-offset="7d" data-initial="true">1 Week</button>
+        <button type="button" class="btn btn-default" data-offset="3d">3 Days</button>
+        <button type="button" class="btn btn-default" data-offset="1d">Today</button>
+    </div>
+    <div class="btn-group" role="group" id="chart-line-selectors">
+        <button type="button" class="btn btn-default text-data-avg-sellers" data-line="avg_sellers">Avg. sellers</button>
+        <button type="button" class="btn btn-default text-data-min-sellers" data-line="min_sellers" data-initial="true">Min. sellers</button>
+        <button type="button" class="btn btn-default text-data-max-buyers" data-line="max_buyers" data-initial="true">Max. buyers</button>
+        <button type="button" class="btn btn-default text-data-avg-buyers" data-line="avg_buyers">Avg. buyers</button>
+    </div>
 </div>
-<div id="priceHistory">
-</div>
+<div id="priceHistory"></div>
 <div id="supplyDemand"></div>
 
 <script src="//d3js.org/d3.v3.min.js"></script>

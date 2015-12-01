@@ -208,3 +208,24 @@ a:focus,
 .rarity-legendary {
     color: #4C139D;
 }
+
+.btn.text-data-avg-buyers,
+.btn.text-data-avg-buyers:focus,
+.btn.text-data-avg-buyers.active {
+    color: #FE7875;
+}
+.btn.text-data-avg-sellers,
+.btn.text-data-avg-sellers:focus,
+.btn.text-data-avg-sellers.active {
+    color: #527EA5;
+}
+.btn.text-data-max-buyers,
+.btn.text-data-max-buyers:focus,
+.btn.text-data-max-buyers.active {
+    color: #C8231F;
+}
+.btn.text-data-min-sellers,
+.btn.text-data-min-sellers:focus,
+.btn.text-data-min-sellers.active {
+    color: #1C5181;
+}
