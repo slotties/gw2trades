@@ -11,7 +11,7 @@ fi
 
 rm -rf $APP_DIR/import
 unzip $SRC_DIR/import/build/distributions/gw2trades-importer-$VERSION.zip -d $APP_DIR/
-mv $APP_DIR/gw2trades-importer-0.1-SNAPSHOT $APP_DIR/import
+mv $APP_DIR/gw2trades-importer-$VERSION $APP_DIR/import
 chmod u+x $APP_DIR/import/*.sh
 
 rm -rf $APP_DIR/server/*
