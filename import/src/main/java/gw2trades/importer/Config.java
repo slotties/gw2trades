@@ -1,6 +1,5 @@
 package gw2trades.importer;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
