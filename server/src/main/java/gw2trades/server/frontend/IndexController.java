@@ -7,13 +7,16 @@ import gw2trades.repository.api.model.ListingStatistics;
 import gw2trades.repository.api.model.SearchResult;
 import gw2trades.server.model.SeoMeta;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * @author Stefan Lotties (slotties@gmail.com)
@@ -29,7 +32,24 @@ public class IndexController {
         this.itemRepository = itemRepository;
     }
 
-    @RequestMapping("/index.html")
+    @RequestMapping("/")
+    public RedirectView root(HttpServletRequest request) {
+        Locale locale = request.getLocale();
+        if (isUnknownLocale(locale)) {
+            locale = Locale.ENGLISH;
+        }
+
+        RedirectView redirectView = new RedirectView("/" + locale.getLanguage() + "/index.html");
+        redirectView.setStatusCode(HttpStatus.MOVED_PERMANENTLY);
+
+        return redirectView;
+    }
+
+    private boolean isUnknownLocale(Locale locale) {
+        return !(Locale.GERMAN.equals(locale) || Locale.ENGLISH.equals(locale));
+    }
+
+    @RequestMapping("**/index.html")
     public ModelAndView index(
             @RequestParam(required = false) String orderBy,
             @RequestParam(required = false) String orderDir,
@@ -48,7 +68,7 @@ public class IndexController {
 
         int lastPage = (int) Math.ceil((float) results.getTotalResults() / (float) this.pageSize);
 
-        model.addObject("seoMeta", new SeoMeta("List of all items"));
+        model.addObject("seoMeta", new SeoMeta("index.title.default"));
         model.addObject("view", "index");
         model.addObject("lastPage", lastPage);
         model.addObject("currentPage", page);

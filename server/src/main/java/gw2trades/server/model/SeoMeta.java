@@ -5,11 +5,20 @@ package gw2trades.server.model;
  */
 public class SeoMeta {
     private String title;
+    private Object[] titleArgs;
     private String imageUrl;
 
     public SeoMeta(String title) {
         // Title is mandatory.
         this.title = title;
+    }
+
+    public void setTitleArgs(Object[] titleArgs) {
+        this.titleArgs = titleArgs;
+    }
+
+    public Object[] getTitleArgs() {
+        return titleArgs;
     }
 
     public String getTitle() {

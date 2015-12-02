@@ -23,12 +23,13 @@ public class DetailsController {
         this.itemRepository = itemRepository;
     }
 
-    @RequestMapping("/details/{itemId}.html")
+    @RequestMapping("**/details/{itemId}.html")
     public ModelAndView details(@PathVariable int itemId) throws IOException {
         ModelAndView model = new ModelAndView("frame");
         ListingStatistics latestStats = itemRepository.latestStatistics(itemId);
 
-        SeoMeta seoMeta = new SeoMeta("Details for " + latestStats.getItem().getName());
+        SeoMeta seoMeta = new SeoMeta("details.title");
+        seoMeta.setTitleArgs(new Object[] { latestStats.getItem().getName() });
         seoMeta.setImageUrl(latestStats.getItem().getIconUrl());
 
         model.addObject("seoMeta", seoMeta);

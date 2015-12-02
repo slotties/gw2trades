@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>${seoMeta.title}</title>
-        <meta property="og:title" content="${seoMeta.title}">
+        #if($seoMeta.titleArgs)
+            #set($title = "$springMacroRequestContext.getMessage($seoMeta.title, $seoMeta.titleArgs)")
+        #else
+            #set($title = "#springMessage($seoMeta.title)")
+        #end
+
+        <title>${title}</title>
+        <meta property="og:title" content="${title}">
         <meta property="og:site_name" content="Guild Wars 2 Trades">
-        <meta property="og:description" content="${seoMeta.title}">
+        <meta property="og:description" content="${title}">
         #if($seoMeta.imageUrl)
         <meta property="og:image" content="${seoMeta.imageUrl}">
         #end
         <meta property="og:type" content="website">
-        <meta property="og:locale" content="en_US">
+        <meta property="og:locale" content="${springMacroRequestContext.locale}">
 
         <link rel="shortcut icon" href="/static/images/favicon.ico" type="image/x-icon; charset=binary">
         <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon; charset=binary">
@@ -23,11 +29,15 @@
         <nav class="navbar-default navbar-fixed-top">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <a class="navbar-brand" href="/index.html">gw2trades</a>
+                    <a class="navbar-brand" href="/${springMacroRequestContext.locale}/index.html">gw2trades</a>
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
                         <li><a href="https://github.com/slotties/gw2trades/wiki/News">News</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/de/index.html">DE</a></li>
+                        <li><a href="/en/index.html">EN</a></li>
                     </ul>
                 </div>
             </div>
@@ -39,8 +49,8 @@
             <footer>
                 <div class="panel panel-default">
                     <ul class="nav nav-pills">
-                        <li><a href="/impressum.html">Impressum</a></li>
-                        <li><a href="mailto:slotties@gmail.com">Contact me</a></li>
+                        <li><a href="/${springMacroRequestContext.locale}/impressum.html">#springMessage('frame.impressum')</a></li>
+                        <li><a href="mailto:slotties@gmail.com">#springMessage('frame.contactMe')</a></li>
                     </ul>
                 </div>
             </footer>

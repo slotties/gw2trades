@@ -276,28 +276,28 @@
         chart.add({
             id: 'min_sellers',
             yFn: function(d) { return d.sellStatistics.minPrice; },
-            label: 'Lowest sellers',
+            label: gw2scope.labels.min_sellers,
             cls: "gw2-history-sellers",
             focusCls: "gw2-history-sellers-focus"
         });
         chart.add({
             id: 'avg_sellers',
             yFn: function(d) { return d.sellStatistics.average; },
-            label: 'Avg. sellers',
+            label: gw2scope.labels.avg_sellers,
             cls: "gw2-history-sellers-avg",
             focusCls: "gw2-history-sellers-focus"
         });
         chart.add({
             id: 'max_buyers',
             yFn: function(d) { return d.buyStatistics.maxPrice; },
-            label: 'Highest buyers',
+            label: gw2scope.labels.max_buyers,
             cls: "gw2-history-buyers",
             focusCls: "gw2-history-buyers-focus"
         });
         chart.add({
             id: 'avg_buyers',
             yFn: function(d) { return d.buyStatistics.average; },
-            label: 'Avg. buyers',
+            label: gw2scope.labels.avg_buyers,
             cls: "gw2-history-buyers-avg",
             focusCls: "gw2-history-buyers-focus"
         });
@@ -314,13 +314,13 @@
         var chart = new gw2charts.Chart(d3.select("#supplyDemand"));
         chart.add({
             yFn: function(d) { return d.sellStatistics.totalAmount; },
-            label: 'Sellers',
+            label: gw2scope.labels.sellers,
             cls: 'gw2-history-sellers',
             focusCls: 'gw2-history-sellers-focus'
         });
         chart.add({
             yFn: function(d) { return d.buyStatistics.totalAmount; },
-            label: 'Buyers',
+            label: gw2scope.labels.buyers,
             cls: 'gw2-history-buyers',
             focusCls: 'gw2-history-buyers-focus'
         });

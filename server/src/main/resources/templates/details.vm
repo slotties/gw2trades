@@ -14,12 +14,12 @@
 
 <div class="page-header">
     <h1 class="rarity-${latestStats.item.rarity.toLowerCase()}">
-        <img alt="Item icon" src="${latestStats.item.iconUrl}"> ${latestStats.item.name} #if($latestStats.item.level > 0)<span title="Level requirements">(${latestStats.item.level})</span>#end
-        <a href="http://wiki-en.guildwars2.com/wiki/${gw2.wikiName($latestStats.item.name)}"><img alt="gw2wiki" title="Link to the official Guild Wars 2 Wiki" src="/static/images/gw2wiki.jpg"></a>
-        <a href="https://gw2treasures.com/item/${latestStats.itemId}"><img alt="gw2treasures" title="Link to gw2treasures.com for further item information" src="/static/images/gw2treasures.png"></a>
+        <img alt="Item icon" src="${latestStats.item.iconUrl}"> ${latestStats.item.name} #if($latestStats.item.level > 0)<span title="#springMessage('details.item.levelReq')">(${latestStats.item.level})</span>#end
+        <a href="http://wiki-en.guildwars2.com/wiki/${gw2.wikiName($latestStats.item.name)}"><img alt="gw2wiki" title="#springMessage('details.links.gw2wiki')" src="/static/images/gw2wiki.jpg"></a>
+        <a href="https://gw2treasures.com/item/${latestStats.itemId}"><img alt="gw2treasures" title="#springMessage('details.links.gw2treasures')" src="/static/images/gw2treasures.png"></a>
     </h1>
     <h3>
-        <span class="text-profit">Profit:</span> #price($gw2.profit($latestStats.buyStatistics.maxPrice, $latestStats.sellStatistics.minPrice))
+        <span class="text-profit">#springMessage('details.data.profit')</span> #price($gw2.profit($latestStats.buyStatistics.maxPrice, $latestStats.sellStatistics.minPrice))
     </h3>
 </div>
 
@@ -27,22 +27,22 @@
     <div class="col-md-6">
         <table class="table table-striped table-bordered table-hover">
             <tr>
-                <th colspan="2" class="text-buyers">Buyers</th>
+                <th colspan="2" class="text-buyers">#springMessage('details.cols.buyers')</th>
             </tr>
             <tr>
-                <th>Highest bidder</th>
+                <th>#springMessage('details.cols.maxBuyer')</th>
                 <td>#price(${latestStats.buyStatistics.maxPrice})</td>
             </tr>
             <tr>
-                <th>Average bidder</th>
+                <th>#springMessage('details.cols.avgBuyer')</th>
                 <td>#price($mathtool.floor($latestStats.buyStatistics.average))</td>
             </tr>
             <tr>
-                <th>Lowest bidder</th>
+                <th>#springMessage('details.cols.minBuyer')</th>
                 <td>#price($mathtool.floor($latestStats.buyStatistics.minPrice))</td>
             </tr>
             <tr>
-                <th>Amount of bidders</th>
+                <th>#springMessage('details.cols.totalBuyers')</th>
                 <td>${latestStats.buyStatistics.totalAmount}</td>
             </tr>
         </table>
@@ -50,22 +50,22 @@
     <div class="col-md-6">
         <table class="table table-striped table-bordered table-hover">
             <tr>
-                <th colspan="2" class="text-sellers">Sellers</th>
+                <th colspan="2" class="text-sellers">#springMessage('details.cols.sellers')</th>
             </tr>
             <tr>
-                <th>Lowest seller</th>
+                <th>#springMessage('details.cols.minSeller')</th>
                 <td>#price(${latestStats.sellStatistics.minPrice})</td>
             </tr>
             <tr>
-                <th>Average seller</th>
+                <th>#springMessage('details.cols.avgSeller')</th>
                 <td>#price($mathtool.floor($latestStats.sellStatistics.average))</td>
             </tr>
             <tr>
-                <th>Highest seller</th>
+                <th>#springMessage('details.cols.maxSeller')</th>
                 <td>#price($mathtool.floor($latestStats.sellStatistics.maxPrice))</td>
             </tr>
             <tr>
-                <th>Amount of sellers</th>
+                <th>#springMessage('details.cols.totalSellers')</th>
                 <td>${latestStats.sellStatistics.totalAmount}</td>
             </tr>
         </table>
@@ -73,30 +73,30 @@
 </div>
 
 <div id="priceHistoryTooltip" class="gw2-history-tooltip" style="display: none;">
-    <span class="tooltip-seller-avg">Average seller:</span>
+    <span class="tooltip-seller-avg">#springMessage('details.tooltip.avgSeller')</span>
     <span class="avg-seller-value"></span>
     <br>
-    <span class="tooltip-seller">Lowest seller:</span>
+    <span class="tooltip-seller">#springMessage('details.tooltip.minSeller')</span>
     <span class="lowest-seller-value"></span>
     <br>
-    <span class="tooltip-bidder">Highest buyer:</span>
+    <span class="tooltip-bidder">#springMessage('details.tooltip.maxBuyer')</span>
     <span class="highest-bidder-value"></span>
     <br>
-    <span class="tooltip-bidder-avg">Average buyer:</span>
+    <span class="tooltip-bidder-avg">#springMessage('details.tooltip.avgBuyer')</span>
     <span class="avg-bidder-value"></span>
 </div>
 <div class="btn-toolbar" role="toolbar">
     <div class="btn-group" role="group" id="chart-timeframe-selectors">
-        <button type="button" class="btn btn-default" data-offset="1m">1 Month</button>
-        <button type="button" class="btn btn-default" data-offset="7d" data-initial="true">1 Week</button>
-        <button type="button" class="btn btn-default" data-offset="3d">3 Days</button>
-        <button type="button" class="btn btn-default" data-offset="1d">Today</button>
+        <button type="button" class="btn btn-default" data-offset="1m">#springMessage('details.timeframes.1m')</button>
+        <button type="button" class="btn btn-default" data-offset="7d" data-initial="true">#springMessage('details.timeframes.7d')</button>
+        <button type="button" class="btn btn-default" data-offset="3d">#springMessage('details.timeframes.3d')</button>
+        <button type="button" class="btn btn-default" data-offset="1d">#springMessage('details.timeframes.1d')</button>
     </div>
     <div class="btn-group" role="group" id="chart-line-selectors">
-        <button type="button" class="btn btn-default text-data-avg-sellers" data-line="avg_sellers">Avg. sellers</button>
-        <button type="button" class="btn btn-default text-data-min-sellers" data-line="min_sellers" data-initial="true">Min. sellers</button>
-        <button type="button" class="btn btn-default text-data-max-buyers" data-line="max_buyers" data-initial="true">Max. buyers</button>
-        <button type="button" class="btn btn-default text-data-avg-buyers" data-line="avg_buyers">Avg. buyers</button>
+        <button type="button" class="btn btn-default text-data-avg-sellers" data-line="avg_sellers">#springMessage('details.lines.avgSellers')</button>
+        <button type="button" class="btn btn-default text-data-min-sellers" data-line="min_sellers" data-initial="true">#springMessage('details.lines.minSellers')</button>
+        <button type="button" class="btn btn-default text-data-max-buyers" data-line="max_buyers" data-initial="true">#springMessage('details.lines.maxBuyers')</button>
+        <button type="button" class="btn btn-default text-data-avg-buyers" data-line="avg_buyers">#springMessage('details.lines.avgBuyers')</button>
     </div>
 </div>
 <div id="priceHistory"></div>
@@ -105,7 +105,15 @@
 <script src="//d3js.org/d3.v3.min.js"></script>
 <script>
     window.gw2scope = {
-        itemId: ${latestStats.item.itemId}
+        itemId: ${latestStats.item.itemId},
+        labels: {
+            min_sellers: "#springMessage('details.lines.minSellers')",
+            avg_sellers: "#springMessage('details.lines.avgSellers')",
+            max_buyers: "#springMessage('details.lines.maxBuyers')",
+            avg_buyers: "#springMessage('details.lines.avgBuyers')",
+            sellers: "#springMessage('details.lines.sellers')",
+            buyers: "#springMessage('details.lines.buyers')",
+        }
     };
 </script>
 <script src="/static/js/history.js"></script>

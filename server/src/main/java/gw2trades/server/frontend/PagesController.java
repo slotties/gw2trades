@@ -10,7 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 public class PagesController {
-    @RequestMapping("/impressum.html")
+    @RequestMapping("**/impressum.html")
     public ModelAndView impressum() {
         ModelAndView mav = new ModelAndView("frame");
         SeoMeta meta = new SeoMeta("Impressum");
