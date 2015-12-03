@@ -13,7 +13,7 @@
         <div class="col-lg-6">
             <div class="input-group">
                 <span class="input-group-addon">#springMessage("index.search.name.label")</span>
-                <input name="name" type="text" class="form-control" placeholder="#springMessage("index.search.name.placeholder")">
+                <input name="name" type="text" class="form-control" placeholder="#springMessage("index.search.name.placeholder")" #if($query && $query.name)value="${escapetool.html($query.name)}"#end>
             </div>
         </div>
         <div class="col-lg-6">

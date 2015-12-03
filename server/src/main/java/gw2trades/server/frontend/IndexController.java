@@ -6,6 +6,7 @@ import gw2trades.repository.api.Query;
 import gw2trades.repository.api.model.ListingStatistics;
 import gw2trades.repository.api.model.SearchResult;
 import gw2trades.server.model.SeoMeta;
+import org.apache.velocity.tools.generic.EscapeTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,8 @@ import java.util.Locale;
  */
 @Controller
 public class IndexController {
+    private static final EscapeTool ESCAPE_TOOL = new EscapeTool();
+
     private ItemRepository itemRepository;
 
     private int pageSize = 30;
@@ -75,9 +78,10 @@ public class IndexController {
         model.addObject("lastPage", lastPage);
         model.addObject("currentPage", page);
         model.addObject("listingStatistics", results.getResults());
-        model.addObject("orderBy", orderBy);
-        model.addObject("orderDir", orderDir);
+        model.addObject("orderBy", ESCAPE_TOOL.html(orderBy));
+        model.addObject("orderDir", ESCAPE_TOOL.html(orderDir));
         model.addObject("query", query);
+        model.addObject("escapetool", ESCAPE_TOOL);
 
         return model;
     }
