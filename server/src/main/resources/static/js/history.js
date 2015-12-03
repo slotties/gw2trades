@@ -1,6 +1,5 @@
-"use strict";
-
 (function() {
+    "use strict";
     var bisectDate = d3.bisector(function(d) { return d.timestamp; }).left;
 
     var splitCoins = function(coins) {
@@ -29,7 +28,7 @@
         height = 400 - margin.top - margin.bottom,
         timeTickFormat = d3.time.format.multi([
                 ["%H:%M", function(d) { return d.getHours(); }],
-                ["%e %b", function(d) { return true; }]
+                ["%e %b", function() { return true; }]
             ]),
         self = this;
 
@@ -112,8 +111,7 @@
         };
     };
     chart.prototype.add = function(conf) {
-        var x = this.x,
-            y = this.y,
+        var y = this.y,
             yFnWrapper = function(d) {
                 return y(conf.yFn(d));
             },
@@ -129,7 +127,7 @@
             line: line,
             path: path,
             focus: focusCircle,
-            lineLabel, lineLabel,
+            lineLabel: lineLabel,
             yFn: conf.yFn
         });
     };
@@ -210,6 +208,7 @@
 })();
 
 (function() {
+    "use strict";
     var renderCoins = function(coins) {
         var coinsObj = gw2charts.splitCoins(coins);
         var html = '';
@@ -334,11 +333,12 @@
     var onTimeselectorClick = function(btn) {
         var offset = btn.getAttribute('data-offset').split(/([0-9]*)/g),
             to = new Date(),
-            from = new Date();
+            from = new Date(),
+            i;
 
         // offset should look like this now: [ "", "1", "d" ] or [ "", "13", "m", "37", "d" ]
         if (offset.length > 1 && offset.length % 2 == 1) {
-            for (var i = 1; i < offset.length; i += 2) {
+            for (i = 1; i < offset.length; i += 2) {
                 var amount = parseInt(offset[i], 10);
                 switch (offset[i + 1]) {
                     case 'm':
@@ -360,7 +360,7 @@
         });
 
         var activeButtons = document.getElementById("chart-timeframe-selectors").querySelectorAll('button.active');
-        for (var i = 0; i < activeButtons.length; i++) {
+        for (i = 0; i < activeButtons.length; i++) {
             activeButtons[i].className = activeButtons[i].className.replace(/active/, '');
         }
         btn.className += ' active';
@@ -377,34 +377,37 @@
         priceHistory.redrawChart(yScalePriceHistoryFn);
     };
 
+    var i;
     var timeframeSelectors = document.getElementById("chart-timeframe-selectors").querySelectorAll('button[data-offset]'),
-        initialTimeframeSelector;
-    for (var i = 0; i < timeframeSelectors.length; i++) {
+        initialTimeframeSelector,
+        timeFrameSelectorListener = function() {
+            onTimeselectorClick(this);
+        };
+    for (i = 0; i < timeframeSelectors.length; i++) {
         if (timeframeSelectors[i].getAttribute('data-initial') === 'true') {
             initialTimeframeSelector = timeframeSelectors[i];
         }
-        timeframeSelectors[i].addEventListener('click', function() {
-            onTimeselectorClick(this);
-        });
-    };
+        timeframeSelectors[i].addEventListener('click', timeFrameSelectorListener);
+    }
 
     var lineSelectors = document.getElementById('chart-line-selectors').querySelectorAll('button[data-line]'),
-        initialLineSelectors = [];
-    for (var i = 0; i < lineSelectors.length; i++) {
+        initialLineSelectors = [],
+        lineSelectorListener = function() {
+            onLineSelectorClick(this);
+        };
+    for (i = 0; i < lineSelectors.length; i++) {
         if (lineSelectors[i].getAttribute('data-initial') === 'true') {
             initialLineSelectors.push(lineSelectors[i]);
         }
 
-        lineSelectors[i].addEventListener('click', function() {
-            onLineSelectorClick(this);
-        });
+        lineSelectors[i].addEventListener('click', lineSelectorListener);
     }
 
     if (initialTimeframeSelector) {
         onTimeselectorClick(initialTimeframeSelector);
     }
     if (initialLineSelectors) {
-        for (var i = 0; i < initialLineSelectors.length; i++) {
+        for (i = 0; i < initialLineSelectors.length; i++) {
             onLineSelectorClick(initialLineSelectors[i]);
         }
     }
