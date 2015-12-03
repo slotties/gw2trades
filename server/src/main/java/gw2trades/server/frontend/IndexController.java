@@ -68,7 +68,9 @@ public class IndexController {
 
         int lastPage = (int) Math.ceil((float) results.getTotalResults() / (float) this.pageSize);
 
-        model.addObject("seoMeta", new SeoMeta("index.title.default"));
+        SeoMeta seoMeta = new SeoMeta("index.title.default");
+        seoMeta.setDescription("index.description");
+        model.addObject("seoMeta", seoMeta);
         model.addObject("view", "index");
         model.addObject("lastPage", lastPage);
         model.addObject("currentPage", page);

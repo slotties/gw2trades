@@ -6,11 +6,20 @@
         #else
             #set($title = "#springMessage($seoMeta.title)")
         #end
+        #if($seoMeta.descriptionArgs)
+            #set($description = "$springMacroRequestContext.getMessage($seoMeta.description, $seoMeta.descriptionArgs)")
+        #else
+            #set($description = "#springMessage($seoMeta.description)")
+        #end
 
         <title>${title}</title>
+        <meta name="description" content="${description}" />
+        <meta name="keywords" content="Guild Wars 2, GW2, Items, $!{seoMeta.keywords}"/>
+
         <meta property="og:title" content="${title}">
         <meta property="og:site_name" content="Guild Wars 2 Trades">
-        <meta property="og:description" content="${title}">
+        <meta property="og:description" content="${description}">
+
         #if($seoMeta.imageUrl)
         <meta property="og:image" content="${seoMeta.imageUrl}">
         #end

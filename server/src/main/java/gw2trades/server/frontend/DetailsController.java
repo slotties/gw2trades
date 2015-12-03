@@ -31,6 +31,9 @@ public class DetailsController {
         SeoMeta seoMeta = new SeoMeta("details.title");
         seoMeta.setTitleArgs(new Object[] { latestStats.getItem().getName() });
         seoMeta.setImageUrl(latestStats.getItem().getIconUrl());
+        seoMeta.setDescription("details.description");
+        seoMeta.setDescriptionArgs(new Object[] { latestStats.getItem().getName() });
+        seoMeta.setKeywords(latestStats.getItem().getName());
 
         model.addObject("seoMeta", seoMeta);
         model.addObject("latestStats", latestStats);
