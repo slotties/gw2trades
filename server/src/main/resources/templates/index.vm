@@ -27,6 +27,7 @@
 <table class="table table-striped table-bordered table-hover">
     <tr>
         <th>&nbsp;</th>
+        <th>&nbsp;</th>
         <th colspan="2">#springMessage("index.cols.buy")</th>
         <th colspan="2">#springMessage("index.cols.sell")</th>
     </tr>
