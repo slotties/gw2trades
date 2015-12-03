@@ -25,7 +25,7 @@ import java.util.Locale;
 public class IndexController {
     private ItemRepository itemRepository;
 
-    private int pageSize = 10;
+    private int pageSize = 30;
 
     @Autowired
     public IndexController(ItemRepository itemRepository) {
