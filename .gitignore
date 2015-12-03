@@ -10,3 +10,5 @@ build
 
 # Tool directories
 data
+# Less binaries for local dev
+/server/src/main/resources/static/css/styles.css

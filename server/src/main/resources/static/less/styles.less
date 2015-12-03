@@ -1,0 +1,236 @@
+/*
+    Colors are from this palette:
+    http://paletton.com/#uid=7010J0kr2p6hjvVm7s7tAkrA0fp
+*/
+@red_normal: #C8231F;
+@red_bright: #FE7875;
+@red_dark: #7B0300;
+@blue_normal: #1C5181;
+@blue_bright: #527EA5;
+@blue_dark: #052C4F;
+@green_normal: #189D21;
+@green_bright: #5CC863;
+@green_dark: #006106;
+@yellow_normal: #C8821F;
+@yellow_bright: #FEC575;
+@yellow_dark: #7B4800;
+
+.currency-gold {
+    background: url('../images/coin_gold.png') center right no-repeat;
+}
+.currency-silver {
+    background: url('../images/coin_silver.png') center right no-repeat;
+}
+.currency-copper {
+    background: url('../images/coin_copper.png') center right no-repeat;
+}
+.currency-negative {
+    font-weight: bold;
+    color: @red_normal;
+}
+
+.currency-gold,
+.currency-silver,
+.currency-copper {
+    padding-right: 20px;
+    margin-right: 4px;
+    display: inline-block;
+    text-align: right;
+}
+
+/*
+    Charts
+*/
+.gw2-charts-axis path,
+.gw2-charts-axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+path.gw2-history-buyers {
+    fill: none;
+    stroke: @red_normal;
+    stroke-width: 2px;
+}
+text.gw2-history-buyers {
+    fill: @red_normal;
+    font-weight: bold;
+}
+path.gw2-history-buyers-avg {
+    fill: none;
+    stroke: @red_bright;
+    stroke-width: 2px;
+    opacity: 0.5;
+}
+text.gw2-history-buyers-avg {
+    fill: @red_bright;
+    font-weight: bold;
+}
+path.gw2-history-sellers {
+    fill: none;
+    stroke: @blue_normal;
+    stroke-width: 2px;
+}
+text.gw2-history-sellers {
+    fill: @blue_normal;
+    font-weight: bold;
+}
+path.gw2-history-sellers-avg {
+    fill: none;
+    stroke: @blue_bright;
+    stroke-width: 2px;
+    opacity: 0.5;
+}
+text.gw2-history-sellers-avg {
+    fill: @blue_bright;
+    font-weight: bold;
+}
+.gw2-history-profit {
+    fill: none;
+    /* FIXME: use a normalized color */
+    stroke: #448F30;
+    stroke-width: 2px;
+}
+
+.gw2-history-buyers-focus {
+    fill: @red_normal;
+    stroke: @red_normal;
+}
+.gw2-history-sellers-focus {
+    fill: @blue_normal;
+    stroke: @blue_normal;
+}
+.gw2-history-tooltip {
+    position: absolute;
+    border: 1px solid @red_bright;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 4px;
+}
+.gw2-history-tooltip span {
+    margin-right: 4px;
+}
+.gw2-history-tooltip .tooltip-seller-avg {
+    color: @blue_bright;
+    font-weight: bold;
+}
+.gw2-history-tooltip .tooltip-seller {
+    color: @blue_normal;
+    font-weight: bold;
+}
+.gw2-history-tooltip .tooltip-bidder {
+    color: @red_normal;
+    font-weight: bold;
+}
+.gw2-history-tooltip .tooltip-bidder-avg {
+    color: @red_bright;
+    font-weight: bold;
+}
+
+.gw2-charts-overlay {
+    fill: none;
+    pointer-events: all;
+}
+
+#body-container {
+    margin-top: 30px;
+}
+
+/*
+    Navigation
+*/
+.navbar-default .navbar-brand {
+    /* FIXME: use a normalized color */
+    color: #C8241F;
+}
+
+a,
+a:hover,
+a:focus,
+.pagination>li>a,
+.pagination>li>a:hover,
+.pagination>li>a:focus {
+    color: @red_normal;
+}
+
+.text-sellers {
+    color: @blue_normal;
+}
+
+.text-buyers {
+    color: @red_normal;
+}
+
+.item-icon-mini {
+    width: 32px;
+    height: 32px;
+}
+
+.grid .tick {
+    stroke: #ddd;
+    opacity: 0.7;
+}
+.grid path {
+      stroke-width: 0;
+}
+.grid .tick {
+    stroke: #ddd;
+    opacity: 0.7;
+}
+.grid path {
+      stroke-width: 0;
+}
+
+.gw2-charts-y .tick line {
+    display: none;
+}
+
+.text-profit {
+   color: @green_normal;
+}
+
+.rarity-junk {
+    color: #AAA;
+}
+.rarity-basic {
+    color: #000;
+}
+.rarity-fine {
+    color: #62A4DA;
+}
+.rarity-masterwork {
+    color: #1a9306;
+}
+.rarity-rare {
+    color: #fcd00b;
+}
+.rarity-exotic {
+    color: #ffa405;
+}
+.rarity-ascended {
+    color: #fb3e8d;
+}
+.rarity-legendary {
+    color: #4C139D;
+}
+
+.btn.text-data-avg-buyers,
+.btn.text-data-avg-buyers:focus,
+.btn.text-data-avg-buyers.active {
+    color: @red_bright;
+}
+.btn.text-data-avg-sellers,
+.btn.text-data-avg-sellers:focus,
+.btn.text-data-avg-sellers.active {
+    color: @blue_bright;
+}
+.btn.text-data-max-buyers,
+.btn.text-data-max-buyers:focus,
+.btn.text-data-max-buyers.active {
+    color: @red_normal;
+}
+.btn.text-data-min-sellers,
+.btn.text-data-min-sellers:focus,
+.btn.text-data-min-sellers.active {
+    color: @blue_normal;
+}

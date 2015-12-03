@@ -1,231 +1,209 @@
 /*
-    TODO: use sass
-
-    Colors:
+    Colors are from this palette:
     http://paletton.com/#uid=7010J0kr2p6hjvVm7s7tAkrA0fp
-
-    color | normal | bright | dark
-    red C8231F FE7875 7B0300
-    blue 1C5181 527EA5 052C4F
-    green 189D21 5CC863 006106
-    yellow C8821F FEC575 7B4800
-
 */
-
 .currency-gold {
-    background: url('../images/coin_gold.png') center right no-repeat;
+  background: url('../images/coin_gold.png') center right no-repeat;
 }
 .currency-silver {
-    background: url('../images/coin_silver.png') center right no-repeat;
+  background: url('../images/coin_silver.png') center right no-repeat;
 }
 .currency-copper {
-    background: url('../images/coin_copper.png') center right no-repeat;
+  background: url('../images/coin_copper.png') center right no-repeat;
 }
 .currency-negative {
-    font-weight: bold;
-    color: C8231F;
+  font-weight: bold;
+  color: #c8231f;
 }
-
 .currency-gold,
 .currency-silver,
 .currency-copper {
-    padding-right: 20px;
-    margin-right: 4px;
-    display: inline-block;
-    text-align: right;
+  padding-right: 20px;
+  margin-right: 4px;
+  display: inline-block;
+  text-align: right;
 }
-
 /*
     Charts
 */
 .gw2-charts-axis path,
 .gw2-charts-axis line {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
-
 path.gw2-history-buyers {
-    fill: none;
-    stroke: #C8231F;
-    stroke-width: 2px;
+  fill: none;
+  stroke: #c8231f;
+  stroke-width: 2px;
 }
 text.gw2-history-buyers {
-    fill: #C8231F;
-    font-weight: bold;
+  fill: #c8231f;
+  font-weight: bold;
 }
 path.gw2-history-buyers-avg {
-    fill: none;
-    stroke: #FE7875;
-    stroke-width: 2px;
-    opacity: 0.5;
+  fill: none;
+  stroke: #fe7875;
+  stroke-width: 2px;
+  opacity: 0.5;
 }
 text.gw2-history-buyers-avg {
-    fill: #FE7875;
-    font-weight: bold;
+  fill: #fe7875;
+  font-weight: bold;
 }
 path.gw2-history-sellers {
-    fill: none;
-    stroke: #1C5181;
-    stroke-width: 2px;
+  fill: none;
+  stroke: #1c5181;
+  stroke-width: 2px;
 }
 text.gw2-history-sellers {
-    fill: #1C5181;
-    font-weight: bold;
+  fill: #1c5181;
+  font-weight: bold;
 }
 path.gw2-history-sellers-avg {
-    fill: none;
-    stroke: #527EA5;
-    stroke-width: 2px;
-    opacity: 0.5;
+  fill: none;
+  stroke: #527ea5;
+  stroke-width: 2px;
+  opacity: 0.5;
 }
 text.gw2-history-sellers-avg {
-    fill: #527EA5;
-    font-weight: bold;
+  fill: #527ea5;
+  font-weight: bold;
 }
 .gw2-history-profit {
-    fill: none;
-    stroke: #448F30;
-    stroke-width: 2px;
-}
+  fill: none;
+  /* FIXME: use a normalized color */
 
+  stroke: #448F30;
+  stroke-width: 2px;
+}
 .gw2-history-buyers-focus {
-    fill: #C8231F;
-    stroke: #C8231F;
+  fill: #c8231f;
+  stroke: #c8231f;
 }
 .gw2-history-sellers-focus {
-    fill: #1C5181;
-    stroke: #1C5181;
+  fill: #1c5181;
+  stroke: #1c5181;
 }
 .gw2-history-tooltip {
-    position: absolute;
-    border: 1px solid #FE7875;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 4px;
+  position: absolute;
+  border: 1px solid #fe7875;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 4px;
 }
 .gw2-history-tooltip span {
-    margin-right: 4px;
+  margin-right: 4px;
 }
 .gw2-history-tooltip .tooltip-seller-avg {
-    color: #527EA5;
-    font-weight: bold;
+  color: #527ea5;
+  font-weight: bold;
 }
 .gw2-history-tooltip .tooltip-seller {
-    color: #1C5181;
-    font-weight: bold;
+  color: #1c5181;
+  font-weight: bold;
 }
 .gw2-history-tooltip .tooltip-bidder {
-    color: #C8231F;
-    font-weight: bold;
+  color: #c8231f;
+  font-weight: bold;
 }
 .gw2-history-tooltip .tooltip-bidder-avg {
-    color: #FE7875;
-    font-weight: bold;
+  color: #fe7875;
+  font-weight: bold;
 }
-
 .gw2-charts-overlay {
-    fill: none;
-    pointer-events: all;
+  fill: none;
+  pointer-events: all;
 }
-
 #body-container {
-    margin-top: 30px;
+  margin-top: 30px;
 }
-
 /*
     Navigation
 */
 .navbar-default .navbar-brand {
-    color: #C8241F;
-}
+  /* FIXME: use a normalized color */
 
+  color: #C8241F;
+}
 a,
 a:hover,
 a:focus,
-.pagination>li>a,
-.pagination>li>a:hover,
-.pagination>li>a:focus {
-    color: #C8231F;
+.pagination > li > a,
+.pagination > li > a:hover,
+.pagination > li > a:focus {
+  color: #c8231f;
 }
-
 .text-sellers {
-    color: #1C5181;
+  color: #1c5181;
 }
-
 .text-buyers {
-    color: #C8231F;
+  color: #c8231f;
 }
-
 .item-icon-mini {
-    width: 32px;
-    height: 32px;
-}
-
-.grid .tick {
-    stroke: #ddd;
-    opacity: 0.7;
-}
-.grid path {
-      stroke-width: 0;
+  width: 32px;
+  height: 32px;
 }
 .grid .tick {
-    stroke: #ddd;
-    opacity: 0.7;
+  stroke: #ddd;
+  opacity: 0.7;
 }
 .grid path {
-      stroke-width: 0;
+  stroke-width: 0;
 }
-
+.grid .tick {
+  stroke: #ddd;
+  opacity: 0.7;
+}
+.grid path {
+  stroke-width: 0;
+}
 .gw2-charts-y .tick line {
-    display: none;
+  display: none;
 }
-
 .text-profit {
-   color: #189D21;
+  color: #189d21;
 }
-
 .rarity-junk {
-    color: #AAA;
+  color: #AAA;
 }
 .rarity-basic {
-    color: #000;
+  color: #000;
 }
 .rarity-fine {
-    color: #62A4DA;
+  color: #62A4DA;
 }
 .rarity-masterwork {
-    color: #1a9306;
+  color: #1a9306;
 }
 .rarity-rare {
-    color: #fcd00b;
+  color: #fcd00b;
 }
 .rarity-exotic {
-    color: #ffa405;
+  color: #ffa405;
 }
 .rarity-ascended {
-    color: #fb3e8d;
+  color: #fb3e8d;
 }
 .rarity-legendary {
-    color: #4C139D;
+  color: #4C139D;
 }
-
 .btn.text-data-avg-buyers,
 .btn.text-data-avg-buyers:focus,
 .btn.text-data-avg-buyers.active {
-    color: #FE7875;
+  color: #fe7875;
 }
 .btn.text-data-avg-sellers,
 .btn.text-data-avg-sellers:focus,
 .btn.text-data-avg-sellers.active {
-    color: #527EA5;
+  color: #527ea5;
 }
 .btn.text-data-max-buyers,
 .btn.text-data-max-buyers:focus,
 .btn.text-data-max-buyers.active {
-    color: #C8231F;
+  color: #c8231f;
 }
 .btn.text-data-min-sellers,
 .btn.text-data-min-sellers:focus,
 .btn.text-data-min-sellers.active {
-    color: #1C5181;
+  color: #1c5181;
 }
