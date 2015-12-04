@@ -60,7 +60,7 @@ public class IndexController {
             @RequestParam(required = false) String name) throws IOException {
 
         if (page < 1) {
-            return new ModelAndView(new RedirectView("/index.html?page=1"));
+            return new ModelAndView(new RedirectView("/"));
         }
 
         ModelAndView model = new ModelAndView("frame");
