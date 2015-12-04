@@ -86,8 +86,8 @@ public class InfluxDbRepository implements ItemRepository {
             PriceStatistics buys = createStatistics(listing.getBuys());
             PriceStatistics sells = createStatistics(listing.getSells());
 
-            // FIXME: respect listing costs (5%) and selling costs (10%)
-            int profit = sells.getMinPrice() - buys.getMaxPrice();
+            int fixCosts = (int) Math.floor(((float) sells.getMinPrice()) * 0.15f);
+            int profit = (sells.getMinPrice() - buys.getMaxPrice()) - fixCosts;
 
             Point dataPoint = createPoint(listing.getItem(), buys, sells, profit);
             points.point(dataPoint);
