@@ -33,27 +33,27 @@
     </tr>
     <tr>
         <th>
-            <a href="#orderLink("name")">#springMessage("index.cols.item")</a>
+            <a href="#orderLink("name")" rel="nofollow">#springMessage("index.cols.item")</a>
             #orderIcon('name')
         </th>
         <th>
-            <a href="#orderLink("profit")">#springMessage("index.cols.profit")</a>
+            <a href="#orderLink("profit")" rel="nofollow">#springMessage("index.cols.profit")</a>
             #orderIcon('profit')
         </th>
         <th>
-            <a href="#orderLink("highestBidder")">#springMessage("index.cols.maxBuyer")</a>
+            <a href="#orderLink("highestBidder")" rel="nofollow">#springMessage("index.cols.maxBuyer")</a>
             #orderIcon('highestBidder')
         </th>
         <th>
-            <a href="#orderLink("avgBidder")">#springMessage("index.cols.avgBuyer")</a>
+            <a href="#orderLink("avgBidder")" rel="nofollow">#springMessage("index.cols.avgBuyer")</a>
             #orderIcon('avgBidder')
         </th>
         <th>
-            <a href="#orderLink("lowestSeller")">#springMessage("index.cols.minSeller")</a>
+            <a href="#orderLink("lowestSeller")" rel="nofollow">#springMessage("index.cols.minSeller")</a>
             #orderIcon('lowestSeller')
         </th>
         <th>
-            <a href="#orderLink("avgSeller")">#springMessage("index.cols.avgSeller")</a>
+            <a href="#orderLink("avgSeller")" rel="nofollow">#springMessage("index.cols.avgSeller")</a>
             #orderIcon('avgSeller')
         </th>
     </tr>
