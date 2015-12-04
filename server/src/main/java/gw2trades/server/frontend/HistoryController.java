@@ -30,10 +30,20 @@ public class HistoryController {
             @PathVariable int itemId,
             @RequestParam String from,
             @RequestParam String to
-    ) throws ParseException, IOException {
+    ) throws IllegalArgumentException, IOException {
+        if (from == null || to == null) {
+            throw new IllegalArgumentException("bad input dates");
+        }
+
         SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
-        long fromTs = format.parse(from).getTime();
-        long toTs = format.parse(to).getTime();
+        long fromTs;
+        long toTs;
+        try {
+            fromTs = format.parse(from).getTime();
+            toTs = format.parse(to).getTime();
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("bad input dates");
+        }
 
         return repository.getHistory(itemId, fromTs, toTs);
     }
