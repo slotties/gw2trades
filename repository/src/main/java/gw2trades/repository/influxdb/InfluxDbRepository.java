@@ -362,7 +362,8 @@ public class InfluxDbRepository implements ItemRepository {
         double profitScore = calculateProfitScore(profit, sells);
         doc.add(new DoubleField("profit_score", profitScore, DoubleField.TYPE_STORED));
         doc.add(new DoubleDocValuesField("profit_score", profitScore));
-        //doc.add(new DoubleField("profit_score", profitScore, DOUBLE_FIELD_TYPE_STORED_SORTED));
+
+        LOGGER.info("Indexed {} with profit_score={} having sells_min={} and profit={}", item.getItemId(), profitScore, sells.getMinPrice(), profit);
 
         return doc;
     }
