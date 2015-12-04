@@ -381,7 +381,7 @@ public class InfluxDbRepository implements ItemRepository {
              <0 = not interesting, because we lose money here
          */
         if (relativeProfit >= 0.0 && relativeProfit <= (goal * 2.0)) {
-            profitScore = 1.0 - goal - Math.abs(relativeProfit);
+            profitScore = 1.0 - Math.abs(goal - relativeProfit);
         } else if (relativeProfit >= (goal * 10.0)) {
             profitScore = 0.5;
         } else if (relativeProfit >= (goal * 2.0)){
