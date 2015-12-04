@@ -45,7 +45,15 @@ public interface ItemRepository {
      */
     ListingStatistics latestStatistics(int itemId) throws IOException;
 
+    /**
+     * Closes the repository.
+     * @throws IOException in case the repository could not be closed
+     */
     void close() throws IOException;
 
+    /**
+     * Reopens the repository.
+     * @throws IOException in case the repository could not be closed or opened.
+     */
     void reopen() throws IOException;
 }

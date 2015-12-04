@@ -1,6 +1,8 @@
 package gw2trades.repository.api;
 
 /**
+ * This class represents a sort order state, that is a combination of a field to sort and the direction (ascending, descending).
+ *
  * @author Stefan Lotties (slotties@gmail.com)
  */
 public class Order {
