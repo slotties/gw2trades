@@ -25,10 +25,9 @@ import java.util.Locale;
 @Controller
 public class IndexController {
     private static final EscapeTool ESCAPE_TOOL = new EscapeTool();
+    private static final int PAGE_SIZE = 30;
 
     private ItemRepository itemRepository;
-
-    private int pageSize = 30;
 
     @Autowired
     public IndexController(ItemRepository itemRepository) {
@@ -69,7 +68,7 @@ public class IndexController {
         Order order = orderBy != null ?  Order.by(orderBy, !"asc".equals(orderDir)) : null;
         SearchResult<ListingStatistics> results = getStatistics(query, order, page);
 
-        int lastPage = (int) Math.ceil((float) results.getTotalResults() / (float) this.pageSize);
+        int lastPage = (int) Math.ceil((float) results.getTotalResults() / (float) PAGE_SIZE);
 
         SeoMeta seoMeta = new SeoMeta("index.title.default");
         seoMeta.setDescription("index.description");
@@ -98,8 +97,8 @@ public class IndexController {
 
     private SearchResult<ListingStatistics> getStatistics(Query query, Order order, int forPage) throws IOException {
         // forPage is 1-based, for easier readability in the URL.
-        int fromPage = (forPage - 1) * this.pageSize;
-        int toPage = fromPage + this.pageSize;
+        int fromPage = (forPage - 1) * PAGE_SIZE;
+        int toPage = fromPage + PAGE_SIZE;
 
         return this.itemRepository.listStatistics(query, order, fromPage, toPage);
     }

@@ -25,4 +25,16 @@ public class Order {
     public String getField() {
         return field;
     }
+
+    @Override
+    public int hashCode() {
+        return field.hashCode() ^ Boolean.hashCode(descending);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Order &&
+                ((Order) obj).field.equals(this.field) &&
+                ((Order) obj).descending == this.descending;
+    }
 }
