@@ -73,7 +73,12 @@
       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
       ga('create', 'UA-70815637-1', 'auto');
-      ga('send', 'pageview');
-
+      ga('send', 'pageview', {
+        #if($googleAnalytics)
+            #foreach($v in $googleAnalytics.dimensions)
+                "dimension${mathtool.add($foreach.index, 1)}": "$v"#if(!$foreach.last),#end
+            #end
+        #end
+      });
     </script>
 </html>
