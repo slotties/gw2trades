@@ -60,7 +60,7 @@
             .attr("class", "gw2-charts-y gw2-charts-axis")
             .call(this.yAxis);
 
-        svg.append("rect")
+        this.overlay = svg.append("rect")
             .attr("class", "gw2-charts-overlay")
             .attr("width", width)
             .attr("height", height)
@@ -121,6 +121,10 @@
             lineLabel = this.svg.append("text").attr("dy", ".35em").attr('class', conf.cls).attr("text-anchor", "start").text(conf.label);
 
         focusCircle.append("circle").attr("r", 3);
+
+        // Ensure the overlay node is the last node to avoid flickering caused by paths or focus circles that steal the mouse-over events from the overlay.
+        var overlay = this.overlay[0][0];
+        overlay.parentNode.appendChild(overlay);
 
         this.lines.push({
             id: conf.id,
