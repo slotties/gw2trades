@@ -86,7 +86,8 @@ public class InfluxDbRepository implements ItemRepository {
             PriceStatistics buys = createStatistics(listing.getBuys());
             PriceStatistics sells = createStatistics(listing.getSells());
 
-            int profit = sells.getMinPrice() - buys.getMaxPrice();
+            int fixCosts = (int) Math.floor(((float) sells.getMinPrice()) * 0.15f);
+            int profit = (sells.getMinPrice() - buys.getMaxPrice()) - fixCosts;
 
             Point dataPoint = createPoint(listing.getItem(), buys, sells, profit);
             points.point(dataPoint);
@@ -110,8 +111,11 @@ public class InfluxDbRepository implements ItemRepository {
 
         org.apache.lucene.search.Query luceneQuery = createLuceneQuery(query);
         Sort sort = createSort(order);
+        if (sort == null) {
+            sort = defaultSort();
+        }
 
-        TopDocs docs = sort != null ? searcher.search(luceneQuery, Integer.MAX_VALUE, sort) : searcher.search(luceneQuery, Integer.MAX_VALUE);
+        TopDocs docs = searcher.search(luceneQuery, Integer.MAX_VALUE, sort);
         List<ListingStatistics> allStats = new ArrayList<>();
         for (int i = fromIdx; i < toIdx && i < docs.scoreDocs.length; i++) {
             Document doc = searcher.doc(docs.scoreDocs[i].doc);
@@ -142,6 +146,13 @@ public class InfluxDbRepository implements ItemRepository {
         }
 
         return luceneQuery;
+    }
+
+    private Sort defaultSort() {
+        return new Sort(
+                new SortedNumericSortField("profit_score", SortField.Type.DOUBLE, true),
+                new SortedNumericSortField("profit", SortField.Type.INT, true)
+            );
     }
 
     private Sort createSort(Order order) {
@@ -348,7 +359,38 @@ public class InfluxDbRepository implements ItemRepository {
         doc.add(new IntField("profit", profit, IntField.TYPE_STORED));
         doc.add(new NumericDocValuesField("profit", profit));
 
+        double profitScore = calculateProfitScore(profit, sells);
+        doc.add(new DoubleField("profit_score", profitScore, DoubleField.TYPE_STORED));
+        doc.add(new DoubleDocValuesField("profit_score", profitScore));
+
+        LOGGER.info("Indexed {} with profit_score={} having sells_min={} and profit={}", item.getItemId(), profitScore, sells.getMinPrice(), profit);
+
         return doc;
+    }
+
+    private double calculateProfitScore(int profit, PriceStatistics sells) {
+        // 30% profit is our goal, the closer we are to that goal the higher is the profit score.
+        double goal = 0.3;
+        double relativeProfit = ((double) profit / (double) sells.getMinPrice());
+        double profitScore;
+        /*
+            We have a ladder score:
+            0.0 to (goal * 2) = highest rating based on the distance to the goal itself.
+            (goal * 2) to (goal * 10) = next best rating, because these are interesting
+             > (goal * 10) = not interesting, because they're not realistic
+             <0 = not interesting, because we lose money here
+         */
+        if (relativeProfit >= 0.0 && relativeProfit <= (goal * 2.0)) {
+            profitScore = 1.0 - Math.abs(goal - relativeProfit);
+        } else if (relativeProfit >= (goal * 10.0)) {
+            profitScore = 0.5;
+        } else if (relativeProfit >= (goal * 2.0)){
+            profitScore = 0.6;
+        } else {
+            profitScore = 0.4;
+        }
+
+        return profitScore;
     }
 
     private Point createPoint(Item item, PriceStatistics buys, PriceStatistics sells, int profit) {

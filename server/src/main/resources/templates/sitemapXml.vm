@@ -4,13 +4,25 @@
     Basic URLs
 *#
     <url>
-        <loc>http://www.gw2trades.de/index.html</loc>
+        <loc>http://www.gw2trades.de/de/index.html</loc>
         <lastmod>${now}</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>http://www.gw2trades.de/impressum.html</loc>
+        <loc>http://www.gw2trades.de/de/impressum.html</loc>
+        <lastmod>${now}</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>http://www.gw2trades.de/en/index.html</loc>
+        <lastmod>${now}</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>http://www.gw2trades.de/en/impressum.html</loc>
         <lastmod>${now}</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
@@ -18,7 +30,13 @@
 
 #foreach($stat in $stats.results)
     <url>
-        <loc>http://www.gw2trades.de/details/${stat.itemId}.html</loc>
+        <loc>http://www.gw2trades.de/de/details/${stat.itemId}.html</loc>
+        <lastmod>${now}</lastmod>
+        <changefreq>hourly</changefreq>
+        <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>http://www.gw2trades.de/en/details/${stat.itemId}.html</loc>
         <lastmod>${now}</lastmod>
         <changefreq>hourly</changefreq>
         <priority>1.0</priority>

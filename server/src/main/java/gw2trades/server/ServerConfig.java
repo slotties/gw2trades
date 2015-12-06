@@ -3,6 +3,8 @@ package gw2trades.server;
 import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.influxdb.InfluxDbConnectionManager;
 import gw2trades.repository.influxdb.InfluxDbRepository;
+import gw2trades.server.locale.LocaleInterceptor;
+import gw2trades.server.locale.PerRequestLocaleResolver;
 import gw2trades.server.security.RemoteAddrFilter;
 import gw2trades.server.security.SecurityHeadersInterceptor;
 import org.apache.logging.log4j.LogManager;
@@ -15,6 +17,7 @@ import org.springframework.boot.web.servlet.view.velocity.EmbeddedVelocityViewRe
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -112,5 +115,11 @@ public class ServerConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new SecurityHeadersInterceptor());
+        registry.addInterceptor(new LocaleInterceptor());
+    }
+
+    @Bean
+    public LocaleResolver localeResolver() {
+        return new PerRequestLocaleResolver();
     }
 }

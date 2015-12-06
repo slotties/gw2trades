@@ -1,6 +1,8 @@
 package gw2trades.repository.api;
 
 /**
+ * This class represents a sort order state, that is a combination of a field to sort and the direction (ascending, descending).
+ *
  * @author Stefan Lotties (slotties@gmail.com)
  */
 public class Order {
@@ -22,5 +24,17 @@ public class Order {
 
     public String getField() {
         return field;
+    }
+
+    @Override
+    public int hashCode() {
+        return field.hashCode() ^ Boolean.hashCode(descending);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Order &&
+                ((Order) obj).field.equals(this.field) &&
+                ((Order) obj).descending == this.descending;
     }
 }

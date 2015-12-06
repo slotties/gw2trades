@@ -1,16 +1,19 @@
 /*
-    TODO: use sass
-
-    Colors:
+    Colors are from this palette:
     http://paletton.com/#uid=7010J0kr2p6hjvVm7s7tAkrA0fp
-
-    color | normal | bright | dark
-    red C8231F FE7875 7B0300
-    blue 1C5181 527EA5 052C4F
-    green 189D21 5CC863 006106
-    yellow C8821F FEC575 7B4800
-
 */
+@red_normal: #C8231F;
+@red_bright: #FE7875;
+@red_dark: #7B0300;
+@blue_normal: #1C5181;
+@blue_bright: #527EA5;
+@blue_dark: #052C4F;
+@green_normal: #189D21;
+@green_bright: #5CC863;
+@green_dark: #006106;
+@yellow_normal: #C8821F;
+@yellow_bright: #FEC575;
+@yellow_dark: #7B4800;
 
 .currency-gold {
     background: url('../images/coin_gold.png') center right no-repeat;
@@ -23,7 +26,7 @@
 }
 .currency-negative {
     font-weight: bold;
-    color: C8231F;
+    color: @red_normal;
 }
 
 .currency-gold,
@@ -47,59 +50,60 @@
 
 path.gw2-history-buyers {
     fill: none;
-    stroke: #C8231F;
+    stroke: @red_normal;
     stroke-width: 2px;
 }
 text.gw2-history-buyers {
-    fill: #C8231F;
+    fill: @red_normal;
     font-weight: bold;
 }
 path.gw2-history-buyers-avg {
     fill: none;
-    stroke: #FE7875;
+    stroke: @red_bright;
     stroke-width: 2px;
     opacity: 0.5;
 }
 text.gw2-history-buyers-avg {
-    fill: #FE7875;
+    fill: @red_bright;
     font-weight: bold;
 }
 path.gw2-history-sellers {
     fill: none;
-    stroke: #1C5181;
+    stroke: @blue_normal;
     stroke-width: 2px;
 }
 text.gw2-history-sellers {
-    fill: #1C5181;
+    fill: @blue_normal;
     font-weight: bold;
 }
 path.gw2-history-sellers-avg {
     fill: none;
-    stroke: #527EA5;
+    stroke: @blue_bright;
     stroke-width: 2px;
     opacity: 0.5;
 }
 text.gw2-history-sellers-avg {
-    fill: #527EA5;
+    fill: @blue_bright;
     font-weight: bold;
 }
 .gw2-history-profit {
     fill: none;
+    /* FIXME: use a normalized color */
     stroke: #448F30;
     stroke-width: 2px;
 }
 
 .gw2-history-buyers-focus {
-    fill: #C8231F;
-    stroke: #C8231F;
+    fill: @red_normal;
+    stroke: @red_normal;
 }
 .gw2-history-sellers-focus {
-    fill: #1C5181;
-    stroke: #1C5181;
+    fill: @blue_normal;
+    stroke: @blue_normal;
 }
 .gw2-history-tooltip {
     position: absolute;
-    border: 1px solid #FE7875;
+    border: 1px solid @red_bright;
     background-color: rgba(255, 255, 255, 0.8);
     padding: 4px;
 }
@@ -107,19 +111,19 @@ text.gw2-history-sellers-avg {
     margin-right: 4px;
 }
 .gw2-history-tooltip .tooltip-seller-avg {
-    color: #527EA5;
+    color: @blue_bright;
     font-weight: bold;
 }
 .gw2-history-tooltip .tooltip-seller {
-    color: #1C5181;
+    color: @blue_normal;
     font-weight: bold;
 }
 .gw2-history-tooltip .tooltip-bidder {
-    color: #C8231F;
+    color: @red_normal;
     font-weight: bold;
 }
 .gw2-history-tooltip .tooltip-bidder-avg {
-    color: #FE7875;
+    color: @red_bright;
     font-weight: bold;
 }
 
@@ -136,6 +140,7 @@ text.gw2-history-sellers-avg {
     Navigation
 */
 .navbar-default .navbar-brand {
+    /* FIXME: use a normalized color */
     color: #C8241F;
 }
 
@@ -145,20 +150,20 @@ a:focus,
 .pagination>li>a,
 .pagination>li>a:hover,
 .pagination>li>a:focus {
-    color: #C8231F;
+    color: @red_normal;
 }
 
 .text-sellers {
-    color: #1C5181;
+    color: @blue_normal;
 }
 
 .text-buyers {
-    color: #C8231F;
+    color: @red_normal;
 }
 
 .item-icon-mini {
-    width: 32px;
-    height: 32px;
+    width: 16px;
+    height: 16px;
 }
 
 .grid .tick {
@@ -181,7 +186,7 @@ a:focus,
 }
 
 .text-profit {
-   color: #189D21;
+   color: @green_normal;
 }
 
 .rarity-junk {
@@ -212,20 +217,20 @@ a:focus,
 .btn.text-data-avg-buyers,
 .btn.text-data-avg-buyers:focus,
 .btn.text-data-avg-buyers.active {
-    color: #FE7875;
+    color: @red_bright;
 }
 .btn.text-data-avg-sellers,
 .btn.text-data-avg-sellers:focus,
 .btn.text-data-avg-sellers.active {
-    color: #527EA5;
+    color: @blue_bright;
 }
 .btn.text-data-max-buyers,
 .btn.text-data-max-buyers:focus,
 .btn.text-data-max-buyers.active {
-    color: #C8231F;
+    color: @red_normal;
 }
 .btn.text-data-min-sellers,
 .btn.text-data-min-sellers:focus,
 .btn.text-data-min-sellers.active {
-    color: #1C5181;
+    color: @blue_normal;
 }
