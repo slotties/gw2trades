@@ -5,6 +5,7 @@ import gw2trades.repository.api.model.ListingStatistics;
 import gw2trades.repository.api.model.SearchResult;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,12 +31,12 @@ public interface ItemRepository {
     /**
      * Returns the history for an item ordered by its timestamp (oldest to newest).
      * @param itemId an item ID
-     * @param fromTimestamp the timestamp to begin at (inclusive)
-     * @param toTimestamp the timestamp to end at (inclusive)
+     * @param from the timestamp to begin at (inclusive)
+     * @param to the timestamp to end at (inclusive)
      * @return statistics
      * @throws IOException in case the repository could not be written
      */
-    List<ListingStatistics> getHistory(int itemId, long fromTimestamp, long toTimestamp) throws IOException;
+    List<ListingStatistics> getHistory(int itemId, LocalDateTime from, LocalDateTime to) throws IOException;
 
     /**
      * Returns the latest/newest statistics for an item.

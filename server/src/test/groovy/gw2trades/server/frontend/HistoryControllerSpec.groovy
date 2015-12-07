@@ -5,6 +5,8 @@ import spock.lang.Specification
 import spock.lang.Subject
 import spock.lang.Unroll
 
+import java.time.LocalDateTime
+
 /**
  * @author Stefan Lotties (slotties@gmail.com)
  */
@@ -19,11 +21,17 @@ class HistoryControllerSpec extends Specification {
     }
 
     def list() {
+        given:
+        def fromDateStr = "1984-06-24T10:00:00"
+        def expFromDate = LocalDateTime.parse(fromDateStr, HistoryController.DATE_FORMAT)
+        def toDateStr = "2002-06-24T10:00:00"
+        def expToDate = LocalDateTime.parse(toDateStr, HistoryController.DATE_FORMAT)
+
         when:
-        historyController.list(123, "1984-06-24T10:00:00", "2002-06-24T10:00:00")
+        historyController.list(123, fromDateStr, toDateStr)
 
         then:
-        1 * itemRepository.getHistory(123, 456912000000, 1024905600000l)
+        1 * itemRepository.getHistory(123, expFromDate, expToDate)
     }
 
     @Unroll("from=#from and to=#to")

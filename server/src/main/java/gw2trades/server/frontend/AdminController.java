@@ -8,14 +8,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author Stefan Lotties (slotties@gmail.com)
  */
 @Controller
 public class AdminController {
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private ItemRepository itemRepository;
 
     @Autowired
@@ -33,8 +34,7 @@ public class AdminController {
     public ModelAndView createSitemapXml() throws IOException {
         ModelAndView mav = new ModelAndView("sitemapXml");
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String now = sdf.format(new Date());
+        String now = DATE_FORMATTER.format(LocalDate.now());
 
         mav.addObject("stats", itemRepository.listStatistics(null, null, 0, Integer.MAX_VALUE));
         mav.addObject("now", now);

@@ -20,12 +20,12 @@ import org.influxdb.dto.QueryResult;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Duration;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,10 +37,10 @@ import java.util.stream.Collectors;
 public class InfluxDbRepository implements ItemRepository {
     private static final Logger LOGGER = LogManager.getLogger(InfluxDbRepository.class);
 
-    private static final String INFLUX_DATE_FORMAT_MSEC = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-    private static final String INFLUX_DATE_FORMAT_SEC = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    private static final DateTimeFormatter INFLUX_DATE_FORMAT_MSEC = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    private static final DateTimeFormatter INFLUX_DATE_FORMAT_SEC = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-    private static final String INFLUX_QUERY_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+    private static final DateTimeFormatter INFLUX_QUERY_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private static final FieldType DOUBLE_FIELD_TYPE_STORED_SORTED = new FieldType();
 
     static {
@@ -196,14 +196,16 @@ public class InfluxDbRepository implements ItemRepository {
         return new Sort(sortField);
     }
 
-    private String createInfluxQuery(int itemId, long fromTimestamp, long toTimestamp) {
-        SimpleDateFormat influxDateFormat = new SimpleDateFormat(INFLUX_QUERY_DATE_FORMAT);
-        String fromTime = influxDateFormat.format(new Date(fromTimestamp - (24 * 60 * 60 * 1000)));
-        String toTime = influxDateFormat.format(new Date(toTimestamp));
+    private String createInfluxQuery(int itemId, LocalDateTime fromDate, LocalDateTime toDate) {
+        // Stretch the dates a little bit to avoid single-data-points and cut-off lines.
+        fromDate = fromDate.minus(1, ChronoUnit.DAYS);
+        toDate = toDate.plus(1, ChronoUnit.DAYS);
+        String fromTime = INFLUX_QUERY_DATE_FORMAT.format(fromDate);
+        String toTime = INFLUX_QUERY_DATE_FORMAT.format(toDate);
 
-        Duration duration = Duration.ofMillis(toTimestamp - fromTimestamp);
+        Duration duration = Duration.between(fromDate, toDate);
         long days = duration.toDays();
-        if (days < 2) {
+        if (days < 4) {
             // Display all points without grouping them.
             return "select time, " +
                     " buys_avg, buys_max, buys_min, buys_total," +
@@ -236,14 +238,12 @@ public class InfluxDbRepository implements ItemRepository {
     }
 
     @Override
-    public List<ListingStatistics> getHistory(int itemId, long fromTimestamp, long toTimestamp) throws IOException {
+    public List<ListingStatistics> getHistory(int itemId, LocalDateTime fromTime, LocalDateTime toTime) throws IOException {
         InfluxDB influxDB = connectionManager.getConnection();
-        String queryStr = createInfluxQuery(itemId, fromTimestamp, toTimestamp);
+        String queryStr = createInfluxQuery(itemId, fromTime, toTime);
         org.influxdb.dto.Query query = new org.influxdb.dto.Query(queryStr, "gw2trades");
         QueryResult results = influxDB.query(query);
         List<ListingStatistics> allStats = new ArrayList<>();
-        SimpleDateFormat dateFormatMsec = new SimpleDateFormat(INFLUX_DATE_FORMAT_MSEC);
-        SimpleDateFormat dateFormatSec = new SimpleDateFormat(INFLUX_DATE_FORMAT_SEC);
 
         for (QueryResult.Result result : results.getResults()) {
             if (result.getSeries() == null) {
@@ -262,7 +262,7 @@ public class InfluxDbRepository implements ItemRepository {
                             stats.setSellStatistics(sells);
 
                             stats.setItemId(itemId);
-                            stats.setTimestamp(parseDateString((String) obj.get(0), dateFormatMsec, dateFormatSec));
+                            stats.setTimestamp(parseDateString((String) obj.get(0), INFLUX_DATE_FORMAT_MSEC, INFLUX_DATE_FORMAT_SEC));
 
                             buys.setAverage(influxDouble(obj.get(1)));
                             buys.setMaxPrice(influxInt(obj.get(2)));
@@ -287,11 +287,12 @@ public class InfluxDbRepository implements ItemRepository {
         return allStats;
     }
 
-    private long parseDateString(String str, SimpleDateFormat... parsers) {
-        for (SimpleDateFormat parser : parsers) {
+    private long parseDateString(String str, DateTimeFormatter... parsers) {
+        for (DateTimeFormatter parser : parsers) {
             try {
-                return parser.parse(str).getTime();
-            } catch (ParseException e) {
+                LocalDateTime ldt = LocalDateTime.parse(str, parser);
+                return ldt.toInstant(ZoneOffset.UTC).toEpochMilli();
+            } catch (DateTimeParseException e) {
                 // ignore, try next parser.
             }
         }
