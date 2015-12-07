@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -36,7 +37,9 @@ import java.util.stream.Collectors;
 public class InfluxDbRepository implements ItemRepository {
     private static final Logger LOGGER = LogManager.getLogger(InfluxDbRepository.class);
 
-    private static final String INFLUX_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    private static final String INFLUX_DATE_FORMAT_MSEC = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    private static final String INFLUX_DATE_FORMAT_SEC = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+
     private static final String INFLUX_QUERY_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
     private static final FieldType DOUBLE_FIELD_TYPE_STORED_SORTED = new FieldType();
 
@@ -193,24 +196,54 @@ public class InfluxDbRepository implements ItemRepository {
         return new Sort(sortField);
     }
 
+    private String createInfluxQuery(int itemId, long fromTimestamp, long toTimestamp) {
+        SimpleDateFormat influxDateFormat = new SimpleDateFormat(INFLUX_QUERY_DATE_FORMAT);
+        String fromTime = influxDateFormat.format(new Date(fromTimestamp - (24 * 60 * 60 * 1000)));
+        String toTime = influxDateFormat.format(new Date(toTimestamp));
+
+        Duration duration = Duration.ofMillis(toTimestamp - fromTimestamp);
+        long days = duration.toDays();
+        if (days < 2) {
+            // Display all points without grouping them.
+            return "select time, " +
+                    " buys_avg, buys_max, buys_min, buys_total," +
+                    " sells_avg, sells_max, sells_min, sells_total," +
+                    " profit" +
+                    " from item_" + itemId +
+                    " where time >= '" + fromTime + "'" +
+                    " and time <= '" + toTime + "'";
+        }
+
+        String groupByDuration;
+        if (days < 7) {
+            groupByDuration = "1h";
+        } else if (days < 14) {
+            groupByDuration = "4h";
+        } else if (days < 30) {
+            groupByDuration = "8h";
+        } else {
+            groupByDuration = "1d";
+        }
+
+        return "select " +
+                " mean(buys_avg), max(buys_max), min(buys_min), sum(buys_total)," +
+                " mean(sells_avg), max(sells_max), min(sells_min), sum(sells_total)," +
+                " min(profit)" +
+                " from item_" + itemId +
+                " where time >= '" + fromTime + "'" +
+                " and time <= '" + toTime + "'" +
+                " group by time(" + groupByDuration + ")";
+    }
+
     @Override
     public List<ListingStatistics> getHistory(int itemId, long fromTimestamp, long toTimestamp) throws IOException {
-        SimpleDateFormat influxDateFormat = new SimpleDateFormat(INFLUX_QUERY_DATE_FORMAT);
-
         InfluxDB influxDB = connectionManager.getConnection();
-        org.influxdb.dto.Query query = new org.influxdb.dto.Query(
-                "select time, " +
-                        " buys_avg, buys_max, buys_min, buys_total," +
-                        " sells_avg, sells_max, sells_min, sells_total," +
-                        " profit" +
-                        " from item_" + itemId +
-                        " where time >= '" + influxDateFormat.format(new Date(fromTimestamp)) + "'" +
-                                " and time <= '" + influxDateFormat.format(new Date(toTimestamp)) + "'",
-                "gw2trades"
-        );
+        String queryStr = createInfluxQuery(itemId, fromTimestamp, toTimestamp);
+        org.influxdb.dto.Query query = new org.influxdb.dto.Query(queryStr, "gw2trades");
         QueryResult results = influxDB.query(query);
         List<ListingStatistics> allStats = new ArrayList<>();
-        SimpleDateFormat dateFormat = new SimpleDateFormat(INFLUX_DATE_FORMAT);
+        SimpleDateFormat dateFormatMsec = new SimpleDateFormat(INFLUX_DATE_FORMAT_MSEC);
+        SimpleDateFormat dateFormatSec = new SimpleDateFormat(INFLUX_DATE_FORMAT_SEC);
 
         for (QueryResult.Result result : results.getResults()) {
             if (result.getSeries() == null) {
@@ -220,6 +253,7 @@ public class InfluxDbRepository implements ItemRepository {
             for (QueryResult.Series series : result.getSeries()) {
                 List<List<Object>> values = series.getValues();
                 List<ListingStatistics> seriesStats = values.stream()
+                        .filter(obj -> obj.size() > 1 && obj.get(1) != null)
                         .map(obj -> {
                             PriceStatistics buys = new PriceStatistics();
                             PriceStatistics sells = new PriceStatistics();
@@ -228,11 +262,7 @@ public class InfluxDbRepository implements ItemRepository {
                             stats.setSellStatistics(sells);
 
                             stats.setItemId(itemId);
-                            try {
-                                stats.setTimestamp(dateFormat.parse((String) obj.get(0)).getTime());
-                            } catch (ParseException e) {
-                                LOGGER.warn("Could not parse date string {}", obj.get(0), e);
-                            }
+                            stats.setTimestamp(parseDateString((String) obj.get(0), dateFormatMsec, dateFormatSec));
 
                             buys.setAverage(influxDouble(obj.get(1)));
                             buys.setMaxPrice(influxInt(obj.get(2)));
@@ -255,6 +285,19 @@ public class InfluxDbRepository implements ItemRepository {
         }
 
         return allStats;
+    }
+
+    private long parseDateString(String str, SimpleDateFormat... parsers) {
+        for (SimpleDateFormat parser : parsers) {
+            try {
+                return parser.parse(str).getTime();
+            } catch (ParseException e) {
+                // ignore, try next parser.
+            }
+        }
+
+        LOGGER.warn("Could not parse date string {}", str);
+        return 0;
     }
 
     private double influxDouble(Object v) {
