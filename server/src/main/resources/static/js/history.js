@@ -269,6 +269,7 @@
         return str;
     },
     updatePriceHistoryTooltip = function(element, data) {
+        element.querySelector('.profit-value').innerHTML = renderCoins(data.profit);
         element.querySelector('.highest-bidder-value').innerHTML = renderCoins(data.buyStatistics.maxPrice);
         element.querySelector('.avg-bidder-value').innerHTML = renderCoins(data.buyStatistics.average);
         element.querySelector('.lowest-seller-value').innerHTML = renderCoins(data.sellStatistics.minPrice);
@@ -303,6 +304,13 @@
             label: gw2scope.labels.avg_buyers,
             cls: "gw2-history-buyers-avg",
             focusCls: "gw2-history-buyers-focus"
+        });
+        chart.add({
+            id: 'profit',
+            yFn: function(d) { return d.profit; },
+            label: gw2scope.labels.profit,
+            cls: "gw2-history-profit",
+            focusCls: "gw2-history-profit-focus"
         });
         chart.setupTooltip(document.getElementById('priceHistoryTooltip'), updatePriceHistoryTooltip);
 

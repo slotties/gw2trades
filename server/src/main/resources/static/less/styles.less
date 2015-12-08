@@ -86,11 +86,14 @@ text.gw2-history-sellers-avg {
     fill: @blue_bright;
     font-weight: bold;
 }
-.gw2-history-profit {
+path.gw2-history-profit {
     fill: none;
-    /* FIXME: use a normalized color */
-    stroke: #448F30;
+    stroke: @green_normal;
     stroke-width: 2px;
+}
+text.gw2-history-profit {
+    fill: @green_normal;
+    font-weight: bold;
 }
 
 .gw2-history-buyers-focus {
@@ -100,6 +103,10 @@ text.gw2-history-sellers-avg {
 .gw2-history-sellers-focus {
     fill: @blue_normal;
     stroke: @blue_normal;
+}
+.gw2-history-profit-focus {
+    fill: @green_normal;
+    stroke: @green_normal;
 }
 .gw2-history-tooltip {
     position: absolute;
@@ -124,6 +131,10 @@ text.gw2-history-sellers-avg {
 }
 .gw2-history-tooltip .tooltip-bidder-avg {
     color: @red_bright;
+    font-weight: bold;
+}
+.gw2-history-tooltip .tooltip-profit {
+    color: @green_normal;
     font-weight: bold;
 }
 
@@ -233,4 +244,9 @@ a:focus,
 .btn.text-data-min-sellers:focus,
 .btn.text-data-min-sellers.active {
     color: @blue_normal;
+}
+.btn.text-data-profit,
+.btn.text-data-profit:focus,
+.btn.text-data-profit.active {
+    color: @green_normal;
 }

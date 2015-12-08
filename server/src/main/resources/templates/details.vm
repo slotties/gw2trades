@@ -73,6 +73,9 @@
 </div>
 
 <div id="priceHistoryTooltip" class="gw2-history-tooltip" style="display: none;">
+    <span class="tooltip-profit">#springMessage('details.tooltip.profit')</span>
+    <span class="profit-value"></span>
+    <br>
     <span class="tooltip-seller-avg">#springMessage('details.tooltip.avgSeller')</span>
     <span class="avg-seller-value"></span>
     <br>
@@ -93,6 +96,7 @@
         <button type="button" class="btn btn-default" data-offset="1d">#springMessage('details.timeframes.1d')</button>
     </div>
     <div class="btn-group" role="group" id="chart-line-selectors">
+        <button type="button" class="btn btn-default text-data-profit" data-line="profit" data-initial="true">#springMessage('details.lines.profit')</button>
         <button type="button" class="btn btn-default text-data-avg-sellers" data-line="avg_sellers">#springMessage('details.lines.avgSellers')</button>
         <button type="button" class="btn btn-default text-data-min-sellers" data-line="min_sellers" data-initial="true">#springMessage('details.lines.minSellers')</button>
         <button type="button" class="btn btn-default text-data-max-buyers" data-line="max_buyers" data-initial="true">#springMessage('details.lines.maxBuyers')</button>
@@ -111,8 +115,9 @@
             avg_sellers: "#springMessage('details.lines.avgSellers')",
             max_buyers: "#springMessage('details.lines.maxBuyers')",
             avg_buyers: "#springMessage('details.lines.avgBuyers')",
+            profit: "#springMessage('details.lines.profit')",
             sellers: "#springMessage('details.lines.sellers')",
-            buyers: "#springMessage('details.lines.buyers')",
+            buyers: "#springMessage('details.lines.buyers')"
         }
     };
 </script>
