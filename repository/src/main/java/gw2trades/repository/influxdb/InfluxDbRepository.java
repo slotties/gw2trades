@@ -37,9 +37,7 @@ import java.util.stream.Collectors;
 public class InfluxDbRepository implements ItemRepository {
     private static final Logger LOGGER = LogManager.getLogger(InfluxDbRepository.class);
 
-    private static final DateTimeFormatter INFLUX_DATE_FORMAT_MSEC = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    private static final DateTimeFormatter INFLUX_DATE_FORMAT_SEC = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-
+    private static final DateTimeFormatter INFLUX_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
     private static final DateTimeFormatter INFLUX_QUERY_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private static final FieldType DOUBLE_FIELD_TYPE_STORED_SORTED = new FieldType();
 
@@ -262,7 +260,7 @@ public class InfluxDbRepository implements ItemRepository {
                             stats.setSellStatistics(sells);
 
                             stats.setItemId(itemId);
-                            stats.setTimestamp(parseDateString((String) obj.get(0), INFLUX_DATE_FORMAT_MSEC, INFLUX_DATE_FORMAT_SEC));
+                            stats.setTimestamp(parseDateString((String) obj.get(0), INFLUX_DATE_FORMAT));
 
                             buys.setAverage(influxDouble(obj.get(1)));
                             buys.setMaxPrice(influxInt(obj.get(2)));
@@ -287,18 +285,24 @@ public class InfluxDbRepository implements ItemRepository {
         return allStats;
     }
 
-    private long parseDateString(String str, DateTimeFormatter... parsers) {
-        for (DateTimeFormatter parser : parsers) {
-            try {
-                LocalDateTime ldt = LocalDateTime.parse(str, parser);
-                return ldt.toInstant(ZoneOffset.UTC).toEpochMilli();
-            } catch (DateTimeParseException e) {
-                // ignore, try next parser.
-            }
+    private long parseDateString(String str, DateTimeFormatter parser) {
+        int msecDelim = str.lastIndexOf('.');
+        if (msecDelim > 0) {
+            // Cut off msecs
+            str = str.substring(0, str.lastIndexOf('.'));
+        } else {
+            // Cut off the 'Z' at the end.
+            str = str.substring(0, str.length() - 1);
         }
+        try {
+            LocalDateTime ldt = LocalDateTime.parse(str, parser);
+            return ldt.toInstant(ZoneOffset.UTC).toEpochMilli();
+        } catch (DateTimeParseException e) {
+            // ignore, try next parser.
 
-        LOGGER.warn("Could not parse date string {}", str);
-        return 0;
+            LOGGER.warn("Could not parse date string {}", str);
+            return 0;
+        }
     }
 
     private double influxDouble(Object v) {
