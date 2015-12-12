@@ -254,3 +254,24 @@ a:focus,
 .btn.text-data-profit.active {
     color: @green_normal;
 }
+
+@media (max-width: 750px) {
+    .idx-col-buy-avg,
+    .idx-col-sell-avg {
+        display: none !important;
+    }
+
+    .item-icon-mini {
+        display: none;
+    }
+
+    .currency-gold,
+    .currency-silver,
+    .currency-copper {
+        display: block;
+    }
+
+    form .col-lg-6 {
+        margin-top: 8px;
+    }
+}
