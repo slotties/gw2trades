@@ -26,6 +26,8 @@
         <meta property="og:type" content="website">
         <meta property="og:locale" content="${springMacroRequestContext.locale}">
 
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
         <link rel="shortcut icon" href="/static/images/favicon.ico" type="image/x-icon; charset=binary">
         <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon; charset=binary">
 
