@@ -2,6 +2,7 @@ package gw2trades.server.frontend;
 
 import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.api.model.ListingStatistics;
+import gw2trades.server.frontend.exception.ItemNotFoundException;
 import gw2trades.server.model.GoogleAnalytics;
 import gw2trades.server.model.SeoMeta;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class DetailsController {
     public ModelAndView details(@PathVariable int itemId) throws IOException {
         ModelAndView model = new ModelAndView("frame");
         ListingStatistics latestStats = itemRepository.latestStatistics(itemId);
+        if (latestStats == null) {
+            throw new ItemNotFoundException();
+        }
 
         SeoMeta seoMeta = new SeoMeta("details.title");
         seoMeta.setTitleArgs(new Object[] { latestStats.getItem().getName() });
