@@ -60,7 +60,7 @@
             .attr("class", "gw2-charts-y gw2-charts-axis")
             .call(this.yAxis);
 
-        svg.append("rect")
+        this.overlay = svg.append("rect")
             .attr("class", "gw2-charts-overlay")
             .attr("width", width)
             .attr("height", height)
@@ -121,6 +121,10 @@
             lineLabel = this.svg.append("text").attr("dy", ".35em").attr('class', conf.cls).attr("text-anchor", "start").text(conf.label);
 
         focusCircle.append("circle").attr("r", 3);
+
+        // Ensure the overlay node is the last node to avoid flickering caused by paths or focus circles that steal the mouse-over events from the overlay.
+        var overlay = this.overlay[0][0];
+        overlay.parentNode.appendChild(overlay);
 
         this.lines.push({
             id: conf.id,
@@ -265,6 +269,7 @@
         return str;
     },
     updatePriceHistoryTooltip = function(element, data) {
+        element.querySelector('.profit-value').innerHTML = renderCoins(data.profit);
         element.querySelector('.highest-bidder-value').innerHTML = renderCoins(data.buyStatistics.maxPrice);
         element.querySelector('.avg-bidder-value').innerHTML = renderCoins(data.buyStatistics.average);
         element.querySelector('.lowest-seller-value').innerHTML = renderCoins(data.sellStatistics.minPrice);
@@ -299,6 +304,13 @@
             label: gw2scope.labels.avg_buyers,
             cls: "gw2-history-buyers-avg",
             focusCls: "gw2-history-buyers-focus"
+        });
+        chart.add({
+            id: 'profit',
+            yFn: function(d) { return d.profit; },
+            label: gw2scope.labels.profit,
+            cls: "gw2-history-profit",
+            focusCls: "gw2-history-profit-focus"
         });
         chart.setupTooltip(document.getElementById('priceHistoryTooltip'), updatePriceHistoryTooltip);
 

@@ -62,6 +62,11 @@ public class Importer {
         executorService.shutdown();
         executorService.awaitTermination(10, TimeUnit.MINUTES);
 
+        if (allListings.isEmpty()) {
+            LOGGER.error("The gw2 API did not return any listings. It's broken again. Won't import anything.");
+            System.exit(1);
+        }
+
         ItemRepository repository = new InfluxDbRepository(connectionManager, indexDir, false);
         try {
             LOGGER.info("Writing everything into repository ...");

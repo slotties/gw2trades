@@ -7,8 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ import java.util.List;
  */
 @Controller
 public class HistoryController {
-    static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     private ItemRepository repository;
 
@@ -35,13 +36,12 @@ public class HistoryController {
             throw new IllegalArgumentException("bad input dates");
         }
 
-        SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
-        long fromTs;
-        long toTs;
+        LocalDateTime fromTs;
+        LocalDateTime toTs;
         try {
-            fromTs = format.parse(from).getTime();
-            toTs = format.parse(to).getTime();
-        } catch (ParseException e) {
+            fromTs = LocalDateTime.parse(from, DATE_FORMAT);
+            toTs = LocalDateTime.parse(to, DATE_FORMAT);
+        } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("bad input dates");
         }
 

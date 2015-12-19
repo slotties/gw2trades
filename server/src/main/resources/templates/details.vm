@@ -14,9 +14,11 @@
 
 <div class="page-header">
     <h1 class="rarity-${latestStats.item.rarity.toLowerCase()}">
-        <img alt="Item icon" src="${latestStats.item.iconUrl}"> ${latestStats.item.name} #if($latestStats.item.level > 0)<span title="#springMessage('details.item.levelReq')">(${latestStats.item.level})</span>#end
-        <a href="http://wiki-en.guildwars2.com/wiki/${gw2.wikiName($latestStats.item.name)}"><img alt="gw2wiki" title="#springMessage('details.links.gw2wiki')" src="/static/images/gw2wiki.jpg"></a>
-        <a href="https://gw2treasures.com/item/${latestStats.itemId}"><img alt="gw2treasures" title="#springMessage('details.links.gw2treasures')" src="/static/images/gw2treasures.png"></a>
+        <img class="item-icon" alt="Item icon" src="${latestStats.item.iconUrl}"> ${latestStats.item.name} #if($latestStats.item.level > 0)<span title="#springMessage('details.item.levelReq')">(${latestStats.item.level})</span>#end
+        <div class="link-outs">
+            <a href="http://wiki-en.guildwars2.com/wiki/${gw2.wikiName($latestStats.item.name)}"><img alt="gw2wiki" title="#springMessage('details.links.gw2wiki')" src="/static/images/gw2wiki.jpg"></a>
+            <a href="https://gw2treasures.com/item/${latestStats.itemId}"><img alt="gw2treasures" title="#springMessage('details.links.gw2treasures')" src="/static/images/gw2treasures.png"></a>
+        </div>
     </h1>
     <h3>
         <span class="text-profit">#springMessage('details.data.profit')</span> #price($gw2.profit($latestStats.buyStatistics.maxPrice, $latestStats.sellStatistics.minPrice))
@@ -73,6 +75,9 @@
 </div>
 
 <div id="priceHistoryTooltip" class="gw2-history-tooltip" style="display: none;">
+    <span class="tooltip-profit">#springMessage('details.tooltip.profit')</span>
+    <span class="profit-value"></span>
+    <br>
     <span class="tooltip-seller-avg">#springMessage('details.tooltip.avgSeller')</span>
     <span class="avg-seller-value"></span>
     <br>
@@ -93,6 +98,7 @@
         <button type="button" class="btn btn-default" data-offset="1d">#springMessage('details.timeframes.1d')</button>
     </div>
     <div class="btn-group" role="group" id="chart-line-selectors">
+        <button type="button" class="btn btn-default text-data-profit" data-line="profit" data-initial="true">#springMessage('details.lines.profit')</button>
         <button type="button" class="btn btn-default text-data-avg-sellers" data-line="avg_sellers">#springMessage('details.lines.avgSellers')</button>
         <button type="button" class="btn btn-default text-data-min-sellers" data-line="min_sellers" data-initial="true">#springMessage('details.lines.minSellers')</button>
         <button type="button" class="btn btn-default text-data-max-buyers" data-line="max_buyers" data-initial="true">#springMessage('details.lines.maxBuyers')</button>
@@ -111,8 +117,9 @@
             avg_sellers: "#springMessage('details.lines.avgSellers')",
             max_buyers: "#springMessage('details.lines.maxBuyers')",
             avg_buyers: "#springMessage('details.lines.avgBuyers')",
+            profit: "#springMessage('details.lines.profit')",
             sellers: "#springMessage('details.lines.sellers')",
-            buyers: "#springMessage('details.lines.buyers')",
+            buyers: "#springMessage('details.lines.buyers')"
         }
     };
 </script>

@@ -20,11 +20,12 @@ import org.influxdb.dto.QueryResult;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,8 +37,8 @@ import java.util.stream.Collectors;
 public class InfluxDbRepository implements ItemRepository {
     private static final Logger LOGGER = LogManager.getLogger(InfluxDbRepository.class);
 
-    private static final String INFLUX_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-    private static final String INFLUX_QUERY_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+    private static final DateTimeFormatter INFLUX_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private static final DateTimeFormatter INFLUX_QUERY_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private static final FieldType DOUBLE_FIELD_TYPE_STORED_SORTED = new FieldType();
 
     static {
@@ -193,24 +194,54 @@ public class InfluxDbRepository implements ItemRepository {
         return new Sort(sortField);
     }
 
-    @Override
-    public List<ListingStatistics> getHistory(int itemId, long fromTimestamp, long toTimestamp) throws IOException {
-        SimpleDateFormat influxDateFormat = new SimpleDateFormat(INFLUX_QUERY_DATE_FORMAT);
+    private String createInfluxQuery(int itemId, LocalDateTime fromDate, LocalDateTime toDate) {
+        // Stretch the dates a little bit to avoid single-data-points and cut-off lines.
+        fromDate = fromDate.minus(1, ChronoUnit.DAYS);
+        toDate = toDate.plus(1, ChronoUnit.DAYS);
+        String fromTime = INFLUX_QUERY_DATE_FORMAT.format(fromDate);
+        String toTime = INFLUX_QUERY_DATE_FORMAT.format(toDate);
 
+        Duration duration = Duration.between(fromDate, toDate);
+        long days = duration.toDays();
+        if (days < 4) {
+            // Display all points without grouping them.
+            return "select time, " +
+                    " buys_avg, buys_max, buys_min, buys_total," +
+                    " sells_avg, sells_max, sells_min, sells_total," +
+                    " profit" +
+                    " from item_" + itemId +
+                    " where time >= '" + fromTime + "'" +
+                    " and time <= '" + toTime + "'";
+        }
+
+        String groupByDuration;
+        if (days < 7) {
+            groupByDuration = "1h";
+        } else if (days < 14) {
+            groupByDuration = "4h";
+        } else if (days < 30) {
+            groupByDuration = "8h";
+        } else {
+            groupByDuration = "1d";
+        }
+
+        return "select " +
+                " mean(buys_avg), max(buys_max), min(buys_min), sum(buys_total)," +
+                " mean(sells_avg), max(sells_max), min(sells_min), sum(sells_total)," +
+                " min(profit)" +
+                " from item_" + itemId +
+                " where time >= '" + fromTime + "'" +
+                " and time <= '" + toTime + "'" +
+                " group by time(" + groupByDuration + ")";
+    }
+
+    @Override
+    public List<ListingStatistics> getHistory(int itemId, LocalDateTime fromTime, LocalDateTime toTime) throws IOException {
         InfluxDB influxDB = connectionManager.getConnection();
-        org.influxdb.dto.Query query = new org.influxdb.dto.Query(
-                "select time, " +
-                        " buys_avg, buys_max, buys_min, buys_total," +
-                        " sells_avg, sells_max, sells_min, sells_total," +
-                        " profit" +
-                        " from item_" + itemId +
-                        " where time >= '" + influxDateFormat.format(new Date(fromTimestamp)) + "'" +
-                                " and time <= '" + influxDateFormat.format(new Date(toTimestamp)) + "'",
-                "gw2trades"
-        );
+        String queryStr = createInfluxQuery(itemId, fromTime, toTime);
+        org.influxdb.dto.Query query = new org.influxdb.dto.Query(queryStr, "gw2trades");
         QueryResult results = influxDB.query(query);
         List<ListingStatistics> allStats = new ArrayList<>();
-        SimpleDateFormat dateFormat = new SimpleDateFormat(INFLUX_DATE_FORMAT);
 
         for (QueryResult.Result result : results.getResults()) {
             if (result.getSeries() == null) {
@@ -220,6 +251,7 @@ public class InfluxDbRepository implements ItemRepository {
             for (QueryResult.Series series : result.getSeries()) {
                 List<List<Object>> values = series.getValues();
                 List<ListingStatistics> seriesStats = values.stream()
+                        .filter(obj -> obj.size() > 1 && obj.get(1) != null)
                         .map(obj -> {
                             PriceStatistics buys = new PriceStatistics();
                             PriceStatistics sells = new PriceStatistics();
@@ -228,11 +260,7 @@ public class InfluxDbRepository implements ItemRepository {
                             stats.setSellStatistics(sells);
 
                             stats.setItemId(itemId);
-                            try {
-                                stats.setTimestamp(dateFormat.parse((String) obj.get(0)).getTime());
-                            } catch (ParseException e) {
-                                LOGGER.warn("Could not parse date string {}", obj.get(0), e);
-                            }
+                            stats.setTimestamp(parseDateString((String) obj.get(0), INFLUX_DATE_FORMAT));
 
                             buys.setAverage(influxDouble(obj.get(1)));
                             buys.setMaxPrice(influxInt(obj.get(2)));
@@ -255,6 +283,26 @@ public class InfluxDbRepository implements ItemRepository {
         }
 
         return allStats;
+    }
+
+    private long parseDateString(String str, DateTimeFormatter parser) {
+        int msecDelim = str.lastIndexOf('.');
+        if (msecDelim > 0) {
+            // Cut off msecs
+            str = str.substring(0, str.lastIndexOf('.'));
+        } else {
+            // Cut off the 'Z' at the end.
+            str = str.substring(0, str.length() - 1);
+        }
+        try {
+            LocalDateTime ldt = LocalDateTime.parse(str, parser);
+            return ldt.toInstant(ZoneOffset.UTC).toEpochMilli();
+        } catch (DateTimeParseException e) {
+            // ignore, try next parser.
+
+            LOGGER.warn("Could not parse date string {}", str);
+            return 0;
+        }
     }
 
     private double influxDouble(Object v) {

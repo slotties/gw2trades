@@ -26,6 +26,8 @@
         <meta property="og:type" content="website">
         <meta property="og:locale" content="${springMacroRequestContext.locale}">
 
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
         <link rel="shortcut icon" href="/static/images/favicon.ico" type="image/x-icon; charset=binary">
         <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon; charset=binary">
 
@@ -73,7 +75,12 @@
       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
       ga('create', 'UA-70815637-1', 'auto');
-      ga('send', 'pageview');
-
+      ga('send', 'pageview', {
+        #if($googleAnalytics)
+            #foreach($v in $googleAnalytics.dimensions)
+                "dimension${mathtool.add($foreach.index, 1)}": "$v"#if(!$foreach.last),#end
+            #end
+        #end
+      });
     </script>
 </html>
