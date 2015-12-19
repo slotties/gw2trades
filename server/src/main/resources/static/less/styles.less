@@ -177,7 +177,7 @@ a:focus,
     height: 16px;
 }
 .item-icon {
-    widht: 64px;
+    width: 64px;
     height: 64px;
 }
 
@@ -255,6 +255,10 @@ a:focus,
     color: @green_normal;
 }
 
+.link-outs {
+    display: inline;
+}
+
 @media (max-width: 750px) {
     .idx-col-buy-avg,
     .idx-col-sell-avg {
@@ -265,13 +269,26 @@ a:focus,
         display: none;
     }
 
-    .currency-gold,
-    .currency-silver,
-    .currency-copper {
+    td .currency-gold,
+    td .currency-silver,
+    td .currency-copper {
         display: block;
     }
 
     form .col-lg-6 {
         margin-top: 8px;
+    }
+
+    .item-icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .link-outs {
+        display: block;
+    }
+
+    #chart-line-selectors {
+        margin-top: 5px;
     }
 }
