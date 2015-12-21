@@ -153,7 +153,7 @@ public class InfluxDbRepository implements ItemRepository {
         return new Sort(
                 new SortedNumericSortField("profit_score", SortField.Type.DOUBLE, true),
                 new SortedNumericSortField("profit", SortField.Type.INT, true)
-            );
+        );
     }
 
     private Sort createSort(Order order) {
@@ -417,28 +417,19 @@ public class InfluxDbRepository implements ItemRepository {
     }
 
     private double calculateProfitScore(int profit, PriceStatistics sells) {
-        // 30% profit is our goal, the closer we are to that goal the higher is the profit score.
-        double goal = 0.3;
-        double relativeProfit = ((double) profit / (double) sells.getMinPrice());
-        double profitScore;
         /*
-            We have a ladder score:
-            0.0 to (goal * 2) = highest rating based on the distance to the goal itself.
-            (goal * 2) to (goal * 10) = next best rating, because these are interesting
-             > (goal * 10) = not interesting, because they're not realistic
-             <0 = not interesting, because we lose money here
+            The algorithm is:
+            - the closer the revenue is to 50% the higher it ranks. The score is distributed between 0.5 and 1.0.
+            - profits >100% are not realistic. These are listed in 0.25 and 0.49.
+            - negative profits are scored with 0.0 to 0.1.
          */
-        if (relativeProfit >= 0.0 && relativeProfit <= (goal * 2.0)) {
-            profitScore = 1.0 - Math.abs(goal - relativeProfit);
-        } else if (relativeProfit >= (goal * 10.0)) {
-            profitScore = 0.5;
-        } else if (relativeProfit >= (goal * 2.0)){
-            profitScore = 0.6;
-        } else {
-            profitScore = 0.4;
-        }
 
-        return profitScore;
+        double goal = 0.5;
+        double revenue = ((double) profit / (double) sells.getMinPrice());
+        double distanceToGoal = (goal - revenue) * 10.0;
+        double profitScore = (-(Math.pow(distanceToGoal, 2)) + 100.0) / 100.0;
+
+        return Math.max(0.0, profitScore);
     }
 
     private Point createPoint(Item item, PriceStatistics buys, PriceStatistics sells, int profit) {

@@ -5,6 +5,7 @@ import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.api.model.Item;
 import gw2trades.repository.api.model.ItemListings;
 import gw2trades.repository.influxdb.InfluxDbConnectionManager;
+import gw2trades.repository.influxdb.InfluxDbConnectionManagerImpl;
 import gw2trades.repository.influxdb.InfluxDbRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,7 +34,7 @@ public class Importer {
     }
 
     public void execute() throws Exception {
-        InfluxDbConnectionManager connectionManager = new InfluxDbConnectionManager(
+        InfluxDbConnectionManager connectionManager = new InfluxDbConnectionManagerImpl(
                 config.required("influxdb.url"),
                 config.optional("influxdb.user").orElse(""),
                 config.optional("influxdb.pass").orElse("")
