@@ -407,7 +407,7 @@ public class InfluxDbRepository implements ItemRepository {
         doc.add(new IntField("profit", profit, IntField.TYPE_STORED));
         doc.add(new NumericDocValuesField("profit", profit));
 
-        double profitScore = calculateProfitScore(profit, sells);
+        double profitScore = calculateProfitScore(profit, sells, buys);
         doc.add(new DoubleField("profit_score", profitScore, DoubleField.TYPE_STORED));
         doc.add(new DoubleDocValuesField("profit_score", profitScore));
 
@@ -416,23 +416,45 @@ public class InfluxDbRepository implements ItemRepository {
         return doc;
     }
 
-    private double calculateProfitScore(int profit, PriceStatistics sells) {
+    private double calculateProfitScore(int profit, PriceStatistics sells, PriceStatistics buys) {
         /*
             The algorithm is:
-            - the closer the revenue is to 50% the higher it ranks. The score is distributed between 0.5 and 1.0.
-            - profits >100% are not realistic. These are listed in 0.25 and 0.49.
-            - negative profits are scored with 0.0 to 0.1.
+            - 0% to 100% revenue are in focus. These numbers are linear scaled between 0.5 and 0.8.
+              Additionally a small bonus for the quantity is added (0.0 to 0.2) in order to push items with less revenue but high demand.
+            - Everything over 100% revenue is ordered by their revenue. These are quite unrealistic, yet better than a loss.
+            - Everything with a loss is ordered to the end.
          */
         if (profit == 0) {
             return 0.0;
         }
 
-        double goal = 0.5;
-        double revenue = ((double) profit / (double) sells.getMinPrice());
-        double distanceToGoal = (goal - revenue) * 10.0;
-        double profitScore = (-(Math.pow(distanceToGoal, 2)) + 100.0) / 100.0;
+        // Cap the profit at 30g. Everything higher requires too much of invest. People that search for such risky
+        // trades can manually sort by the profit and pick out such items.
+        profit = Math.min(profit, 30_000);
+        double revenue = ((double) profit / (double) (sells.getMinPrice() - profit));
+        double profitScore;
+        if (revenue > 0.0 && revenue <= 1.0) {
+            double singleTradeScore = scale(revenue, 0.0, 1.0, 0.5, 0.8);
+            double quantityScore = scale((double) buys.getTotalAmount(), 0.0, 100.0, 0.0, 0.2);
 
-        return Math.max(0.0, profitScore);
+            profitScore = singleTradeScore + quantityScore;
+        } else if (revenue > 1.0) {
+            profitScore = scale(Math.min(10.0, revenue), 2.0, 10.0, 0.1, 0.5);
+        } else {
+            profitScore = scale(Math.min(Math.abs(revenue), 1.0), 0.0, 1.0, 0.0, 0.1);
+        }
+
+        return profitScore;
+    }
+
+    private double scale(double x, double origMin, double origMax, double min, double max) {
+        return
+                (
+                        ((max - min) * (x + origMin))
+                                /
+                                (origMax - origMin)
+                )
+                        + min;
     }
 
     private Point createPoint(Item item, PriceStatistics buys, PriceStatistics sells, int profit) {

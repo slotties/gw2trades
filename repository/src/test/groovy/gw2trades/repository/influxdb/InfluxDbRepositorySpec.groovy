@@ -44,8 +44,7 @@ class InfluxDbRepositorySpec extends Specification {
         def listings = new ItemListings(
                 itemId: 123,
                 buys: [ new ItemListing(unitPrice: buyPrice, quantity: 1) ],
-                // Add ~15% to the sellPrice because 15% of the these are fix costs in gw2.
-                sells: [ new ItemListing(unitPrice: sellPrice * 1.15, quantity: 1 )],
+                sells: [ new ItemListing(unitPrice: sellPrice, quantity: 1 )],
                 item: new Item(
                         itemId: 123,
                         name: "foo",
@@ -70,17 +69,18 @@ class InfluxDbRepositorySpec extends Specification {
         where:
         buyPrice | sellPrice | minProfitScore | maxProfitScore
         100      | 50        | 0.0            | 0.1
-        100      | 100       | 0.7            | 0.75
-        100      | 125       | 0.8            | 0.9
-        100      | 150       | 0.9            | 1.0
-        100      | 200       | 0.9            | 1.0
-        100      | 90        | 0.6            | 0.7
+        100      | 100       | 0.0            | 0.1
+        100      | 125       | 0.5            | 0.6
+        100      | 150       | 0.5            | 0.6
+        100      | 200       | 0.6            | 0.7
+        100      | 250       | 0.70           | 0.8
+        100      | 90        | 0.0            | 0.1
         1000     | 500       | 0.0            | 0.1
-        1000     | 1000      | 0.7            | 0.75
-        1000     | 1250      | 0.8            | 0.9
-        1000     | 1500      | 0.9            | 1.0
-        1000     | 1750      | 0.9            | 1.0
-        1000     | 2000      | 0.9            | 1.0
-        1000     | 10000     | 0.9            | 1.0
+        1000     | 1000      | 0.0            | 0.1
+        1000     | 1250      | 0.5            | 0.6
+        1000     | 1500      | 0.5            | 0.6
+        1000     | 1750      | 0.6            | 0.7
+        1000     | 2000      | 0.6            | 0.7
+        1000     | 10000     | 0.3            | 0.4
     }
 }
