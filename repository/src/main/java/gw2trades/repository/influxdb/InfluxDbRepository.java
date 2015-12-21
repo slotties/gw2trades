@@ -434,8 +434,8 @@ public class InfluxDbRepository implements ItemRepository {
         double revenue = ((double) profit / (double) (sells.getMinPrice() - profit));
         double profitScore;
         if (revenue > 0.0 && revenue <= 1.0) {
-            double singleTradeScore = scale(revenue, 0.0, 1.0, 0.5, 0.8);
-            double quantityScore = scale((double) buys.getTotalAmount(), 0.0, 100.0, 0.0, 0.2);
+            double singleTradeScore = scale(revenue, 0.0, 1.0, 0.5, 0.9);
+            double quantityScore = scale(Math.min((double) buys.getTotalAmount(), 100.0), 0.0, 100.0, 0.0, 0.1);
 
             profitScore = singleTradeScore + quantityScore;
         } else if (revenue > 1.0) {
