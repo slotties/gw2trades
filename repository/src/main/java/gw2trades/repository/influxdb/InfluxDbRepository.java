@@ -423,6 +423,9 @@ public class InfluxDbRepository implements ItemRepository {
             - profits >100% are not realistic. These are listed in 0.25 and 0.49.
             - negative profits are scored with 0.0 to 0.1.
          */
+        if (profit == 0) {
+            return 0.0;
+        }
 
         double goal = 0.5;
         double revenue = ((double) profit / (double) sells.getMinPrice());
