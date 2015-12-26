@@ -16,6 +16,24 @@ public class Item {
     @JsonProperty
     private String rarity;
     private int level;
+    private String type;
+    private ItemDetails details;
+
+    public ItemDetails getDetails() {
+        return details;
+    }
+
+    public void setDetails(ItemDetails details) {
+        this.details = details;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getName() {
         return name;

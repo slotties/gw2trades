@@ -1,5 +1,6 @@
 package gw2trades.repository.influxdb;
 
+import com.google.common.base.Strings;
 import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.api.Order;
 import gw2trades.repository.api.Query;
@@ -20,7 +21,9 @@ import org.influxdb.dto.QueryResult;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.time.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
@@ -40,6 +43,14 @@ public class InfluxDbRepository implements ItemRepository {
     private static final DateTimeFormatter INFLUX_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
     private static final DateTimeFormatter INFLUX_QUERY_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private static final FieldType DOUBLE_FIELD_TYPE_STORED_SORTED = new FieldType();
+
+    private static final String ATTR_COND_DMG = "ConditionDamage";
+    private static final String ATTR_FEROCITY = "CritDamage";
+    private static final String ATTR_HEALING = "Healing";
+    private static final String ATTR_POWER = "Power";
+    private static final String ATTR_PRECISION = "Precision";
+    private static final String ATTR_TOUGHNESS = "Toughness";
+    private static final String ATTR_VITALITY = "Vitality";
 
     static {
         DOUBLE_FIELD_TYPE_STORED_SORTED.setTokenized(true);
@@ -354,7 +365,26 @@ public class InfluxDbRepository implements ItemRepository {
         item.setIconUrl(doc.get("iconUrl"));
         item.setName(doc.get("name"));
         item.setRarity(doc.get("rarity"));
+        item.setType(doc.get("type"));
         stats.setItem(item);
+
+        ItemDetails details = new ItemDetails();
+        details.setType(doc.get("details_type"));
+        details.setMinPower(intIfNotNull(doc, "min_dmg"));
+        details.setMaxPower(intIfNotNull(doc, "max_dmg"));
+        details.setWeightClass(doc.get("weight_class"));
+        List<ItemAttributes.Attribute> attributes = new ArrayList<>();
+        attrIfNotNull(doc, ATTR_COND_DMG, attributes);
+        attrIfNotNull(doc, ATTR_FEROCITY, attributes);
+        attrIfNotNull(doc, ATTR_HEALING, attributes);
+        attrIfNotNull(doc, ATTR_POWER, attributes);
+        attrIfNotNull(doc, ATTR_PRECISION, attributes);
+        attrIfNotNull(doc, ATTR_TOUGHNESS, attributes);
+        attrIfNotNull(doc, ATTR_VITALITY, attributes);
+        ItemAttributes attrContainer = new ItemAttributes();
+        attrContainer.setAttributes(attributes);
+        details.setAttributes(attrContainer);
+        item.setDetails(details);
 
         PriceStatistics buys = new PriceStatistics();
         buys.setMinPrice(Integer.valueOf(doc.get("buys_min")));
@@ -376,6 +406,25 @@ public class InfluxDbRepository implements ItemRepository {
         return stats;
     }
 
+    private int intIfNotNull(Document doc, String fieldName) {
+        String value = doc.get(fieldName);
+        return value != null ? Integer.valueOf(value) : 0;
+    }
+
+    private void attrIfNotNull(Document document, String attributeName, List<ItemAttributes.Attribute> attributes) {
+        String fieldName = "attr_" + attributeName.toLowerCase();
+        String valueStr = document.get(fieldName);
+        if (valueStr != null) {
+            int value = Integer.valueOf(valueStr);
+            if (value > 0) {
+                ItemAttributes.Attribute attr = new ItemAttributes.Attribute();
+                attr.setAttribute(attributeName);
+                attr.setModifier(value);
+                attributes.add(attr);
+            }
+        }
+    }
+
     private Document createStatsDoc(Item item, PriceStatistics buys, PriceStatistics sells, int profit) {
         Document doc = new Document();
         doc.add(new TextField("name", item.getName(), Field.Store.YES));
@@ -384,6 +433,21 @@ public class InfluxDbRepository implements ItemRepository {
         doc.add(new TextField("rarity", item.getRarity(), Field.Store.YES));
         doc.add(new SortedDocValuesField("rarity", new BytesRef(item.getRarity())));
 
+        if (item.getDetails() != null) {
+            if (item.getDetails().getAttributes() != null && item.getDetails().getAttributes().getAttributes() != null) {
+                for (ItemAttributes.Attribute attr : item.getDetails().getAttributes().getAttributes()) {
+                    String fieldName = "attr_" + attr.getAttribute().toLowerCase();
+                    doc.add(new IntField(fieldName, attr.getModifier(), IntField.TYPE_STORED));
+                    doc.add(new NumericDocValuesField(fieldName, attr.getModifier()));
+                }
+            }
+            doc.add(new TextField("details_type", Strings.nullToEmpty(item.getDetails().getType()), Field.Store.YES));
+            doc.add(new TextField("weight_class", Strings.nullToEmpty(item.getDetails().getWeightClass()), Field.Store.YES));
+            doc.add(new IntField("min_dmg", item.getDetails().getMinPower(), IntField.TYPE_STORED));
+            doc.add(new IntField("max_dmg", item.getDetails().getMaxPower(), IntField.TYPE_STORED));
+        }
+
+        doc.add(new TextField("type", item.getType(), Field.Store.YES));
         doc.add(new StringField("iconUrl", item.getIconUrl(), Field.Store.YES));
         doc.add(new IntField("level", item.getLevel(), IntField.TYPE_STORED));
         doc.add(new StringField("itemId", Integer.toString(item.getItemId()), Field.Store.YES));
