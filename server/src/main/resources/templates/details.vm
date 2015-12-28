@@ -56,7 +56,9 @@
                     <span class="item-attributes-name">#springMessage("details.attr.${attr.attribute}")</span>
                 </li>
                 #end
+                #if(!$latestStats.item.details.attributes.attributes.empty)
                 <li>&nbsp;</li>
+                #end
                 <li>#springMessage("details.rarity.${latestStats.item.rarity}")</li>
                 #if($latestStats.item.type == "Armor")
                 <li>#springMessage("details.weightClass.${latestStats.item.details.weightClass}")</li>
