@@ -47,6 +47,9 @@
             </div>
             <div class="panel-body">
                 <ul class="item-attributes">
+                #if($latestStats.item.type == "Weapon")
+                <li>$springMacroRequestContext.getMessage("details.weaponStrength", [ $latestStats.item.details.minPower, $latestStats.item.details.maxPower ])</li>
+                #end
                 #foreach($attr in $latestStats.item.details.attributes.attributes)
                 <li>
                     <span class="item-attributes-modifier">+&nbsp;${attr.modifier}</span>
