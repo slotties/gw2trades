@@ -216,10 +216,10 @@
     var renderCoins = function(coins) {
         var coinsObj = gw2charts.splitCoins(coins);
         var html = '';
-        if (coinsObj.gold > 0) {
+        if (coinsObj.gold != 0) {
             html += '<span class="currency-gold">' + coinsObj.gold + '</span>';
         }
-        if (coinsObj.silver > 0) {
+        if (coinsObj.silver != 0) {
             html += '<span class="currency-silver">' + coinsObj.silver + '</span>';
         }
         html += '<span class="currency-copper">' + coinsObj.copper + '</span>';
@@ -233,16 +233,29 @@
     },
     yScalePriceHistoryFn = function(data, lines) {
         var maxPrice = d3.max(data, function(d) {
-            var max = 0;
-            for (var i = 0; i < lines.length; i++) {
-                if (lines[i].visible) {
-                    max = Math.max(max, lines[i].yFn(d));
+                var max = 0;
+                for (var i = 0; i < lines.length; i++) {
+                    if (lines[i].visible) {
+                        max = Math.max(max, lines[i].yFn(d));
+                    }
                 }
-            }
-            return max;
-        });
+                return max;
+            }),
+        minPrice = d3.min(data, function(d) {
+                var min = 0;
+                for (var i = 0; i < lines.length; i++) {
+                    if (lines[i].visible) {
+                        min = Math.min(min, lines[i].yFn(d));
+                    }
+                }
+                return min;
+            });
 
-        return [ 0, maxPrice * 1.1 ];
+        return [
+            // Ensure the minimum y value is either 0 or the minPrice itself, but on fully positive number we want y to start at 0 and not the minPrice.
+            Math.min(minPrice, 0),
+            maxPrice * 1.1
+        ];
     },
     yScaleSupplyDemandFn = function(data) {
         var totalAmount = d3.max(data, function(d) {
@@ -258,10 +271,10 @@
         var coins = gw2charts.splitCoins(d),
             str = '';
 
-        if (coins.gold > 0) {
+        if (coins.gold != 0) {
             str += coins.gold + 'g ';
         }
-        if (coins.silver > 0) {
+        if (coins.silver != 0) {
             str += coins.silver + 's ';
         }
         str += coins.copper + 'c';
