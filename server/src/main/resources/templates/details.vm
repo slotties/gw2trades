@@ -45,7 +45,10 @@
             <div class="panel-body">
                 <ul class="item-attributes">
                 #if($latestStats.item.type == "Weapon")
-                <li>$springMacroRequestContext.getMessage("details.weaponStrength", [ $latestStats.item.details.minPower, $latestStats.item.details.maxPower ])</li>
+                <li>
+                    #springMessage("details.weaponStrength")
+                    <span class="item-attributes-weapon-strength">${latestStats.item.details.minPower}&nbsp;-&nbsp;${latestStats.item.details.maxPower}</span>
+                </li>
                 #end
                 #foreach($attr in $latestStats.item.details.attributes.attributes)
                 <li>
@@ -61,6 +64,7 @@
                 <li>#springMessage("details.weightClass.${latestStats.item.details.weightClass}")</li>
                 #end
                 <li>#springMessage("details.slot.${latestStats.item.details.type}")</li>
+                <li>#springMessage("details.requiredLevel") ${latestStats.item.level}</li>
                 </ul>
             </div>
         </div>
