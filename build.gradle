@@ -1,6 +1,6 @@
 allprojects {
     group = 'com.github.slotties.gw2trades'
-    version = '1.3'
+    version = '1.4'
 }
 
 def javaLangLevel = 1.8
