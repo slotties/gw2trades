@@ -216,10 +216,10 @@
     var renderCoins = function(coins) {
         var coinsObj = gw2charts.splitCoins(coins);
         var html = '';
-        if (coinsObj.gold != 0) {
+        if (coinsObj.gold !== 0) {
             html += '<span class="currency-gold">' + coinsObj.gold + '</span>';
         }
-        if (coinsObj.silver != 0) {
+        if (coinsObj.silver !== 0) {
             html += '<span class="currency-silver">' + coinsObj.silver + '</span>';
         }
         html += '<span class="currency-copper">' + coinsObj.copper + '</span>';
@@ -271,10 +271,10 @@
         var coins = gw2charts.splitCoins(d),
             str = '';
 
-        if (coins.gold != 0) {
+        if (coins.gold !== 0) {
             str += coins.gold + 'g ';
         }
-        if (coins.silver != 0) {
+        if (coins.silver !== 0) {
             str += coins.silver + 's ';
         }
         str += coins.copper + 'c';
