@@ -1,5 +1,6 @@
 package gw2trades.repository.influxdb;
 
+import com.google.common.base.Strings;
 import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.api.Order;
 import gw2trades.repository.api.Query;
@@ -20,7 +21,9 @@ import org.influxdb.dto.QueryResult;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.time.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
@@ -40,6 +43,14 @@ public class InfluxDbRepository implements ItemRepository {
     private static final DateTimeFormatter INFLUX_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
     private static final DateTimeFormatter INFLUX_QUERY_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private static final FieldType DOUBLE_FIELD_TYPE_STORED_SORTED = new FieldType();
+
+    private static final String ATTR_COND_DMG = "ConditionDamage";
+    private static final String ATTR_FEROCITY = "CritDamage";
+    private static final String ATTR_HEALING = "Healing";
+    private static final String ATTR_POWER = "Power";
+    private static final String ATTR_PRECISION = "Precision";
+    private static final String ATTR_TOUGHNESS = "Toughness";
+    private static final String ATTR_VITALITY = "Vitality";
 
     static {
         DOUBLE_FIELD_TYPE_STORED_SORTED.setTokenized(true);
@@ -153,7 +164,7 @@ public class InfluxDbRepository implements ItemRepository {
         return new Sort(
                 new SortedNumericSortField("profit_score", SortField.Type.DOUBLE, true),
                 new SortedNumericSortField("profit", SortField.Type.INT, true)
-            );
+        );
     }
 
     private Sort createSort(Order order) {
@@ -354,7 +365,26 @@ public class InfluxDbRepository implements ItemRepository {
         item.setIconUrl(doc.get("iconUrl"));
         item.setName(doc.get("name"));
         item.setRarity(doc.get("rarity"));
+        item.setType(doc.get("type"));
         stats.setItem(item);
+
+        ItemDetails details = new ItemDetails();
+        details.setType(doc.get("details_type"));
+        details.setMinPower(intIfNotNull(doc, "min_dmg"));
+        details.setMaxPower(intIfNotNull(doc, "max_dmg"));
+        details.setWeightClass(doc.get("weight_class"));
+        List<ItemAttributes.Attribute> attributes = new ArrayList<>();
+        attrIfNotNull(doc, ATTR_COND_DMG, attributes);
+        attrIfNotNull(doc, ATTR_FEROCITY, attributes);
+        attrIfNotNull(doc, ATTR_HEALING, attributes);
+        attrIfNotNull(doc, ATTR_POWER, attributes);
+        attrIfNotNull(doc, ATTR_PRECISION, attributes);
+        attrIfNotNull(doc, ATTR_TOUGHNESS, attributes);
+        attrIfNotNull(doc, ATTR_VITALITY, attributes);
+        ItemAttributes attrContainer = new ItemAttributes();
+        attrContainer.setAttributes(attributes);
+        details.setAttributes(attrContainer);
+        item.setDetails(details);
 
         PriceStatistics buys = new PriceStatistics();
         buys.setMinPrice(Integer.valueOf(doc.get("buys_min")));
@@ -376,6 +406,25 @@ public class InfluxDbRepository implements ItemRepository {
         return stats;
     }
 
+    private int intIfNotNull(Document doc, String fieldName) {
+        String value = doc.get(fieldName);
+        return value != null ? Integer.valueOf(value) : 0;
+    }
+
+    private void attrIfNotNull(Document document, String attributeName, List<ItemAttributes.Attribute> attributes) {
+        String fieldName = "attr_" + attributeName.toLowerCase();
+        String valueStr = document.get(fieldName);
+        if (valueStr != null) {
+            int value = Integer.valueOf(valueStr);
+            if (value > 0) {
+                ItemAttributes.Attribute attr = new ItemAttributes.Attribute();
+                attr.setAttribute(attributeName);
+                attr.setModifier(value);
+                attributes.add(attr);
+            }
+        }
+    }
+
     private Document createStatsDoc(Item item, PriceStatistics buys, PriceStatistics sells, int profit) {
         Document doc = new Document();
         doc.add(new TextField("name", item.getName(), Field.Store.YES));
@@ -384,6 +433,21 @@ public class InfluxDbRepository implements ItemRepository {
         doc.add(new TextField("rarity", item.getRarity(), Field.Store.YES));
         doc.add(new SortedDocValuesField("rarity", new BytesRef(item.getRarity())));
 
+        if (item.getDetails() != null) {
+            if (item.getDetails().getAttributes() != null && item.getDetails().getAttributes().getAttributes() != null) {
+                for (ItemAttributes.Attribute attr : item.getDetails().getAttributes().getAttributes()) {
+                    String fieldName = "attr_" + attr.getAttribute().toLowerCase();
+                    doc.add(new IntField(fieldName, attr.getModifier(), IntField.TYPE_STORED));
+                    doc.add(new NumericDocValuesField(fieldName, attr.getModifier()));
+                }
+            }
+            doc.add(new TextField("details_type", Strings.nullToEmpty(item.getDetails().getType()), Field.Store.YES));
+            doc.add(new TextField("weight_class", Strings.nullToEmpty(item.getDetails().getWeightClass()), Field.Store.YES));
+            doc.add(new IntField("min_dmg", item.getDetails().getMinPower(), IntField.TYPE_STORED));
+            doc.add(new IntField("max_dmg", item.getDetails().getMaxPower(), IntField.TYPE_STORED));
+        }
+
+        doc.add(new TextField("type", item.getType(), Field.Store.YES));
         doc.add(new StringField("iconUrl", item.getIconUrl(), Field.Store.YES));
         doc.add(new IntField("level", item.getLevel(), IntField.TYPE_STORED));
         doc.add(new StringField("itemId", Integer.toString(item.getItemId()), Field.Store.YES));
@@ -407,7 +471,7 @@ public class InfluxDbRepository implements ItemRepository {
         doc.add(new IntField("profit", profit, IntField.TYPE_STORED));
         doc.add(new NumericDocValuesField("profit", profit));
 
-        double profitScore = calculateProfitScore(profit, sells);
+        double profitScore = calculateProfitScore(profit, sells, buys);
         doc.add(new DoubleField("profit_score", profitScore, DoubleField.TYPE_STORED));
         doc.add(new DoubleDocValuesField("profit_score", profitScore));
 
@@ -416,29 +480,45 @@ public class InfluxDbRepository implements ItemRepository {
         return doc;
     }
 
-    private double calculateProfitScore(int profit, PriceStatistics sells) {
-        // 30% profit is our goal, the closer we are to that goal the higher is the profit score.
-        double goal = 0.3;
-        double relativeProfit = ((double) profit / (double) sells.getMinPrice());
-        double profitScore;
+    private double calculateProfitScore(int profit, PriceStatistics sells, PriceStatistics buys) {
         /*
-            We have a ladder score:
-            0.0 to (goal * 2) = highest rating based on the distance to the goal itself.
-            (goal * 2) to (goal * 10) = next best rating, because these are interesting
-             > (goal * 10) = not interesting, because they're not realistic
-             <0 = not interesting, because we lose money here
+            The algorithm is:
+            - 0% to 100% revenue are in focus. These numbers are linear scaled between 0.5 and 0.8.
+              Additionally a small bonus for the quantity is added (0.0 to 0.2) in order to push items with less revenue but high demand.
+            - Everything over 100% revenue is ordered by their revenue. These are quite unrealistic, yet better than a loss.
+            - Everything with a loss is ordered to the end.
          */
-        if (relativeProfit >= 0.0 && relativeProfit <= (goal * 2.0)) {
-            profitScore = 1.0 - Math.abs(goal - relativeProfit);
-        } else if (relativeProfit >= (goal * 10.0)) {
-            profitScore = 0.5;
-        } else if (relativeProfit >= (goal * 2.0)){
-            profitScore = 0.6;
+        if (profit == 0) {
+            return 0.0;
+        }
+
+        // Cap the profit at 30g. Everything higher requires too much of invest. People that search for such risky
+        // trades can manually sort by the profit and pick out such items.
+        profit = Math.min(profit, 30_000);
+        double revenue = ((double) profit / (double) (sells.getMinPrice() - profit));
+        double profitScore;
+        if (revenue > 0.0 && revenue <= 1.0) {
+            double singleTradeScore = scale(revenue, 0.0, 1.0, 0.5, 0.9);
+            double quantityScore = scale(Math.min((double) buys.getTotalAmount(), 100.0), 0.0, 100.0, 0.0, 0.1);
+
+            profitScore = singleTradeScore + quantityScore;
+        } else if (revenue > 1.0) {
+            profitScore = scale(Math.min(10.0, revenue), 2.0, 10.0, 0.1, 0.5);
         } else {
-            profitScore = 0.4;
+            profitScore = scale(Math.min(Math.abs(revenue), 1.0), 0.0, 1.0, 0.0, 0.1);
         }
 
         return profitScore;
+    }
+
+    private double scale(double x, double origMin, double origMax, double min, double max) {
+        return
+                (
+                        ((max - min) * (x + origMin))
+                                /
+                                (origMax - origMin)
+                )
+                        + min;
     }
 
     private Point createPoint(Item item, PriceStatistics buys, PriceStatistics sells, int profit) {

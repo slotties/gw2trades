@@ -1,7 +1,7 @@
 package gw2trades.server;
 
 import gw2trades.repository.api.ItemRepository;
-import gw2trades.repository.influxdb.InfluxDbConnectionManager;
+import gw2trades.repository.influxdb.InfluxDbConnectionManagerImpl;
 import gw2trades.repository.influxdb.InfluxDbRepository;
 import gw2trades.server.locale.LocaleInterceptor;
 import gw2trades.server.locale.PerRequestLocaleResolver;
@@ -46,7 +46,7 @@ public class ServerConfig extends WebMvcConfigurerAdapter {
 
     @Bean
     public ItemRepository itemRepository() throws IOException {
-        InfluxDbConnectionManager connectionManager = new InfluxDbConnectionManager(
+        InfluxDbConnectionManagerImpl connectionManager = new InfluxDbConnectionManagerImpl(
                 this.environment.getProperty("influx.url"),
                 this.environment.getProperty("influx.user"),
                 this.environment.getProperty("influx.pass")

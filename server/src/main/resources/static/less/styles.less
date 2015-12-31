@@ -151,8 +151,7 @@ text.gw2-history-profit {
     Navigation
 */
 .navbar-default .navbar-brand {
-    /* FIXME: use a normalized color */
-    color: #C8241F;
+    color: @red_normal;
 }
 
 a,
@@ -257,6 +256,28 @@ a:focus,
 
 .link-outs {
     display: inline;
+}
+
+.item-attributes {
+    padding: 0;
+}
+.item-attributes li {
+  list-style-type: none;
+}
+.item-attributes .item-attributes-modifier {
+  display: inline-block;
+  width: 45px;
+  text-align: right;
+  color: @green_bright;
+}
+
+.item-attributes .item-attributes-weapon-strength {
+  color: @green_bright;
+}
+
+.attributes .panel-body {
+  background: url('/static/images/tooltip_bg.png') no-repeat center center;
+  color: #fff;
 }
 
 @media (max-width: 750px) {

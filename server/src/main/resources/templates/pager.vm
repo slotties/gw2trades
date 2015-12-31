@@ -6,7 +6,6 @@
             </a>
         </li>
 
-        ## TODO: think about a smarter way to do this
         #set($skippedEntryBefore = false)
         #foreach($idx in [1..$lastPage])
             #if($idx == $currentPage)
@@ -16,7 +15,7 @@
                     </a>
                 </li>
                 #set($skippedEntryBefore = false)
-            #elseif($idx < 5 || ($idx >= $mathtool.sub($currentPage, 4) && $idx <= $mathtool.add($currentPage, 4)) || ($idx > $mathtool.sub($lastPage, 5)))
+            #elseif($idx < 4 || ($idx >= $mathtool.sub($currentPage, 1) && $idx <= $mathtool.add($currentPage, 1)) || ($idx == $lastPage))
                 <li>
                     <a href="#indexPagerLink($idx)">
                         <span>${idx}</span>
