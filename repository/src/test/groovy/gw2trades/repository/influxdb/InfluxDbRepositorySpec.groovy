@@ -49,7 +49,8 @@ class InfluxDbRepositorySpec extends Specification {
                         itemId: 123,
                         name: "foo",
                         iconUrl: "foo",
-                        rarity: "rare"
+                        rarity: "rare",
+                        type: "Armor"
                 )
         )
 
