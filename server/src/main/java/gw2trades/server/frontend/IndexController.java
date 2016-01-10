@@ -58,6 +58,9 @@ public class IndexController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(required = false) String name) throws IOException {
 
+        if (1 < 2) {
+            throw new NullPointerException();
+        }
         if (page < 1) {
             return new ModelAndView(new RedirectView("/"));
         }
@@ -65,7 +68,7 @@ public class IndexController {
         ModelAndView model = new ModelAndView("frame");
 
         Query query = createQuery(name);
-        Order order = orderBy != null ?  Order.by(orderBy, !"asc".equals(orderDir)) : null;
+        Order order = orderBy != null ? Order.by(orderBy, !"asc".equals(orderDir)) : null;
         SearchResult<ListingStatistics> results = getStatistics(query, order, page);
 
         int lastPage = (int) Math.ceil((float) results.getTotalResults() / (float) PAGE_SIZE);
