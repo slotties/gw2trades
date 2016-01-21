@@ -144,4 +144,43 @@ class TradingPostSpec extends Specification {
         items.get(0).name == "Zhos Maske"
         items.get(0).iconUrl == "https://render.guildwars2.com/file/65A0C7367206E6CE4EC7C8CBE07EABAE0191BFBA/561548.png"
     }
+
+    def listRecipeIds() {
+        given:
+        apiClient.get(TradingPost.URL_RECIPES) >> "[1,2,3,4,5,6,7]"
+
+        when:
+        def ids = tradingPost.listRecipeIds()
+
+        then:
+        ids == [ 1, 2,3,4,5,6,7 ]
+    }
+
+    def listRecipes() {
+        given:
+        apiClient.get(TradingPost.URL_RECIPES + "?ids=7319,8") >> "[{\"type\":\"RefinementEctoplasm\",\"output_item_id\":46742,\"output_item_count\":1,\"min_rating\":450,\"time_to_craft_ms\":5000,\"disciplines\":[\"Armorsmith\",\"Artificer\",\"Weaponsmith\",\"Huntsman\"],\"flags\":[\"AutoLearned\"],\"ingredients\":[{\"item_id\":19684,\"count\":50},{\"item_id\":19721,\"count\":1},{\"item_id\":46747,\"count\":10}],\"id\":7319,\"chat_link\":\"[&CZccAAA=]\"},{\"type\":\"Refinement\",\"output_item_id\":19747,\"output_item_count\":1,\"min_rating\":300,\"time_to_craft_ms\":2000,\"disciplines\":[\"Leatherworker\",\"Armorsmith\",\"Tailor\",\"Scribe\"],\"flags\":[\"AutoLearned\"],\"ingredients\":[{\"item_id\":19748,\"count\":3}],\"id\":8,\"chat_link\":\"[&CQgAAAA=]\"}]"
+
+        when:
+        def recipes = tradingPost.listRecipes([ 7319, 8 ])
+
+        then:
+        recipes.size() == 2
+        recipes.get(0).id == 7319
+        recipes.get(0).type == "RefinementEctoplasm"
+        recipes.get(0).outputItemId == 46742
+        recipes.get(0).ingredients.size() == 3
+        recipes.get(0).ingredients.get(0).itemId == 19684
+        recipes.get(0).ingredients.get(0).count == 50
+        recipes.get(0).ingredients.get(1).itemId == 19721
+        recipes.get(0).ingredients.get(1).count == 1
+        recipes.get(0).ingredients.get(2).itemId == 46747
+        recipes.get(0).ingredients.get(2).count == 10
+
+        recipes.get(1).id == 8
+        recipes.get(1).type == "Refinement"
+        recipes.get(1).outputItemId == 19747
+        recipes.get(1).ingredients.size() == 1
+        recipes.get(1).ingredients.get(0).itemId == 19748
+        recipes.get(1).ingredients.get(0).count == 3
+    }
 }
