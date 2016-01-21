@@ -48,12 +48,19 @@ public class Importer {
 
         LOGGER.info("Importing with {} threads (each {} chunks) into {}...\n", threadCount, chunkSize, indexDir);
 
+        LOGGER.info("Importing items ...");
+        long t0 = System.currentTimeMillis();
+        importItems(threadCount, chunkSize, connectionManager, indexDir);
+        long t1 = System.currentTimeMillis();
+        LOGGER.info("Imported the trading post within {} ms.", t1 - t0);
+    }
+
+    private void importItems(int threadCount, int chunkSize, InfluxDbConnectionManager connectionManager, String indexDir) throws Exception {
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 
         Map<Integer, Item> itemCache = new ConcurrentHashMap<>();
         Map<Integer, ItemListings> allListings = new ConcurrentHashMap<>();
 
-        long t0 = System.currentTimeMillis();
         List<Integer> itemIds = tradingPost.listItemIds();
         for (int i = 0; i < itemIds.size(); i += chunkSize) {
             List<Integer> chunk = itemIds.subList(i, Math.min(itemIds.size(), i + chunkSize));
@@ -76,8 +83,6 @@ public class Importer {
             repository.close();
         }
 
-        long t1 = System.currentTimeMillis();
-        LOGGER.info("Imported the trading post within {} ms.", t1 - t0);
     }
 
     private void setupDatabase(InfluxDbConnectionManager influxDbConnectionManager) {
