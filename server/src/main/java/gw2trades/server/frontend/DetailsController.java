@@ -48,6 +48,7 @@ public class DetailsController {
         model.addObject("seoMeta", seoMeta);
         model.addObject("latestStats", latestStats);
         model.addObject("sourceRecipes", recipeRepository.getRecipesByIngredient(itemId));
+        model.addObject("targetRecipes", recipeRepository.getRecipesByOutputItem(itemId));
         model.addObject("view", "details");
 
         return model;

@@ -15,10 +15,6 @@
 <div class="page-header">
     <h1 class="rarity-${latestStats.item.rarity.toLowerCase()}">
         <img class="item-icon" alt="Item icon" src="${latestStats.item.iconUrl}"> ${latestStats.item.name} #if($latestStats.item.level > 0)<span title="#springMessage('details.item.levelReq')">(${latestStats.item.level})</span>#end
-        <div class="link-outs">
-
-
-        </div>
     </h1>
     <nav class="navbar navbar-default">
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -38,9 +34,10 @@
     </h3>
 </div>
 
+<a name="attributes"></a>
+<h3>#springMessage('details.area.attributes')</h3>
+#if($latestStats.item.type == "Armor" || $latestStats.item.type == "Back" || $latestStats.item.type == "Trinket" || $latestStats.item.type == "UpgradeComponent" || $latestStats.item.type == "Weapon")
 <div class="row">
-    <a name="attributes"></a>
-    #if($latestStats.item.type == "Armor" || $latestStats.item.type == "Back" || $latestStats.item.type == "Trinket" || $latestStats.item.type == "UpgradeComponent" || $latestStats.item.type == "Weapon")
     <div class="col-md-4">
         <div class="panel panel-default attributes">
             <div class="panel-body">
@@ -70,9 +67,12 @@
             </div>
         </div>
     </div>
-    #end
 </div>
+#else
+<i>#springMessage('details.area.attributes.noneAvailable')</i>
+#end
 
+<h3>#springMessage('details.area.trading')</h3>
 <div class="row">
     <a name="trading"></a>
     <div class="col-md-6">
@@ -141,6 +141,7 @@
 </div>
 
 <a name="graphs"></a>
+<h3>#springMessage('details.area.graphs')</h3>
 <div class="btn-toolbar" role="toolbar">
     <div class="btn-group" role="group" id="chart-timeframe-selectors">
         <button type="button" class="btn btn-default" data-offset="1m">#springMessage('details.timeframes.1m')</button>
@@ -177,6 +178,38 @@
 <script src="/static/js/history.js"></script>
 
 <a name="crafting"></a>
+<h3>#springMessage('details.area.crafting')</h3>
+
+<h4>#springMessage('details.area.crafting.targetRecipes')</h4>
+#if($sourceRecipes.empty)
+<i>#springMessage('details.area.crafting.sourceRecipes.noneAvailable')</i>
+#else
+<div class="crafting-list">
+    #foreach($recipe in $targetRecipes)
+    <div class="crafting-list-item">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <a href="/${locale}/details/${recipe.outputItemId}.html">${recipe.outputItemName}</a>
+                </h3>
+            </div>
+            <div class="panel-body">
+                <ul class="crafting-ingredients">
+                #foreach($ingredient in $recipe.ingredients)
+                <li>${ingredient.count}x <a href="/${locale}/details/${ingredient.itemId}.html">${ingredient.name}</a></li>
+                #end
+                </ul>
+            </div>
+        </div>
+    </div>
+    #end
+</div>
+#end
+
+<h4>#springMessage('details.area.crafting.sourceRecipes')</h4>
+#if($sourceRecipes.empty)
+<i>#springMessage('details.area.crafting.sourceRecipes.noneAvailable')</i>
+#else
 <div class="crafting-list">
     #foreach($recipe in $sourceRecipes)
     <div class="crafting-list-item">
@@ -197,3 +230,4 @@
     </div>
     #end
 </div>
+#end
