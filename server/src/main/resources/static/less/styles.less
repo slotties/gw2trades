@@ -280,6 +280,36 @@ a:focus,
   color: #fff;
 }
 
+.crafting-list {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
+.crafting-list-item {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  padding-left: 15px;
+  padding-right: 15px;
+
+  .panel {
+    width: 300px;
+  }
+
+  ul {
+    padding-left: 0;
+
+    li {
+      list-style-type: none;
+    }
+  }
+}
+
 @media (max-width: 750px) {
     .idx-col-buy-avg,
     .idx-col-sell-avg {

@@ -26,6 +26,7 @@
                 <li><a href="#attributes">#springMessage('details.area.attributes')</a></li>
                 <li><a href="#trading">#springMessage('details.area.trading')</a></li>
                 <li><a href="#graphs">#springMessage('details.area.graphs')</a></li>
+                <li><a href="#crafting">#springMessage('details.area.crafting')</a></li>
 
                 <li><a href="http://wiki-en.guildwars2.com/wiki/${gw2.wikiName($latestStats.item.name)}">Wiki</a></li>
                 <li><a href="https://gw2treasures.com/item/${latestStats.itemId}">gw2treaures</a></li>
@@ -174,3 +175,25 @@
     };
 </script>
 <script src="/static/js/history.js"></script>
+
+<a name="crafting"></a>
+<div class="crafting-list">
+    #foreach($recipe in $sourceRecipes)
+    <div class="crafting-list-item">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <a href="/${locale}/details/${recipe.outputItemId}.html">${recipe.outputItemName}</a>
+                </h3>
+            </div>
+            <div class="panel-body">
+                <ul class="crafting-ingredients">
+                #foreach($ingredient in $recipe.ingredients)
+                <li>${ingredient.count}x <a href="/${locale}/details/${ingredient.itemId}.html">${ingredient.name}</a></li>
+                #end
+                </ul>
+            </div>
+        </div>
+    </div>
+    #end
+</div>

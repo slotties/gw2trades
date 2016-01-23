@@ -1,13 +1,14 @@
 package gw2trades.server.frontend;
 
 import gw2trades.repository.api.ItemRepository;
+import gw2trades.repository.api.RecipeRepository;
 import gw2trades.repository.api.model.ListingStatistics;
 import gw2trades.server.frontend.exception.ItemNotFoundException;
 import gw2trades.server.model.GoogleAnalytics;
 import gw2trades.server.model.Price;
 import gw2trades.server.model.SeoMeta;
-import gw2trades.server.util.GuildWars2Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,12 +22,13 @@ import java.io.IOException;
 @Controller
 public class DetailsController {
     private ItemRepository itemRepository;
-    private GuildWars2Util guildWars2Util;
+    private RecipeRepository recipeRepository;
 
     @Autowired
-    public DetailsController(ItemRepository itemRepository) {
+    public DetailsController(ItemRepository itemRepository, RecipeRepository recipeRepository) {
         this.itemRepository = itemRepository;
-        this.guildWars2Util = new GuildWars2Util();
+        this.recipeRepository = recipeRepository;
+
     }
 
     @RequestMapping("**/details/{itemId}.html")
@@ -37,6 +39,21 @@ public class DetailsController {
             throw new ItemNotFoundException();
         }
 
+        SeoMeta seoMeta = createSeoMeta(latestStats);
+        GoogleAnalytics googleAnalytics = new GoogleAnalytics();
+        googleAnalytics.getDimensions().add(Integer.toString(latestStats.getItem().getItemId()));
+
+        model.addObject("locale", LocaleContextHolder.getLocale());
+        model.addObject("googleAnalytics", googleAnalytics);
+        model.addObject("seoMeta", seoMeta);
+        model.addObject("latestStats", latestStats);
+        model.addObject("sourceRecipes", recipeRepository.getRecipesByIngredient(itemId));
+        model.addObject("view", "details");
+
+        return model;
+    }
+
+    private SeoMeta createSeoMeta(ListingStatistics latestStats) {
         SeoMeta seoMeta = new SeoMeta("details.title");
         seoMeta.setTitleArgs(new Object[] { latestStats.getItem().getName() });
         seoMeta.setImageUrl(latestStats.getItem().getIconUrl());
@@ -49,15 +66,7 @@ public class DetailsController {
         });
         seoMeta.setKeywords(latestStats.getItem().getName());
 
-        GoogleAnalytics googleAnalytics = new GoogleAnalytics();
-        googleAnalytics.getDimensions().add(Integer.toString(latestStats.getItem().getItemId()));
-
-        model.addObject("googleAnalytics", googleAnalytics);
-        model.addObject("seoMeta", seoMeta);
-        model.addObject("latestStats", latestStats);
-        model.addObject("view", "details");
-
-        return model;
+        return seoMeta;
     }
 
     private String formatPrice(int coins) {
