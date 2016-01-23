@@ -66,7 +66,7 @@ public class LuceneRecipeRepository implements RecipeRepository {
         Document doc = new Document();
         doc.add(new StringField("recipeId", Integer.toString(recipe.getId()), Field.Store.YES));
 
-        doc.add(new IntField("outputItemId", recipe.getOutputItemId(), IntField.TYPE_STORED));
+        doc.add(new StringField("outputItemId", Integer.toString(recipe.getOutputItemId()), Field.Store.YES));
         doc.add(new TextField("type", recipe.getType(), Field.Store.YES));
         doc.add(new SortedDocValuesField("type", new BytesRef(recipe.getType())));
 
@@ -108,6 +108,23 @@ public class LuceneRecipeRepository implements RecipeRepository {
     public Collection<Recipe> getRecipesByIngredient(int itemId) throws IOException {
         IndexSearcher searcher = new IndexSearcher(this.indexReader);
         Query query = new TermQuery(new Term("ingredients", Integer.toString(itemId)));
+        TopDocs topDocs = searcher.search(query, Integer.MAX_VALUE);
+
+        List<Recipe> recipes = new ArrayList<>(topDocs.totalHits);
+        for (int i = 0; i < topDocs.scoreDocs.length; i++) {
+            Document doc = indexReader.document(topDocs.scoreDocs[i].doc);
+            if (doc != null) {
+                recipes.add(readRecipe(doc));
+            }
+        }
+
+        return recipes;
+    }
+
+    @Override
+    public Collection<Recipe> getRecipesByOutputItem(int itemId) throws IOException {
+        IndexSearcher searcher = new IndexSearcher(this.indexReader);
+        Query query = new TermQuery(new Term("outputItemId", Integer.toString(itemId)));
         TopDocs topDocs = searcher.search(query, Integer.MAX_VALUE);
 
         List<Recipe> recipes = new ArrayList<>(topDocs.totalHits);

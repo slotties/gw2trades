@@ -13,6 +13,7 @@ public interface RecipeRepository {
 
     Recipe getRecipe(int id) throws IOException;
     Collection<Recipe> getRecipesByIngredient(int itemId) throws IOException;
+    Collection<Recipe> getRecipesByOutputItem(int itemId) throws IOException;
 
     void close() throws IOException;
 

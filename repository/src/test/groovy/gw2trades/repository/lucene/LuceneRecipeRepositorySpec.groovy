@@ -146,4 +146,33 @@ class LuceneRecipeRepositorySpec extends Specification {
         assert recipes.contains(recipeMatch1)
         assert recipes.contains(recipeMatch2)
     }
+
+    def getRecipesByOutputItem() {
+        given:
+        def recipeMatch = new Recipe(
+                id: 123,
+                outputItemId: 456,
+                outputItemName: "xxx",
+                type: "foo",
+        )
+        def recipeNoMatch = new Recipe(
+                id: 456,
+                outputItemId: 789,
+                outputItemName: "xxx",
+                type: "foo",
+        )
+
+        when:
+        repository = new LuceneRecipeRepository(tmpDir.getAbsolutePath(), false)
+        repository.store([ recipeMatch, recipeNoMatch ])
+        repository.close()
+
+        repository = new LuceneRecipeRepository(tmpDir.getAbsolutePath(), true)
+        def recipes = repository.getRecipesByOutputItem(456)
+        repository.close()
+
+        then:
+        assert recipes.size() == 1
+        assert recipes.contains(recipeMatch)
+    }
 }
