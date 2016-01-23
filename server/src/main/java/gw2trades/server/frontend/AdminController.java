@@ -1,6 +1,7 @@
 package gw2trades.server.frontend;
 
 import gw2trades.repository.api.ItemRepository;
+import gw2trades.repository.api.RecipeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,15 +19,19 @@ import java.time.format.DateTimeFormatter;
 public class AdminController {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private ItemRepository itemRepository;
+    private RecipeRepository recipeRepository;
 
     @Autowired
-    public AdminController(ItemRepository itemRepository) {
+    public AdminController(ItemRepository itemRepository, RecipeRepository recipeRepository) {
         this.itemRepository = itemRepository;
+        this.recipeRepository = recipeRepository;
     }
 
     @RequestMapping("/admin/reopenRepository")
     public @ResponseBody String reopenRepository() throws IOException {
         this.itemRepository.reopen();
+        this.recipeRepository.reopen();
+
         return "OK";
     }
 
