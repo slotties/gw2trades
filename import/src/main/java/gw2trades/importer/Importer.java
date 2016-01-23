@@ -53,18 +53,18 @@ public class Importer {
 
         LOGGER.info("Importing items ...");
         long t0 = System.currentTimeMillis();
-        importItems(threadCount, chunkSize, connectionManager, indexDir + "/items");
+        Map<Integer, Item> items = importItems(threadCount, chunkSize, connectionManager, indexDir + "/items");
         long t1 = System.currentTimeMillis();
         LOGGER.info("Imported items in {} ms.", t1 - t0);
 
         LOGGER.info("Importing recipes ...");
         t0 = System.currentTimeMillis();
-        importRecipes(threadCount, chunkSize, indexDir + "/recipes");
+        importRecipes(threadCount, chunkSize, indexDir + "/recipes", items);
         t1 = System.currentTimeMillis();
         LOGGER.info("Imported recipes in {} ms.", t1 - t0);
     }
 
-    private void importItems(int threadCount, int chunkSize, InfluxDbConnectionManager connectionManager, String indexDir) throws Exception {
+    private Map<Integer, Item> importItems(int threadCount, int chunkSize, InfluxDbConnectionManager connectionManager, String indexDir) throws Exception {
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 
         Map<Integer, Item> itemCache = new ConcurrentHashMap<>();
@@ -91,9 +91,11 @@ public class Importer {
         } finally {
             repository.close();
         }
+
+        return itemCache;
     }
 
-    private void importRecipes(int threadCount, int chunkSize, String indexDir) throws Exception {
+    private void importRecipes(int threadCount, int chunkSize, String indexDir, Map<Integer, Item> items) throws Exception {
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 
         Map<Integer, Recipe> recipes = new ConcurrentHashMap<>();
@@ -101,7 +103,7 @@ public class Importer {
         List<Integer> ids = tradingPost.listRecipeIds();
         for (int i = 0; i < ids.size(); i += chunkSize) {
             List<Integer> chunk = ids.subList(i, Math.min(ids.size(), i + chunkSize));
-            executorService.execute(new RecipePuller(tradingPost, chunk, recipes));
+            executorService.execute(new RecipePuller(tradingPost, chunk, recipes, items));
         }
 
         executorService.shutdown();
@@ -174,11 +176,13 @@ public class Importer {
         private final TradingPost tradingPost;
         private final List<Integer> ids;
         private final Map<Integer, Recipe> allRecipes;
+        private final Map<Integer, Item> items;
 
-        public RecipePuller(TradingPost tradingPost, List<Integer> ids, Map<Integer, Recipe> allRecipes) {
+        public RecipePuller(TradingPost tradingPost, List<Integer> ids, Map<Integer, Recipe> allRecipes, Map<Integer, Item> items) {
             this.tradingPost = tradingPost;
             this.ids = ids;
             this.allRecipes = allRecipes;
+            this.items = items;
         }
 
         @Override
@@ -188,11 +192,22 @@ public class Importer {
 
                 // Register all listings.
                 for (Recipe recipe : recipes) {
+                    recipe.setOutputItemName(resolveName(recipe.getOutputItemId()));
+                    List<Recipe.Ingredient> ingredients = recipe.getIngredients();
+                    if (ingredients != null) {
+                        ingredients.forEach(ingredient -> ingredient.setName(resolveName(ingredient.getItemId())));
+                    }
+
                     allRecipes.put(recipe.getId(), recipe);
                 }
             } catch (IOException e) {
                 LOGGER.error("Could not import recipes {}", ids, e);
             }
+        }
+
+        private String resolveName(int itemId) {
+            Item item = items.get(itemId);
+            return item != null ? item.getName() : Integer.toString(itemId);
         }
     }
 }

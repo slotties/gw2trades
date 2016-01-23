@@ -70,6 +70,9 @@ public class LuceneRecipeRepository implements RecipeRepository {
         doc.add(new TextField("type", recipe.getType(), Field.Store.YES));
         doc.add(new SortedDocValuesField("type", new BytesRef(recipe.getType())));
 
+        doc.add(new TextField("outputItemName", recipe.getOutputItemName(), Field.Store.YES));
+        doc.add(new SortedDocValuesField("outputItemName", new BytesRef(recipe.getOutputItemName())));
+
         List<Recipe.Ingredient> ingredients = recipe.getIngredients();
         if (ingredients != null) {
             doc.add(new IntField("ingredientsCount", ingredients.size(), IntField.TYPE_STORED));
@@ -78,6 +81,8 @@ public class LuceneRecipeRepository implements RecipeRepository {
                 doc.add(new StringField("ingredients", Integer.toString(ingredient.getItemId()), Field.Store.YES));
                 doc.add(new IntField("ingredient" + i + "_id", ingredient.getItemId(), IntField.TYPE_STORED));
                 doc.add(new IntField("ingredient" + i + "_count", ingredient.getCount(), IntField.TYPE_STORED));
+                doc.add(new TextField("ingredient" + i + "_name", ingredient.getName(), Field.Store.YES));
+                doc.add(new SortedDocValuesField("ingredient" + i + "_name", new BytesRef(ingredient.getName())));
             }
         } else {
             doc.add(new IntField("ingredientsCount", 0, IntField.TYPE_STORED));
@@ -99,11 +104,29 @@ public class LuceneRecipeRepository implements RecipeRepository {
         return readRecipe(doc);
     }
 
+    @Override
+    public Collection<Recipe> getRecipesByIngredient(int itemId) throws IOException {
+        IndexSearcher searcher = new IndexSearcher(this.indexReader);
+        Query query = new TermQuery(new Term("ingredients", Integer.toString(itemId)));
+        TopDocs topDocs = searcher.search(query, Integer.MAX_VALUE);
+
+        List<Recipe> recipes = new ArrayList<>(topDocs.totalHits);
+        for (int i = 0; i < topDocs.scoreDocs.length; i++) {
+            Document doc = indexReader.document(topDocs.scoreDocs[i].doc);
+            if (doc != null) {
+                recipes.add(readRecipe(doc));
+            }
+        }
+
+        return recipes;
+    }
+
     private Recipe readRecipe(Document document) {
         Recipe recipe = new Recipe();
         recipe.setId(Integer.valueOf(document.get("recipeId")));
         recipe.setOutputItemId(Integer.valueOf(document.get("outputItemId")));
         recipe.setType(document.get("type"));
+        recipe.setOutputItemName(document.get("outputItemName"));
 
         int ingredientsCount = Integer.valueOf(document.get("ingredientsCount"));
         List<Recipe.Ingredient> ingredients = new ArrayList<>(ingredientsCount);
@@ -111,6 +134,7 @@ public class LuceneRecipeRepository implements RecipeRepository {
             Recipe.Ingredient ingredient = new Recipe.Ingredient();
             ingredient.setItemId(Integer.valueOf(document.get("ingredient" + i + "_id")));
             ingredient.setCount(Integer.valueOf(document.get("ingredient" + i + "_count")));
+            ingredient.setName(document.get("ingredient" + i + "_name"));
             ingredients.add(ingredient);
         }
         recipe.setIngredients(ingredients);

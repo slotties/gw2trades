@@ -13,6 +13,7 @@ public class Recipe {
     private String type;
     @JsonProperty("output_item_id")
     private int outputItemId;
+    private String outputItemName;
     private List<Ingredient> ingredients;
     private int id;
 
@@ -48,10 +49,42 @@ public class Recipe {
         this.id = id;
     }
 
+    public String getOutputItemName() {
+        return outputItemName;
+    }
+
+    public void setOutputItemName(String outputItemName) {
+        this.outputItemName = outputItemName;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(this.id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Recipe && ((Recipe) obj).id == this.id;
+    }
+
+    @Override
+    public String toString() {
+        return "Recipe: " + this.id;
+    }
+
     public static class Ingredient {
         @JsonProperty("item_id")
         private int itemId;
         private int count;
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
 
         public int getItemId() {
             return itemId;

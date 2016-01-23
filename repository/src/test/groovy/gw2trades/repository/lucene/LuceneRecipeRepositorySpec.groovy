@@ -32,10 +32,11 @@ class LuceneRecipeRepositorySpec extends Specification {
         def recipe = new Recipe(
                 id: 123,
                 outputItemId: 456,
+                outputItemName: "xxx",
                 type: "foo",
                 ingredients: [
-                        new Recipe.Ingredient(itemId: 1, count: 2),
-                        new Recipe.Ingredient(itemId: 3, count: 4),
+                        new Recipe.Ingredient(itemId: 1, count: 2, name: "bla"),
+                        new Recipe.Ingredient(itemId: 3, count: 4, name: "blub"),
                 ]
         )
 
@@ -51,12 +52,15 @@ class LuceneRecipeRepositorySpec extends Specification {
         document.get("recipeId") == "123"
         document.get("outputItemId") == "456"
         document.get("type") == "foo"
+        document.get("outputItemName") == "xxx"
         document.get("ingredientsCount") == "2"
         document.getValues("ingredients") == [ "1", "3" ]
         document.get("ingredient0_id") == "1"
         document.get("ingredient0_count") == "2"
+        document.get("ingredient0_name") == "bla"
         document.get("ingredient1_id") == "3"
         document.get("ingredient1_count") == "4"
+        document.get("ingredient1_name") == "blub"
     }
 
     def getRecipe() {
@@ -64,10 +68,11 @@ class LuceneRecipeRepositorySpec extends Specification {
         def recipe = new Recipe(
                 id: 123,
                 outputItemId: 456,
+                outputItemName: "xxx",
                 type: "foo",
                 ingredients: [
-                        new Recipe.Ingredient(itemId: 1, count: 2),
-                        new Recipe.Ingredient(itemId: 3, count: 4),
+                        new Recipe.Ingredient(itemId: 1, count: 2, name: "bla"),
+                        new Recipe.Ingredient(itemId: 3, count: 4, name: "blub"),
                 ]
         )
 
@@ -84,11 +89,61 @@ class LuceneRecipeRepositorySpec extends Specification {
         receivedRecipe != null
         receivedRecipe.id == 123
         receivedRecipe.outputItemId == 456
+        receivedRecipe.outputItemName == "xxx"
         receivedRecipe.type == "foo"
         receivedRecipe.ingredients.size() == 2
         receivedRecipe.ingredients.get(0).itemId == 1
         receivedRecipe.ingredients.get(0).count == 2
+        receivedRecipe.ingredients.get(0).name == "bla"
         receivedRecipe.ingredients.get(1).itemId == 3
         receivedRecipe.ingredients.get(1).count == 4
+        receivedRecipe.ingredients.get(1).name == "blub"
+    }
+
+    def getRecipesByIngredient() {
+        given:
+        def recipeMatch1 = new Recipe(
+                id: 123,
+                outputItemId: 456,
+                outputItemName: "xxx",
+                type: "foo",
+                ingredients: [
+                        new Recipe.Ingredient(itemId: 1, count: 2, name: "bla"),
+                        new Recipe.Ingredient(itemId: 3, count: 4, name: "bla"),
+                ]
+        )
+        def recipeMatch2 = new Recipe(
+                id: 456,
+                outputItemId: 456,
+                outputItemName: "xxx",
+                type: "foo",
+                ingredients: [
+                        new Recipe.Ingredient(itemId: 3, count: 4, name: "bla"),
+                        new Recipe.Ingredient(itemId: 1, count: 2, name: "bla"),
+                ]
+        )
+        def recipeNoMatch = new Recipe(
+                id: 789,
+                outputItemId: 456,
+                outputItemName: "xxx",
+                type: "foo",
+                ingredients: [
+                        new Recipe.Ingredient(itemId: 3, count: 4, name: "bla"),
+                ]
+        )
+
+        when:
+        repository = new LuceneRecipeRepository(tmpDir.getAbsolutePath(), false)
+        repository.store([ recipeMatch1, recipeMatch2, recipeNoMatch ])
+        repository.close()
+
+        repository = new LuceneRecipeRepository(tmpDir.getAbsolutePath(), true)
+        def recipes = repository.getRecipesByIngredient(1)
+        repository.close()
+
+        then:
+        assert recipes.size() == 2
+        assert recipes.contains(recipeMatch1)
+        assert recipes.contains(recipeMatch2)
     }
 }
