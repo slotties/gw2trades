@@ -58,9 +58,6 @@ public class IndexController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(required = false) String name) throws IOException {
 
-        if (1 < 2) {
-            throw new NullPointerException();
-        }
         if (page < 1) {
             return new ModelAndView(new RedirectView("/"));
         }
