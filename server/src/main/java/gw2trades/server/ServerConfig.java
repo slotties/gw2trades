@@ -1,8 +1,10 @@
 package gw2trades.server;
 
 import gw2trades.repository.api.ItemRepository;
+import gw2trades.repository.api.RecipeRepository;
 import gw2trades.repository.influxdb.InfluxDbConnectionManagerImpl;
 import gw2trades.repository.influxdb.InfluxDbRepository;
+import gw2trades.repository.lucene.LuceneRecipeRepository;
 import gw2trades.server.locale.LocaleInterceptor;
 import gw2trades.server.locale.PerRequestLocaleResolver;
 import gw2trades.server.security.RemoteAddrFilter;
@@ -52,10 +54,18 @@ public class ServerConfig extends WebMvcConfigurerAdapter {
                 this.environment.getProperty("influx.pass")
         );
 
-        String indexDir = this.environment.getProperty("index.dir");
-        LOGGER.info("Using {} as index directory.", indexDir);
+        String indexDir = this.environment.getProperty("index.dir.items");
+        LOGGER.info("Using {} as item index directory.", indexDir);
 
         return new InfluxDbRepository(connectionManager, indexDir, true);
+    }
+
+    @Bean
+    public RecipeRepository recipeRepository() throws IOException {
+        String indexDir = this.environment.getProperty("index.dir.recipes");
+        LOGGER.info("Using {} as recipe index directory.", indexDir);
+
+        return new LuceneRecipeRepository(indexDir, true);
     }
 
     @Override
