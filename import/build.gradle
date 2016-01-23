@@ -1,8 +1,8 @@
 dependencies {
     compile project(':repository')
 
-    compile 'com.fasterxml.jackson.core:jackson-core:2.7.0'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.0'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.6.3'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.6.3'
     compile 'org.apache.logging.log4j:log4j-api:2.5'
     compile 'org.apache.logging.log4j:log4j-core:2.5'
 

@@ -1,6 +1,6 @@
 dependencies {
     compile 'org.influxdb:influxdb-java:2.1'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.0'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.6.3'
     compile 'org.apache.lucene:lucene-core:5.4.1'
     compile 'org.apache.lucene:lucene-analyzers-common:5.4.1'
     compile 'org.apache.lucene:lucene-queryparser:5.4.1'
