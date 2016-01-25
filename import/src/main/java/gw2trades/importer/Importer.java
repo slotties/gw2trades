@@ -14,13 +14,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.influxdb.InfluxDB;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * @author Stefan Lotties (slotties@gmail.com)
@@ -48,38 +46,70 @@ public class Importer {
 
         int chunkSize = Integer.valueOf(config.required("importer.chunkSize"));
         int threadCount = Integer.valueOf(config.required("importer.threads"));
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 
         LOGGER.info("Importing with {} threads (each {} chunks) into {}...\n", threadCount, chunkSize, indexDir);
 
-        LOGGER.info("Importing items ...");
+        LOGGER.info("Loading items ...");
         long t0 = System.currentTimeMillis();
-        Map<Integer, Item> items = importItems(threadCount, chunkSize, connectionManager, indexDir + "/items");
+        Map<Integer, Item> items = loadItems(chunkSize, executorService);
         long t1 = System.currentTimeMillis();
+        LOGGER.info("Loaded  items in {} ms.", t1 - t0);
+
+        LOGGER.info("Importing items ...");
+        t0 = System.currentTimeMillis();
+        importItems(items, chunkSize, connectionManager, indexDir + "/items", executorService);
+        t1 = System.currentTimeMillis();
         LOGGER.info("Imported items in {} ms.", t1 - t0);
 
         LOGGER.info("Importing recipes ...");
         t0 = System.currentTimeMillis();
-        importRecipes(threadCount, chunkSize, indexDir + "/recipes", items);
+        importRecipes(items, chunkSize, indexDir + "/recipes", executorService);
         t1 = System.currentTimeMillis();
         LOGGER.info("Imported recipes in {} ms.", t1 - t0);
+
+        executorService.shutdown();
     }
 
-    private Map<Integer, Item> importItems(int threadCount, int chunkSize, InfluxDbConnectionManager connectionManager, String indexDir) throws Exception {
-        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
-
-        Map<Integer, Item> itemCache = new ConcurrentHashMap<>();
-        Map<Integer, ItemListings> allListings = new ConcurrentHashMap<>();
-
+    private Map<Integer, Item> loadItems(int chunkSize, ExecutorService executorService) throws Exception {
+        List<Callable<List<Item>>> tasks = new ArrayList<>();
         List<Integer> itemIds = tradingPost.listItemIds();
         for (int i = 0; i < itemIds.size(); i += chunkSize) {
             List<Integer> chunk = itemIds.subList(i, Math.min(itemIds.size(), i + chunkSize));
-            executorService.execute(new ItemPuller(tradingPost, chunk, itemCache, allListings));
+            tasks.add(new ItemPuller(tradingPost, chunk));
         }
 
-        executorService.shutdown();
-        executorService.awaitTermination(10, TimeUnit.MINUTES);
+        List<Future<List<Item>>> results = executorService.invokeAll(tasks);
+        Map<Integer, Item> items = new HashMap<>(25000);
+        for (Future<List<Item>> result : results) {
+            for (Item item : result.get()) {
+                items.put(item.getItemId(), item);
+            }
+        }
 
-        if (allListings.isEmpty()) {
+        if (items.isEmpty()) {
+            LOGGER.error("The gw2 API did not return any items. It's broken again. Won't import anything.");
+            System.exit(1);
+        }
+
+        return items;
+    }
+
+    private void importItems(Map<Integer, Item> items, int chunkSize, InfluxDbConnectionManager connectionManager, String indexDir, ExecutorService executorService) throws Exception {
+        List<Callable<List<ItemListings>>> tasks = new ArrayList<>();
+        List<Integer> itemIds = tradingPost.listItemIds();
+        for (int i = 0; i < itemIds.size(); i += chunkSize) {
+            List<Integer> chunk = itemIds.subList(i, Math.min(itemIds.size(), i + chunkSize));
+            tasks.add(new ItemListingsPuller(tradingPost, chunk, items));
+        }
+
+        List<Future<List<ItemListings>>> results = executorService.invokeAll(tasks);
+        List<ItemListings> listings = new ArrayList<>(items.size());
+        for (Future<List<ItemListings>> result : results) {
+            listings.addAll(result.get());
+        }
+
+        if (listings.isEmpty()) {
             LOGGER.error("The gw2 API did not return any listings. It's broken again. Won't import anything.");
             System.exit(1);
         }
@@ -87,27 +117,25 @@ public class Importer {
         ItemRepository repository = new InfluxDbRepository(connectionManager, indexDir, false);
         try {
             LOGGER.info("Writing everything into repository ...");
-            repository.store(allListings.values(), System.currentTimeMillis());
+            repository.store(listings, System.currentTimeMillis());
         } finally {
             repository.close();
         }
-
-        return itemCache;
     }
 
-    private void importRecipes(int threadCount, int chunkSize, String indexDir, Map<Integer, Item> items) throws Exception {
-        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
-
-        Map<Integer, Recipe> recipes = new ConcurrentHashMap<>();
-
+    private void importRecipes(Map<Integer, Item> items, int chunkSize, String indexDir, ExecutorService executorService) throws Exception {
+        List<Callable<List<Recipe>>> tasks = new ArrayList<>();
         List<Integer> ids = tradingPost.listRecipeIds();
         for (int i = 0; i < ids.size(); i += chunkSize) {
             List<Integer> chunk = ids.subList(i, Math.min(ids.size(), i + chunkSize));
-            executorService.execute(new RecipePuller(tradingPost, chunk, recipes, items));
+            tasks.add(new RecipePuller(tradingPost, chunk, items));
         }
 
-        executorService.shutdown();
-        executorService.awaitTermination(10, TimeUnit.MINUTES);
+        List<Future<List<Recipe>>> results = executorService.invokeAll(tasks);
+        List<Recipe> recipes = new ArrayList<>(items.size());
+        for (Future<List<Recipe>> result : results) {
+            recipes.addAll(result.get());
+        }
 
         if (recipes.isEmpty()) {
             LOGGER.error("The gw2 API did not return any recipes. It's broken again. Won't import anything.");
@@ -117,7 +145,7 @@ public class Importer {
         RecipeRepository repository = new LuceneRecipeRepository(indexDir, false);
         try {
             LOGGER.info("Writing everything into repository ...");
-            repository.store(recipes.values());
+            repository.store(recipes);
         } finally {
             repository.close();
         }
@@ -129,85 +157,6 @@ public class Importer {
             influxDb.createDatabase("gw2trades");
         } catch (Exception e) {
             LOGGER.info("Database exists already.");
-        }
-    }
-
-    static final class ItemPuller implements Runnable {
-        private final TradingPost tradingPost;
-        private final List<Integer> itemIdsChunk;
-        private final Map<Integer, Item> itemCache;
-        private final Map<Integer, ItemListings> allListings;
-
-        public ItemPuller(TradingPost tradingPost, List<Integer> itemIdsChunk, Map<Integer, Item> itemCache, Map<Integer, ItemListings> allListings) {
-            this.tradingPost = tradingPost;
-            this.itemIdsChunk = itemIdsChunk;
-            this.itemCache = itemCache;
-            this.allListings = allListings;
-        }
-
-        @Override
-        public void run() {
-            try {
-                List<ItemListings> listings = tradingPost.listings(itemIdsChunk);
-                List<Item> items = tradingPost.listItems(itemIdsChunk);
-
-                // Fill the item cache.
-                for (Item item : items) {
-                    itemCache.put(item.getItemId(), item);
-                }
-
-                // Register all listings.
-                for (ItemListings listing : listings) {
-                    Item item = itemCache.get(listing.getItemId());
-                    if (item != null) {
-                        listing.setItem(item);
-                        allListings.put(listing.getItemId(), listing);
-                    } else {
-                        LOGGER.warn("Could not find item {}.", listing.getItemId());
-                    }
-                }
-            } catch (IOException e) {
-                LOGGER.error("Could not import item ids {}", itemIdsChunk, e);
-            }
-        }
-    }
-
-    static final class RecipePuller implements Runnable {
-        private final TradingPost tradingPost;
-        private final List<Integer> ids;
-        private final Map<Integer, Recipe> allRecipes;
-        private final Map<Integer, Item> items;
-
-        public RecipePuller(TradingPost tradingPost, List<Integer> ids, Map<Integer, Recipe> allRecipes, Map<Integer, Item> items) {
-            this.tradingPost = tradingPost;
-            this.ids = ids;
-            this.allRecipes = allRecipes;
-            this.items = items;
-        }
-
-        @Override
-        public void run() {
-            try {
-                List<Recipe> recipes = tradingPost.listRecipes(ids);
-
-                // Register all listings.
-                for (Recipe recipe : recipes) {
-                    recipe.setOutputItemName(resolveName(recipe.getOutputItemId()));
-                    List<Recipe.Ingredient> ingredients = recipe.getIngredients();
-                    if (ingredients != null) {
-                        ingredients.forEach(ingredient -> ingredient.setName(resolveName(ingredient.getItemId())));
-                    }
-
-                    allRecipes.put(recipe.getId(), recipe);
-                }
-            } catch (IOException e) {
-                LOGGER.error("Could not import recipes {}", ids, e);
-            }
-        }
-
-        private String resolveName(int itemId) {
-            Item item = items.get(itemId);
-            return item != null ? item.getName() : Integer.toString(itemId);
         }
     }
 }
