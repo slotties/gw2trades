@@ -40,16 +40,13 @@ public class LuceneRecipeRepository implements RecipeRepository {
 
     @Override
     public void store(Collection<Recipe> recipes) throws IOException {
-        IndexWriter indexWriter = openIndexWriter();
-        try {
+        try (IndexWriter indexWriter = openIndexWriter()) {
             for (Recipe recipe : recipes) {
                 Document doc = createDoc(recipe);
                 indexWriter.addDocument(doc);
             }
 
             indexWriter.commit();
-        } finally {
-            indexWriter.close();
         }
     }
 

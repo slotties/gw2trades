@@ -93,27 +93,25 @@ public class InfluxDbRepository implements ItemRepository {
                 .consistency(InfluxDB.ConsistencyLevel.ALL)
                 .build();
 
-        IndexWriter indexWriter = openIndexWriter();
-        for (ItemListings listing : listings) {
-            PriceStatistics buys = createStatistics(listing.getBuys());
-            PriceStatistics sells = createStatistics(listing.getSells());
+        try (IndexWriter indexWriter = openIndexWriter()) {
+            for (ItemListings listing : listings) {
+                PriceStatistics buys = createStatistics(listing.getBuys());
+                PriceStatistics sells = createStatistics(listing.getSells());
 
-            int fixCosts = (int) Math.floor(((float) sells.getMinPrice()) * 0.15f);
-            int profit = (sells.getMinPrice() - buys.getMaxPrice()) - fixCosts;
+                int fixCosts = (int) Math.floor(((float) sells.getMinPrice()) * 0.15f);
+                int profit = (sells.getMinPrice() - buys.getMaxPrice()) - fixCosts;
 
-            Point dataPoint = createPoint(listing.getItem(), buys, sells, profit);
-            points.point(dataPoint);
+                Point dataPoint = createPoint(listing.getItem(), buys, sells, profit);
+                points.point(dataPoint);
 
-            Document doc = createStatsDoc(listing.getItem(), buys, sells, profit);
-            indexWriter.addDocument(doc);
-        }
+                Document doc = createStatsDoc(listing.getItem(), buys, sells, profit);
+                indexWriter.addDocument(doc);
+            }
 
-        InfluxDB influxDB = connectionManager.getConnection();
-        try {
+            InfluxDB influxDB = connectionManager.getConnection();
             influxDB.write(points);
+
             indexWriter.commit();
-        } finally {
-            indexWriter.close();
         }
     }
 
