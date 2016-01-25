@@ -16,6 +16,25 @@ public class Recipe {
     private String outputItemName;
     private List<Ingredient> ingredients;
     private int id;
+    private List<String> disciplines;
+    @JsonProperty("min_rating")
+    private int minRating;
+
+    public List<String> getDisciplines() {
+        return disciplines;
+    }
+
+    public void setDisciplines(List<String> disciplines) {
+        this.disciplines = disciplines;
+    }
+
+    public int getMinRating() {
+        return minRating;
+    }
+
+    public void setMinRating(int minRating) {
+        this.minRating = minRating;
+    }
 
     public String getType() {
         return type;

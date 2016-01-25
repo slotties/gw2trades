@@ -34,6 +34,8 @@ class LuceneRecipeRepositorySpec extends Specification {
                 outputItemId: 456,
                 outputItemName: "xxx",
                 type: "foo",
+                disciplines: ["foo", "bar"],
+                minRating: 666,
                 ingredients: [
                         new Recipe.Ingredient(itemId: 1, count: 2, name: "bla"),
                         new Recipe.Ingredient(itemId: 3, count: 4, name: "blub"),
@@ -53,6 +55,8 @@ class LuceneRecipeRepositorySpec extends Specification {
         document.get("outputItemId") == "456"
         document.get("type") == "foo"
         document.get("outputItemName") == "xxx"
+        document.get("minRating") == "666"
+        document.getValues("discipline") == [ "foo", "bar" ]
         document.get("ingredientsCount") == "2"
         document.getValues("ingredients") == [ "1", "3" ]
         document.get("ingredient0_id") == "1"
@@ -70,6 +74,8 @@ class LuceneRecipeRepositorySpec extends Specification {
                 outputItemId: 456,
                 outputItemName: "xxx",
                 type: "foo",
+                disciplines: ["foo", "bar"],
+                minRating: 666,
                 ingredients: [
                         new Recipe.Ingredient(itemId: 1, count: 2, name: "bla"),
                         new Recipe.Ingredient(itemId: 3, count: 4, name: "blub"),
@@ -91,6 +97,8 @@ class LuceneRecipeRepositorySpec extends Specification {
         receivedRecipe.outputItemId == 456
         receivedRecipe.outputItemName == "xxx"
         receivedRecipe.type == "foo"
+        receivedRecipe.minRating == 666
+        receivedRecipe.disciplines == [ "foo", "bar" ]
         receivedRecipe.ingredients.size() == 2
         receivedRecipe.ingredients.get(0).itemId == 1
         receivedRecipe.ingredients.get(0).count == 2

@@ -167,6 +167,8 @@ class TradingPostSpec extends Specification {
         recipes.size() == 2
         recipes.get(0).id == 7319
         recipes.get(0).type == "RefinementEctoplasm"
+        recipes.get(0).minRating == 450
+        recipes.get(0).disciplines == ["Armorsmith","Artificer","Weaponsmith","Huntsman"]
         recipes.get(0).outputItemId == 46742
         recipes.get(0).ingredients.size() == 3
         recipes.get(0).ingredients.get(0).itemId == 19684
@@ -179,6 +181,8 @@ class TradingPostSpec extends Specification {
         recipes.get(1).id == 8
         recipes.get(1).type == "Refinement"
         recipes.get(1).outputItemId == 19747
+        recipes.get(1).minRating == 300
+        recipes.get(1).disciplines == ["Leatherworker","Armorsmith","Tailor","Scribe"]
         recipes.get(1).ingredients.size() == 1
         recipes.get(1).ingredients.get(0).itemId == 19748
         recipes.get(1).ingredients.get(0).count == 3

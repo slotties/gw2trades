@@ -16,6 +16,7 @@ import org.apache.lucene.util.BytesRef;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -69,6 +70,13 @@ public class LuceneRecipeRepository implements RecipeRepository {
         doc.add(new StringField("outputItemId", Integer.toString(recipe.getOutputItemId()), Field.Store.YES));
         doc.add(new TextField("type", recipe.getType(), Field.Store.YES));
         doc.add(new SortedDocValuesField("type", new BytesRef(recipe.getType())));
+
+        doc.add(new IntField("minRating", recipe.getMinRating(), IntField.TYPE_STORED));
+        if (recipe.getDisciplines() != null) {
+            for (String discipline : recipe.getDisciplines()) {
+                doc.add(new StringField("discipline", discipline, Field.Store.YES));
+            }
+        }
 
         doc.add(new TextField("outputItemName", recipe.getOutputItemName(), Field.Store.YES));
         doc.add(new SortedDocValuesField("outputItemName", new BytesRef(recipe.getOutputItemName())));
@@ -144,6 +152,9 @@ public class LuceneRecipeRepository implements RecipeRepository {
         recipe.setOutputItemId(Integer.valueOf(document.get("outputItemId")));
         recipe.setType(document.get("type"));
         recipe.setOutputItemName(document.get("outputItemName"));
+        recipe.setMinRating(Integer.valueOf(document.get("minRating")));
+
+        recipe.setDisciplines(Arrays.asList(document.getValues("discipline")));
 
         int ingredientsCount = Integer.valueOf(document.get("ingredientsCount"));
         List<Recipe.Ingredient> ingredients = new ArrayList<>(ingredientsCount);
