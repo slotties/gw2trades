@@ -101,11 +101,15 @@ public class InfluxDbRepository implements ItemRepository {
                 int fixCosts = (int) Math.floor(((float) sells.getMinPrice()) * 0.15f);
                 int profit = (sells.getMinPrice() - buys.getMaxPrice()) - fixCosts;
 
-                Point dataPoint = createPoint(listing.getItem(), buys, sells, profit);
-                points.point(dataPoint);
+                if (listing.getItem() != null) {
+                    Point dataPoint = createPoint(listing.getItem(), buys, sells, profit);
+                    points.point(dataPoint);
 
-                Document doc = createStatsDoc(listing.getItem(), buys, sells, profit);
-                indexWriter.addDocument(doc);
+                    Document doc = createStatsDoc(listing.getItem(), buys, sells, profit);
+                    indexWriter.addDocument(doc);
+                } else {
+                    LOGGER.error("The listing {} has no item.", listing.getItemId());
+                }
             }
 
             InfluxDB influxDB = connectionManager.getConnection();
