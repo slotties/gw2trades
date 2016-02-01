@@ -25,7 +25,6 @@
                 <li><a href="#crafting">#springMessage('details.area.crafting')</a></li>
 
                 <li><a href="http://wiki-en.guildwars2.com/wiki/${gw2.wikiName($latestStats.item.name)}">Wiki</a></li>
-                <li><a href="https://gw2treasures.com/item/${latestStats.itemId}">gw2treaures</a></li>
             </ul>
         </div>
     </nav>
