@@ -2,12 +2,12 @@ package gw2trades.server;
 
 import gw2trades.server.i18n.LocaleHandler;
 import gw2trades.server.i18n.Translator;
+import gw2trades.server.util.EscapeTool;
 import gw2trades.server.util.GuildWars2Util;
+import gw2trades.server.util.MathTool;
 import io.vertx.ext.web.RoutingContext;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.tools.generic.EscapeTool;
-import org.apache.velocity.tools.generic.MathTool;
 
 import java.io.StringWriter;
 import java.util.Map;
