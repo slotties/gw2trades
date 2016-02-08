@@ -1,16 +1,22 @@
 package gw2trades.server;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerResponse;
 
 /**
  * @author Stefan Lotties (slotties@gmail.com)
  */
-@EnableAutoConfiguration
-@ComponentScan
-public class Server {
-    public static void main(String[] args) throws Exception {
-        SpringApplication.run(Server.class, args);
+public class Server extends AbstractVerticle {
+    @Override
+    public void start() throws Exception {
+        HttpServer server = vertx.createHttpServer();
+        server.requestHandler(request -> {
+            HttpServerResponse response = request.response();
+            response.end("blub");
+        });
+
+        // TODO: read port from config
+        server.listen(8080);
     }
 }

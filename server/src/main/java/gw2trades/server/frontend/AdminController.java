@@ -1,22 +1,11 @@
 package gw2trades.server.frontend;
 
-import gw2trades.repository.api.ItemRepository;
-import gw2trades.repository.api.RecipeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
-
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
 /**
  * @author Stefan Lotties (slotties@gmail.com)
  */
-@Controller
+// TODO
 public class AdminController {
+    /*
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private ItemRepository itemRepository;
     private RecipeRepository recipeRepository;
@@ -46,4 +35,5 @@ public class AdminController {
 
         return mav;
     }
+    */
 }

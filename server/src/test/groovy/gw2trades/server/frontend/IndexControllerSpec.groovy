@@ -5,15 +5,14 @@ import gw2trades.repository.api.Order
 import gw2trades.repository.api.Query
 import gw2trades.repository.api.model.ListingStatistics
 import gw2trades.repository.api.model.SearchResult
-import org.springframework.web.servlet.view.RedirectView
 import spock.lang.Specification
 import spock.lang.Subject
 
-import javax.servlet.http.HttpServletRequest
 
 /**
  * @author Stefan Lotties (slotties@gmail.com)
  */
+// TODO
 class IndexControllerSpec extends Specification {
     @Subject
     IndexController indexController
@@ -33,8 +32,9 @@ class IndexControllerSpec extends Specification {
         def view = indexController.root(request)
 
         then:
-        view instanceof RedirectView
-        ((RedirectView) view).getUrl() == "/de/index.html"
+        assert true == false
+        // FIXME view instanceof RedirectView
+        // FIXME ((RedirectView) view).getUrl() == "/de/index.html"
     }
 
     def firstPageIndex() {

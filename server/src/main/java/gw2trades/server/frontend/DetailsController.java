@@ -2,28 +2,16 @@ package gw2trades.server.frontend;
 
 import gw2trades.repository.api.ItemRepository;
 import gw2trades.repository.api.RecipeRepository;
-import gw2trades.repository.api.model.ListingStatistics;
-import gw2trades.server.frontend.exception.ItemNotFoundException;
-import gw2trades.server.model.GoogleAnalytics;
-import gw2trades.server.model.Price;
-import gw2trades.server.model.SeoMeta;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
-
-import java.io.IOException;
 
 /**
  * @author Stefan Lotties (slotties@gmail.com)
  */
-@Controller
+// TODO
 public class DetailsController {
     private ItemRepository itemRepository;
     private RecipeRepository recipeRepository;
 
+    /*
     @Autowired
     public DetailsController(ItemRepository itemRepository, RecipeRepository recipeRepository) {
         this.itemRepository = itemRepository;
@@ -31,7 +19,9 @@ public class DetailsController {
 
     }
 
-    @RequestMapping("**/details/{itemId}.html")
+*/
+//    @RequestMapping("**/details/{itemId}.html")
+    /*
     public ModelAndView details(@PathVariable int itemId) throws IOException {
         ModelAndView model = new ModelAndView("frame");
         ListingStatistics latestStats = itemRepository.latestStatistics(itemId);
@@ -93,4 +83,5 @@ public class DetailsController {
 
         return sb.toString();
     }
+    */
 }

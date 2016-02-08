@@ -1,43 +1,10 @@
 package gw2trades.server;
 
-import gw2trades.repository.api.ItemRepository;
-import gw2trades.repository.api.RecipeRepository;
-import gw2trades.repository.influxdb.InfluxDbConnectionManagerImpl;
-import gw2trades.repository.influxdb.InfluxDbRepository;
-import gw2trades.repository.lucene.LuceneRecipeRepository;
-import gw2trades.server.locale.LocaleInterceptor;
-import gw2trades.server.locale.PerRequestLocaleResolver;
-import gw2trades.server.security.RemoteAddrFilter;
-import gw2trades.server.security.SecurityHeadersInterceptor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.velocity.VelocityProperties;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
-import org.springframework.boot.context.embedded.ErrorPage;
-import org.springframework.boot.context.embedded.FilterRegistrationBean;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.web.servlet.view.velocity.EmbeddedVelocityViewResolver;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-
 /**
  * @author Stefan Lotties (slotties@gmail.com)
  */
-@Configuration
-@ConfigurationProperties
-public class ServerConfig extends WebMvcConfigurerAdapter {
+// TODO
+public class ServerConfig { /*extends WebMvcConfigurerAdapter {
     private static final Logger LOGGER = LogManager.getLogger(ServerConfig.class);
 
     @Autowired
@@ -145,4 +112,5 @@ public class ServerConfig extends WebMvcConfigurerAdapter {
             container.addErrorPages(error404Page, error500Page);
         });
     }
+    */
 }

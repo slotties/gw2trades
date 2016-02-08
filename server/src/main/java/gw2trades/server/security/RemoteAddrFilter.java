@@ -1,22 +1,10 @@
 package gw2trades.server.security;
 
-import org.apache.catalina.comet.CometEvent;
-import org.apache.catalina.comet.CometFilterChain;
-import org.apache.catalina.filters.RequestFilter;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-
 /**
  * @author Stefan Lotties (slotties@gmail.com)
  */
-public class RemoteAddrFilter extends RequestFilter {
+// TODO
+public class RemoteAddrFilter { /*extends RequestFilter {
     private static final Log log = LogFactory.getLog(RemoteAddrFilter.class);
 
     @Override
@@ -42,4 +30,5 @@ public class RemoteAddrFilter extends RequestFilter {
 
         return clientIp;
     }
+    */
 }

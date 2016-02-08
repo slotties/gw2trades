@@ -1,29 +1,11 @@
 package gw2trades.server.frontend;
 
-import gw2trades.repository.api.ItemRepository;
-import gw2trades.repository.api.Order;
-import gw2trades.repository.api.Query;
-import gw2trades.repository.api.model.ListingStatistics;
-import gw2trades.repository.api.model.SearchResult;
-import gw2trades.server.model.SeoMeta;
-import org.apache.velocity.tools.generic.EscapeTool;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.Locale;
-
 /**
  * @author Stefan Lotties (slotties@gmail.com)
  */
-@Controller
+// TODO
 public class IndexController {
+    /*
     private static final EscapeTool ESCAPE_TOOL = new EscapeTool();
     private static final int PAGE_SIZE = 30;
 
@@ -50,8 +32,9 @@ public class IndexController {
     private boolean isUnknownLocale(Locale locale) {
         return !(Locale.GERMAN.equals(locale) || Locale.ENGLISH.equals(locale));
     }
-
-    @RequestMapping("**/index.html")
+*/
+    //@RequestMapping("**/index.html")
+    /*
     public ModelAndView index(
             @RequestParam(required = false) String orderBy,
             @RequestParam(required = false) String orderDir,
@@ -102,4 +85,5 @@ public class IndexController {
 
         return this.itemRepository.listStatistics(query, order, fromPage, toPage);
     }
+    */
 }

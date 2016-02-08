@@ -1,17 +1,10 @@
 package gw2trades.server.locale;
 
-import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-import org.springframework.web.servlet.support.RequestContextUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * @author Stefan Lotties (slotties@gmail.com)
  */
-public class LocaleInterceptor extends HandlerInterceptorAdapter {
+// TODO
+public class LocaleInterceptor { /*extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String path = request.getRequestURI();
@@ -36,4 +29,5 @@ public class LocaleInterceptor extends HandlerInterceptorAdapter {
 
         return path.substring(1, endIdx);
     }
+    */
 }
