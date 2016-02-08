@@ -2,14 +2,16 @@
 <html>
     <head>
         #if($seoMeta.titleArgs)
+            ## TODO: test
             #set($title = "$springMacroRequestContext.getMessage($seoMeta.title, $seoMeta.titleArgs)")
         #else
-            #set($title = "#springMessage($seoMeta.title)")
+            #set($title = "${i18n.message($seoMeta.title)}")
         #end
         #if($seoMeta.descriptionArgs)
+            ## TODO: test
             #set($description = "$springMacroRequestContext.getMessage($seoMeta.description, $seoMeta.descriptionArgs)")
         #else
-            #set($description = "#springMessage($seoMeta.description)")
+            #set($description = "${i18n.message($seoMeta.description)}")
         #end
 
         <title>${title}</title>
@@ -24,7 +26,7 @@
         <meta property="og:image" content="${seoMeta.imageUrl}">
         #end
         <meta property="og:type" content="website">
-        <meta property="og:locale" content="${springMacroRequestContext.locale}">
+        <meta property="og:locale" content="${currentLocale}">
 
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
@@ -42,7 +44,7 @@
         <nav class="navbar-default navbar-fixed-top">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <a class="navbar-brand" href="/${springMacroRequestContext.locale}/index.html">gw2trades</a>
+                    <a class="navbar-brand" href="/${currentLocale}/index.html">gw2trades</a>
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
@@ -62,8 +64,8 @@
             <footer>
                 <div class="panel panel-default">
                     <ul class="nav nav-pills">
-                        <li><a href="/${springMacroRequestContext.locale}/impressum.html">#springMessage('frame.impressum')</a></li>
-                        <li><a href="mailto:slotties@gmail.com">#springMessage('frame.contactMe')</a></li>
+                        <li><a href="/${currentLocale}/impressum.html">${i18n.message('frame.impressum')}</a></li>
+                        <li><a href="mailto:slotties@gmail.com">${i18n.message('frame.contactMe')}</a></li>
                     </ul>
                 </div>
             </footer>

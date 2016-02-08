@@ -5,8 +5,10 @@ import gw2trades.repository.api.RecipeRepository;
 import gw2trades.repository.influxdb.InfluxDbConnectionManagerImpl;
 import gw2trades.repository.influxdb.InfluxDbRepository;
 import gw2trades.repository.lucene.LuceneRecipeRepository;
+import gw2trades.server.frontend.ImprintHandler;
 import gw2trades.server.frontend.ReopenRepositoryHandler;
 import gw2trades.server.frontend.SitemapHandler;
+import gw2trades.server.i18n.LocaleHandler;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
@@ -27,22 +29,22 @@ public class Server extends AbstractVerticle {
 
     private ItemRepository itemRepository;
     private RecipeRepository recipeRepository;
-    private VelocityEngine velocityEngine;
+    private VelocityRenderer renderer;
 
     @Override
     public void start() throws Exception {
-        initVelocity();
+        initRenderer();
         openRepositories();
         startWebServer();
     }
 
-    private void initVelocity() {
+    private void initRenderer() {
         Properties props = new Properties();
         props.setProperty("file.resource.loader.path", config().getString("templates.dir"));
         props.setProperty("file.resource.loader.cache", Boolean.toString(!config().getBoolean("resources.disableCaching", false)));
         props.setProperty("resource.loader", "file");
 
-        velocityEngine = new VelocityEngine(props);
+        renderer = new VelocityRenderer(new VelocityEngine(props));
     }
 
     private void openRepositories() throws IOException {
@@ -65,8 +67,8 @@ public class Server extends AbstractVerticle {
 
     private void startWebServer() {
         HttpServer server = vertx.createHttpServer();
-
         Router router = Router.router(vertx);
+        LocaleHandler localeHandler = new LocaleHandler();
 
         router.routeWithRegex("/static/.*").handler(
                 StaticHandler
@@ -75,7 +77,10 @@ public class Server extends AbstractVerticle {
         );
 
         router.route("/admin/reopenRepository").handler(new ReopenRepositoryHandler(itemRepository, recipeRepository));
-        router.route("/admin/sitemap.xml").handler(new SitemapHandler(itemRepository, velocityEngine));
+        router.route("/admin/sitemap.xml").handler(new SitemapHandler(itemRepository, renderer));
+
+        router.routeWithRegex("/.*/impressum.html").handler(localeHandler);
+        router.routeWithRegex("/.*/impressum.html").handler(new ImprintHandler(renderer));
 
         server.requestHandler(router::accept).listen(config().getInteger("http.port"));
     }
