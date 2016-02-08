@@ -64,7 +64,8 @@ public class HistoryHandler implements Handler<RoutingContext> {
             fromTs = LocalDateTime.parse(from, DATE_FORMAT);
             toTs = LocalDateTime.parse(to, DATE_FORMAT);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("bad input dates");
+            event.fail(new IllegalArgumentException("bad input dates"));
+            return;
         }
 
         try {
