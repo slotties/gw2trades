@@ -2,14 +2,12 @@
 <html>
     <head>
         #if($seoMeta.titleArgs)
-            ## TODO: test
-            #set($title = "$springMacroRequestContext.getMessage($seoMeta.title, $seoMeta.titleArgs)")
+            #set($title = "${i18n.message($seoMeta.title, $seoMeta.titleArgs)}")
         #else
             #set($title = "${i18n.message($seoMeta.title)}")
         #end
         #if($seoMeta.descriptionArgs)
-            ## TODO: test
-            #set($description = "$springMacroRequestContext.getMessage($seoMeta.description, $seoMeta.descriptionArgs)")
+            #set($description = "${i18n.message($seoMeta.description, $seoMeta.descriptionArgs)}")
         #else
             #set($description = "${i18n.message($seoMeta.description)}")
         #end

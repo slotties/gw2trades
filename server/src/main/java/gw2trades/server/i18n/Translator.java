@@ -17,7 +17,7 @@ public class Translator {
         return resourceBundle.getString(key);
     }
 
-    public String message(String key, String... args) {
+    public String message(String key, Object[] args) {
         String text = this.message(key);
 
         MessageFormat format = new MessageFormat(text);
