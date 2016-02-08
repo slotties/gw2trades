@@ -1,9 +1,9 @@
 <div class="page-header">
     <h1>
         #if ($query)
-            #springMessage("index.title.query")
+            ${i18n.message("index.title.query")}
         #else
-            #springMessage("index.title.default")
+            ${i18n.message("index.title.default")}
         #end
     </h1>
 </div>
@@ -12,12 +12,12 @@
     <form method="GET">
         <div class="col-lg-6">
             <div class="input-group">
-                <span class="input-group-addon">#springMessage("index.search.name.label")</span>
-                <input name="name" type="text" class="form-control" placeholder="#springMessage("index.search.name.placeholder")" #if($query && $query.name)value="${escapetool.html($query.name)}"#end>
+                <span class="input-group-addon">${i18n.message("index.search.name.label")}</span>
+                <input name="name" type="text" class="form-control" placeholder="${i18n.message("index.search.name.placeholder")}" #if($query && $query.name)value="${escapetool.html($query.name)}"#end>
             </div>
         </div>
         <div class="col-lg-6">
-            <button type="submit" class="btn btn-default">#springMessage("index.search.btn")</button>
+            <button type="submit" class="btn btn-default">${i18n.message("index.search.btn")}</button>
         </div>
     </form>
 </div>
@@ -27,27 +27,27 @@
 <table class="table table-striped table-bordered table-hover">
     <tr>
         <th>
-            <a href="#orderLink("name")" rel="nofollow">#springMessage("index.cols.item")</a>
+            <a href="#orderLink("name")" rel="nofollow">${i18n.message("index.cols.item")}</a>
             #orderIcon('name')
         </th>
         <th>
-            <a href="#orderLink("profit")" rel="nofollow">#springMessage("index.cols.profit")</a>
+            <a href="#orderLink("profit")" rel="nofollow">${i18n.message("index.cols.profit")}</a>
             #orderIcon('profit')
         </th>
         <th>
-            <a href="#orderLink("highestBidder")" rel="nofollow">#springMessage("index.cols.maxBuyer")</a>
+            <a href="#orderLink("highestBidder")" rel="nofollow">${i18n.message("index.cols.maxBuyer")}</a>
             #orderIcon('highestBidder')
         </th>
         <th class="idx-col-buy-avg">
-            <a href="#orderLink("avgBidder")" rel="nofollow">#springMessage("index.cols.avgBuyer")</a>
+            <a href="#orderLink("avgBidder")" rel="nofollow">${i18n.message("index.cols.avgBuyer")}</a>
             #orderIcon('avgBidder')
         </th>
         <th>
-            <a href="#orderLink("lowestSeller")" rel="nofollow">#springMessage("index.cols.minSeller")</a>
+            <a href="#orderLink("lowestSeller")" rel="nofollow">${i18n.message("index.cols.minSeller")}</a>
             #orderIcon('lowestSeller')
         </th>
         <th class="idx-col-sell-avg">
-            <a href="#orderLink("avgSeller")" rel="nofollow">#springMessage("index.cols.avgSeller")</a>
+            <a href="#orderLink("avgSeller")" rel="nofollow">${i18n.message("index.cols.avgSeller")}</a>
             #orderIcon('avgSeller')
         </th>
     </tr>
@@ -55,7 +55,7 @@
     <tr>
         <td>
             <img src="${stats.item.iconUrl}" alt="Icon" title="${stats.item.name}" class="item-icon-mini">
-            <a href="/${springMacroRequestContext.locale}/details/${stats.item.itemId}.html" class="rarity-${stats.item.rarity.toLowerCase()}">
+            <a href="/${currentLocale}/details/${stats.item.itemId}.html" class="rarity-${stats.item.rarity.toLowerCase()}">
                 ${stats.item.name} #if($stats.item.level > 0)(${stats.item.level})#end
             </a>
         </td>

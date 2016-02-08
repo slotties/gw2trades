@@ -5,10 +5,7 @@ import gw2trades.repository.api.RecipeRepository;
 import gw2trades.repository.influxdb.InfluxDbConnectionManagerImpl;
 import gw2trades.repository.influxdb.InfluxDbRepository;
 import gw2trades.repository.lucene.LuceneRecipeRepository;
-import gw2trades.server.frontend.ImprintHandler;
-import gw2trades.server.frontend.RedirectIndexHandler;
-import gw2trades.server.frontend.ReopenRepositoryHandler;
-import gw2trades.server.frontend.SitemapHandler;
+import gw2trades.server.frontend.*;
 import gw2trades.server.i18n.LocaleHandler;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpServer;
@@ -44,6 +41,7 @@ public class Server extends AbstractVerticle {
         props.setProperty("file.resource.loader.path", config().getString("templates.dir"));
         props.setProperty("file.resource.loader.cache", Boolean.toString(!config().getBoolean("resources.disableCaching", false)));
         props.setProperty("resource.loader", "file");
+        props.setProperty("velocimacro.library", "macros.vm");
 
         renderer = new VelocityRenderer(new VelocityEngine(props));
     }
@@ -85,6 +83,9 @@ public class Server extends AbstractVerticle {
 
         router.routeWithRegex("/").handler(localeHandler);
         router.routeWithRegex("/").handler(new RedirectIndexHandler());
+
+        router.routeWithRegex("/.*/index.html").handler(localeHandler);
+        router.routeWithRegex("/.*/index.html").handler(new IndexHandler(itemRepository, renderer));
 
         server.requestHandler(router::accept).listen(config().getInteger("http.port"));
     }

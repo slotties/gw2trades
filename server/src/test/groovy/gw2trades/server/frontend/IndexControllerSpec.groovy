@@ -14,6 +14,7 @@ import spock.lang.Subject
  */
 // TODO
 class IndexControllerSpec extends Specification {
+    /*
     @Subject
     IndexController indexController
     ItemRepository itemRepository
@@ -124,4 +125,5 @@ class IndexControllerSpec extends Specification {
         modelAndView.model.orderDir == "desc"
         modelAndView.model.query == null
     }
+    */
 }
