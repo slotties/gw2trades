@@ -11,27 +11,6 @@ public class IndexController {
 
     private ItemRepository itemRepository;
 
-    @Autowired
-    public IndexController(ItemRepository itemRepository) {
-        this.itemRepository = itemRepository;
-    }
-
-    @RequestMapping("/")
-    public RedirectView root(HttpServletRequest request) {
-        Locale locale = request.getLocale();
-        if (isUnknownLocale(locale)) {
-            locale = Locale.ENGLISH;
-        }
-
-        RedirectView redirectView = new RedirectView("/" + locale.getLanguage() + "/index.html");
-        redirectView.setStatusCode(HttpStatus.MOVED_PERMANENTLY);
-
-        return redirectView;
-    }
-
-    private boolean isUnknownLocale(Locale locale) {
-        return !(Locale.GERMAN.equals(locale) || Locale.ENGLISH.equals(locale));
-    }
 */
     //@RequestMapping("**/index.html")
     /*

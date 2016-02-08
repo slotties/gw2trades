@@ -6,6 +6,7 @@ import gw2trades.repository.influxdb.InfluxDbConnectionManagerImpl;
 import gw2trades.repository.influxdb.InfluxDbRepository;
 import gw2trades.repository.lucene.LuceneRecipeRepository;
 import gw2trades.server.frontend.ImprintHandler;
+import gw2trades.server.frontend.RedirectIndexHandler;
 import gw2trades.server.frontend.ReopenRepositoryHandler;
 import gw2trades.server.frontend.SitemapHandler;
 import gw2trades.server.i18n.LocaleHandler;
@@ -81,6 +82,9 @@ public class Server extends AbstractVerticle {
 
         router.routeWithRegex("/.*/impressum.html").handler(localeHandler);
         router.routeWithRegex("/.*/impressum.html").handler(new ImprintHandler(renderer));
+
+        router.routeWithRegex("/").handler(localeHandler);
+        router.routeWithRegex("/").handler(new RedirectIndexHandler());
 
         server.requestHandler(router::accept).listen(config().getInteger("http.port"));
     }

@@ -24,12 +24,16 @@ public class LocaleHandler implements Handler<RoutingContext> {
             }
         }
 
-        if (currentLocale == null) {
+        if (currentLocale == null || isUnknownLocale(currentLocale)) {
             currentLocale = Locale.ENGLISH;
         }
 
         event.data().put(CTX_CURRENT_LOCALE, currentLocale);
         event.next();
+    }
+
+    private boolean isUnknownLocale(Locale locale) {
+        return !(Locale.GERMAN.equals(locale) || Locale.ENGLISH.equals(locale));
     }
 
     private String resolveLocaleString(String path) {
