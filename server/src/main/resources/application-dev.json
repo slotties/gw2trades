@@ -6,5 +6,6 @@
   "influx.url": "http://127.0.0.1:8086",
   "http.port": 8080,
 
-  "resources.disableCaching": true
+  "resources.disableCaching": true,
+  "templates.dir": "../../src/main/resources/templates"
 }
