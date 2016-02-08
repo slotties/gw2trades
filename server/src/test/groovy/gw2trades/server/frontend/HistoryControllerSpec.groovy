@@ -11,6 +11,7 @@ import java.time.LocalDateTime
  * @author Stefan Lotties (slotties@gmail.com)
  */
 class HistoryControllerSpec extends Specification {
+    /*
     @Subject
     HistoryController historyController
     ItemRepository itemRepository
@@ -49,4 +50,5 @@ class HistoryControllerSpec extends Specification {
         "1984-06-24T10:00"    | "1984-06-24T10:00:00"
         "1984-06-24 10:00:00" | "1984-06-24T10:00:00"
     }
+    */
 }

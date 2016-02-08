@@ -6,6 +6,7 @@ import gw2trades.repository.influxdb.InfluxDbConnectionManagerImpl;
 import gw2trades.repository.influxdb.InfluxDbRepository;
 import gw2trades.repository.lucene.LuceneRecipeRepository;
 import gw2trades.server.frontend.*;
+import gw2trades.server.frontend.exception.ExceptionHandler;
 import gw2trades.server.i18n.LocaleHandler;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpServer;
@@ -93,6 +94,7 @@ public class Server extends AbstractVerticle {
         router.routeWithRegex("/api/history/[0-9]*").handler(localeHandler);
         router.routeWithRegex("/api/history/[0-9]*").handler(new HistoryHandler(itemRepository));
 
+        router.get("/*").failureHandler(new ExceptionHandler());
 
         server.requestHandler(router::accept).listen(config().getInteger("http.port"));
     }
