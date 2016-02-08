@@ -90,6 +90,10 @@ public class Server extends AbstractVerticle {
         router.routeWithRegex("/.*/details/[0-9]*\\.html").handler(localeHandler);
         router.routeWithRegex("/.*/details/[0-9]*\\.html").handler(new DetailsHandler(itemRepository, recipeRepository, renderer));
 
+        router.routeWithRegex("/api/history/[0-9]*").handler(localeHandler);
+        router.routeWithRegex("/api/history/[0-9]*").handler(new HistoryHandler(itemRepository));
+
+
         server.requestHandler(router::accept).listen(config().getInteger("http.port"));
     }
 }
