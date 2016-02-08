@@ -9,7 +9,6 @@ import spock.lang.Unroll
 /**
  * @author Stefan Lotties (slotties@gmail.com)
  */
-// TODO
 class LocaleHandlerSpec extends Specification {
     @Subject
     LocaleHandler localeHandler = new LocaleHandler()
