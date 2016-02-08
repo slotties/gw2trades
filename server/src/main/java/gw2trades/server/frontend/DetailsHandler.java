@@ -33,7 +33,7 @@ public class DetailsHandler implements Handler<RoutingContext> {
     }
 
     private int resolveItemId(HttpServerRequest request) {
-        String uri = request.uri();
+        String uri = request.path();
         int idStartIdx = uri.lastIndexOf('/');
         int idEndIdx = uri.lastIndexOf('.');
 
