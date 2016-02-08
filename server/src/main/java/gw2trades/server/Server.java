@@ -87,6 +87,9 @@ public class Server extends AbstractVerticle {
         router.routeWithRegex("/.*/index.html").handler(localeHandler);
         router.routeWithRegex("/.*/index.html").handler(new IndexHandler(itemRepository, renderer));
 
+        router.routeWithRegex("/.*/details/[0-9]*\\.html").handler(localeHandler);
+        router.routeWithRegex("/.*/details/[0-9]*\\.html").handler(new DetailsHandler(itemRepository, recipeRepository, renderer));
+
         server.requestHandler(router::accept).listen(config().getInteger("http.port"));
     }
 }
