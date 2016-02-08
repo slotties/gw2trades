@@ -91,7 +91,6 @@
             <artifactId>velocity-tools</artifactId>
         </dependency>
 
-
         <dependency>
             <groupId>com.github.slotties.gw2trades</groupId>
             <artifactId>gw2trades-repository</artifactId>
