@@ -8,6 +8,7 @@ import gw2trades.repository.lucene.LuceneRecipeRepository;
 import gw2trades.server.frontend.*;
 import gw2trades.server.frontend.exception.ExceptionHandler;
 import gw2trades.server.i18n.LocaleHandler;
+import gw2trades.server.security.SecurityHeadersHandler;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
@@ -24,7 +25,7 @@ import java.util.Properties;
  * @author Stefan Lotties (slotties@gmail.com)
  */
 public class Server extends AbstractVerticle {
-    private static final Logger LOGGER = LogManager.getLogger(ServerConfig.class);
+    private static final Logger LOGGER = LogManager.getLogger(Server.class);
 
     private ItemRepository itemRepository;
     private RecipeRepository recipeRepository;
@@ -69,6 +70,7 @@ public class Server extends AbstractVerticle {
         HttpServer server = vertx.createHttpServer();
         Router router = Router.router(vertx);
         LocaleHandler localeHandler = new LocaleHandler();
+        SecurityHeadersHandler securityHeadersHandler = new SecurityHeadersHandler();
 
         router.routeWithRegex("/static/.*").handler(
                 StaticHandler
@@ -82,13 +84,16 @@ public class Server extends AbstractVerticle {
         router.routeWithRegex("/.*/impressum.html").handler(localeHandler);
         router.routeWithRegex("/.*/impressum.html").handler(new ImprintHandler(renderer));
 
-        router.routeWithRegex("/").handler(localeHandler);
-        router.routeWithRegex("/").handler(new RedirectIndexHandler());
+        router.route("/").handler(localeHandler);
+        router.route("/").handler(securityHeadersHandler);
+        router.route("/").handler(new RedirectIndexHandler());
 
         router.routeWithRegex("/.*/index.html").handler(localeHandler);
+        router.routeWithRegex("/.*/index.html").handler(securityHeadersHandler);
         router.routeWithRegex("/.*/index.html").handler(new IndexHandler(itemRepository, renderer));
 
         router.routeWithRegex("/.*/details/[0-9]*\\.html").handler(localeHandler);
+        router.routeWithRegex("/.*/details/[0-9]*\\.html").handler(securityHeadersHandler);
         router.routeWithRegex("/.*/details/[0-9]*\\.html").handler(new DetailsHandler(itemRepository, recipeRepository, renderer));
 
         router.routeWithRegex("/api/history/[0-9]*").handler(localeHandler);
