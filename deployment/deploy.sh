@@ -10,8 +10,8 @@ if [ "$SRC_DIR" == "" ] || [ "$APP_DIR" == "" ] || [ "$VERSION" == "" ]; then
 fi
 
 rm -rf $APP_DIR/import
-unzip $SRC_DIR/import/target/gw2trades-importer-$VERSION-distribution.zip -d $APP_DIR/
-mv $APP_DIR/gw2trades-importer-$VERSION $APP_DIR/import
+unzip $SRC_DIR/import/target/gw2trades-import-$VERSION-distribution.zip -d $APP_DIR/
+mv $APP_DIR/gw2trades-import-$VERSION $APP_DIR/import
 chmod u+x $APP_DIR/import/*.sh
 
 rm -rf $APP_DIR/server
