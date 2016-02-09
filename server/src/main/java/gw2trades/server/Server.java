@@ -78,7 +78,7 @@ public class Server extends AbstractVerticle {
 
         router.routeWithRegex("/static/.*").handler(
                 StaticHandler
-                        .create(new File(".").getAbsolutePath())
+                        .create("./")
                         .setCachingEnabled(config().getBoolean("resources.disableCaching", false))
         );
 
