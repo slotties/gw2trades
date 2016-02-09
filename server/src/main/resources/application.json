@@ -5,6 +5,6 @@
   "influx.pass": "root",
   "influx.url": "http://127.0.0.1:8086",
   "http.port": 8080,
-  "templates.dir": "resources/templates"
+  "templates.dir": "templates"
 }
 
