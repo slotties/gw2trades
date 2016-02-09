@@ -12,7 +12,6 @@
             <excludes>
                 <exclude>*.sh</exclude>
             </excludes>
-            <fileMode>0755</fileMode>
         </fileSet>
         <fileSet>
             <directory>${project.basedir}/src/main/resources</directory>
