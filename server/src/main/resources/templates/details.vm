@@ -14,27 +14,27 @@
 
 <div class="page-header">
     <h1 class="rarity-${latestStats.item.rarity.toLowerCase()}">
-        <img class="item-icon" alt="Item icon" src="${latestStats.item.iconUrl}"> ${latestStats.item.name} #if($latestStats.item.level > 0)<span title="#springMessage('details.item.levelReq')">(${latestStats.item.level})</span>#end
+        <img class="item-icon" alt="Item icon" src="${latestStats.item.iconUrl}"> ${latestStats.item.name} #if($latestStats.item.level > 0)<span title="${i18n.message('details.item.levelReq')}">(${latestStats.item.level})</span>#end
     </h1>
     <nav class="navbar navbar-default">
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li><a href="#attributes">#springMessage('details.area.attributes')</a></li>
-                <li><a href="#trading">#springMessage('details.area.trading')</a></li>
-                <li><a href="#graphs">#springMessage('details.area.graphs')</a></li>
-                <li><a href="#crafting">#springMessage('details.area.crafting')</a></li>
+                <li><a href="#attributes">${i18n.message('details.area.attributes')}</a></li>
+                <li><a href="#trading">${i18n.message('details.area.trading')}</a></li>
+                <li><a href="#graphs">${i18n.message('details.area.graphs')}</a></li>
+                <li><a href="#crafting">${i18n.message('details.area.crafting')}</a></li>
 
                 <li><a href="http://wiki-en.guildwars2.com/wiki/${gw2.wikiName($latestStats.item.name)}">Wiki</a></li>
             </ul>
         </div>
     </nav>
     <h3>
-        <span class="text-profit">#springMessage('details.data.profit')</span> #price($gw2.profit($latestStats.buyStatistics.maxPrice, $latestStats.sellStatistics.minPrice))
+        <span class="text-profit">${i18n.message('details.data.profit')}</span> #price($gw2.profit($latestStats.buyStatistics.maxPrice, $latestStats.sellStatistics.minPrice))
     </h3>
 </div>
 
 <a name="attributes"></a>
-<h3>#springMessage('details.area.attributes')</h3>
+<h3>${i18n.message('details.area.attributes')}</h3>
 #if($latestStats.item.type == "Armor" || $latestStats.item.type == "Back" || $latestStats.item.type == "Trinket" || $latestStats.item.type == "UpgradeComponent" || $latestStats.item.type == "Weapon")
 <div class="row">
     <div class="col-md-4">
@@ -43,56 +43,56 @@
                 <ul class="item-attributes">
                 #if($latestStats.item.type == "Weapon")
                 <li>
-                    #springMessage("details.weaponStrength")
+                    ${i18n.message("details.weaponStrength")}
                     <span class="item-attributes-weapon-strength">${latestStats.item.details.minPower}&nbsp;-&nbsp;${latestStats.item.details.maxPower}</span>
                 </li>
                 #end
                 #foreach($attr in $latestStats.item.details.attributes.attributes)
                 <li>
                     <span class="item-attributes-modifier">+&nbsp;${attr.modifier}</span>
-                    <span class="item-attributes-name">#springMessage("details.attr.${attr.attribute}")</span>
+                    <span class="item-attributes-name">${i18n.message("details.attr.${attr.attribute}")}</span>
                 </li>
                 #end
                 #if(!$latestStats.item.details.attributes.attributes.empty)
                 <li>&nbsp;</li>
                 #end
-                <li>#springMessage("details.rarity.${latestStats.item.rarity}")</li>
+                <li>${i18n.message("details.rarity.${latestStats.item.rarity}")}</li>
                 #if($latestStats.item.type == "Armor")
-                <li>#springMessage("details.weightClass.${latestStats.item.details.weightClass}")</li>
+                <li>${i18n.message("details.weightClass.${latestStats.item.details.weightClass}")}</li>
                 #end
-                <li>#springMessage("details.slot.${latestStats.item.details.type}")</li>
-                <li>#springMessage("details.requiredLevel") ${latestStats.item.level}</li>
+                <li>${i18n.message("details.slot.${latestStats.item.details.type}")}</li>
+                <li>${i18n.message("details.requiredLevel")} ${latestStats.item.level}</li>
                 </ul>
             </div>
         </div>
     </div>
 </div>
 #else
-<i>#springMessage('details.area.attributes.noneAvailable')</i>
+<i>${i18n.message('details.area.attributes.noneAvailable')}</i>
 #end
 
-<h3>#springMessage('details.area.trading')</h3>
+<h3>${i18n.message('details.area.trading')}</h3>
 <div class="row">
     <a name="trading"></a>
     <div class="col-md-6">
         <table class="table table-striped table-bordered table-hover">
             <tr>
-                <th colspan="2" class="text-buyers">#springMessage('details.cols.buyers')</th>
+                <th colspan="2" class="text-buyers">${i18n.message('details.cols.buyers')}</th>
             </tr>
             <tr>
-                <th>#springMessage('details.cols.maxBuyer')</th>
+                <th>${i18n.message('details.cols.maxBuyer')}</th>
                 <td>#price(${latestStats.buyStatistics.maxPrice})</td>
             </tr>
             <tr>
-                <th>#springMessage('details.cols.avgBuyer')</th>
+                <th>${i18n.message('details.cols.avgBuyer')}</th>
                 <td>#price($mathtool.floor($latestStats.buyStatistics.average))</td>
             </tr>
             <tr>
-                <th>#springMessage('details.cols.minBuyer')</th>
+                <th>${i18n.message('details.cols.minBuyer')}</th>
                 <td>#price($mathtool.floor($latestStats.buyStatistics.minPrice))</td>
             </tr>
             <tr>
-                <th>#springMessage('details.cols.totalBuyers')</th>
+                <th>${i18n.message('details.cols.totalBuyers')}</th>
                 <td>${latestStats.buyStatistics.totalAmount}</td>
             </tr>
         </table>
@@ -100,22 +100,22 @@
     <div class="col-md-6">
         <table class="table table-striped table-bordered table-hover">
             <tr>
-                <th colspan="2" class="text-sellers">#springMessage('details.cols.sellers')</th>
+                <th colspan="2" class="text-sellers">${i18n.message('details.cols.sellers')}</th>
             </tr>
             <tr>
-                <th>#springMessage('details.cols.minSeller')</th>
+                <th>${i18n.message('details.cols.minSeller')}</th>
                 <td>#price(${latestStats.sellStatistics.minPrice})</td>
             </tr>
             <tr>
-                <th>#springMessage('details.cols.avgSeller')</th>
+                <th>${i18n.message('details.cols.avgSeller')}</th>
                 <td>#price($mathtool.floor($latestStats.sellStatistics.average))</td>
             </tr>
             <tr>
-                <th>#springMessage('details.cols.maxSeller')</th>
+                <th>${i18n.message('details.cols.maxSeller')}</th>
                 <td>#price($mathtool.floor($latestStats.sellStatistics.maxPrice))</td>
             </tr>
             <tr>
-                <th>#springMessage('details.cols.totalSellers')</th>
+                <th>${i18n.message('details.cols.totalSellers')}</th>
                 <td>${latestStats.sellStatistics.totalAmount}</td>
             </tr>
         </table>
@@ -123,37 +123,47 @@
 </div>
 
 <div id="priceHistoryTooltip" class="gw2-history-tooltip" style="display: none;">
-    <span class="tooltip-profit">#springMessage('details.tooltip.profit')</span>
+    <span class="tooltip-profit">${i18n.message('details.tooltip.profit')}</span>
     <span class="profit-value"></span>
     <br>
-    <span class="tooltip-seller-avg">#springMessage('details.tooltip.avgSeller')</span>
+    <span class="tooltip-seller-avg">${i18n.message('details.tooltip.avgSeller')}</span>
     <span class="avg-seller-value"></span>
     <br>
-    <span class="tooltip-seller">#springMessage('details.tooltip.minSeller')</span>
+    <span class="tooltip-seller">${i18n.message('details.tooltip.minSeller')}</span>
     <span class="lowest-seller-value"></span>
     <br>
-    <span class="tooltip-bidder">#springMessage('details.tooltip.maxBuyer')</span>
+    <span class="tooltip-bidder">${i18n.message('details.tooltip.maxBuyer')}</span>
     <span class="highest-bidder-value"></span>
     <br>
-    <span class="tooltip-bidder-avg">#springMessage('details.tooltip.avgBuyer')</span>
+    <span class="tooltip-bidder-avg">${i18n.message('details.tooltip.avgBuyer')}</span>
     <span class="avg-bidder-value"></span>
 </div>
 
 <a name="graphs"></a>
-<h3>#springMessage('details.area.graphs')</h3>
+<h3>${i18n.message('details.area.graphs')}</h3>
 <div class="btn-toolbar" role="toolbar">
     <div class="btn-group" role="group" id="chart-timeframe-selectors">
-        <button type="button" class="btn btn-default" data-offset="1m">#springMessage('details.timeframes.1m')</button>
-        <button type="button" class="btn btn-default" data-offset="7d" data-initial="true">#springMessage('details.timeframes.7d')</button>
-        <button type="button" class="btn btn-default" data-offset="3d">#springMessage('details.timeframes.3d')</button>
-        <button type="button" class="btn btn-default" data-offset="1d">#springMessage('details.timeframes.1d')</button>
+        <button type="button" class="btn btn-default" data-offset="1m">${i18n.message('details.timeframes.1m')}</button>
+        <button type="button" class="btn btn-default" data-offset="7d" data-initial="true">${i18n.message('details.timeframes.7d')}</button>
+        <button type="button" class="btn btn-default" data-offset="3d">${i18n.message('details.timeframes.3d')}</button>
+        <button type="button" class="btn btn-default" data-offset="1d">${i18n.message('details.timeframes.1d')}</button>
     </div>
     <div class="btn-group" role="group" id="chart-line-selectors">
-        <button type="button" class="btn btn-default text-data-profit" data-line="profit" data-initial="true">#springMessage('details.lines.profit')</button>
-        <button type="button" class="btn btn-default text-data-avg-sellers" data-line="avg_sellers">#springMessage('details.lines.avgSellers')</button>
-        <button type="button" class="btn btn-default text-data-min-sellers" data-line="min_sellers" data-initial="true">#springMessage('details.lines.minSellers')</button>
-        <button type="button" class="btn btn-default text-data-max-buyers" data-line="max_buyers" data-initial="true">#springMessage('details.lines.maxBuyers')</button>
-        <button type="button" class="btn btn-default text-data-avg-buyers" data-line="avg_buyers">#springMessage('details.lines.avgBuyers')</button>
+        <button type="button" class="btn btn-default text-data-profit" data-line="profit" data-initial="true">
+            ${i18n.message('details.lines.profit')}
+        </button>
+        <button type="button" class="btn btn-default text-data-avg-sellers" data-line="avg_sellers">
+            ${i18n.message('details.lines.avgSellers')}
+        </button>
+        <button type="button" class="btn btn-default text-data-min-sellers" data-line="min_sellers" data-initial="true">
+            ${i18n.message('details.lines.minSellers')}
+        </button>
+        <button type="button" class="btn btn-default text-data-max-buyers" data-line="max_buyers" data-initial="true">
+            ${i18n.message('details.lines.maxBuyers')}
+        </button>
+        <button type="button" class="btn btn-default text-data-avg-buyers" data-line="avg_buyers">
+            ${i18n.message('details.lines.avgBuyers')}
+        </button>
     </div>
 </div>
 <div id="priceHistory"></div>
@@ -164,24 +174,24 @@
     window.gw2scope = {
         itemId: ${latestStats.item.itemId},
         labels: {
-            min_sellers: "#springMessage('details.lines.minSellers')",
-            avg_sellers: "#springMessage('details.lines.avgSellers')",
-            max_buyers: "#springMessage('details.lines.maxBuyers')",
-            avg_buyers: "#springMessage('details.lines.avgBuyers')",
-            profit: "#springMessage('details.lines.profit')",
-            sellers: "#springMessage('details.lines.sellers')",
-            buyers: "#springMessage('details.lines.buyers')"
+            min_sellers: "${i18n.message('details.lines.minSellers')}",
+            avg_sellers: "${i18n.message('details.lines.avgSellers')}",
+            max_buyers: "${i18n.message('details.lines.maxBuyers')}",
+            avg_buyers: "${i18n.message('details.lines.avgBuyers')}",
+            profit: "${i18n.message('details.lines.profit')}",
+            sellers: "${i18n.message('details.lines.sellers')}",
+            buyers: "${i18n.message('details.lines.buyers')}"
         }
     };
 </script>
 <script src="/static/js/history.js"></script>
 
 <a name="crafting"></a>
-<h3>#springMessage('details.area.crafting')</h3>
+<h3>${i18n.message('details.area.crafting')}</h3>
 
-<h4>#springMessage('details.area.crafting.targetRecipes')</h4>
+<h4>${i18n.message('details.area.crafting.targetRecipes')}</h4>
 #if($sourceRecipes.empty)
-<i>#springMessage('details.area.crafting.sourceRecipes.noneAvailable')</i>
+<i>${i18n.message('details.area.crafting.targetRecipes.noneAvailable')}</i>
 #else
 <div class="crafting-list">
     #foreach($recipe in $targetRecipes)
@@ -205,9 +215,9 @@
 </div>
 #end
 
-<h4>#springMessage('details.area.crafting.sourceRecipes')</h4>
+<h4>${i18n.message('details.area.crafting.sourceRecipes')}</h4>
 #if($sourceRecipes.empty)
-<i>#springMessage('details.area.crafting.sourceRecipes.noneAvailable')</i>
+<i>${i18n.message('details.area.crafting.sourceRecipes.noneAvailable')}</i>
 #else
 <div class="crafting-list">
     #foreach($recipe in $sourceRecipes)

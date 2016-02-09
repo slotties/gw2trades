@@ -1,0 +1,11 @@
+{
+  "index.dir.items": "../../../data/items",
+  "index.dir.recipes": "../../../data/recipes",
+  "influx.user": "root",
+  "influx.pass": "root",
+  "influx.url": "http://127.0.0.1:8086",
+  "http.port": 8080,
+
+  "resources.disableCaching": true,
+  "templates.dir": "../../src/main/resources/templates"
+}

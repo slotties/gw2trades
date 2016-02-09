@@ -1,32 +1,36 @@
 package gw2trades.server.frontend.exception;
 
+import io.vertx.core.Handler;
+import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.ErrorHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Stefan Lotties (slotties@gmail.com)
  */
-@ControllerAdvice
-public class ExceptionHandler {
+public class ExceptionHandler implements Handler<RoutingContext> {
     private static final Logger LOGGER = LogManager.getLogger(ExceptionHandler.class);
 
-    @ResponseStatus(value= HttpStatus.NOT_FOUND)
-    @org.springframework.web.bind.annotation.ExceptionHandler(ItemNotFoundException.class)
-    public ModelAndView itemNotFoundException(HttpServletRequest request, Exception e) {
-        LOGGER.warn("An item was not found ({})", request.getRequestURI(), e);
-        return new ModelAndView("error_404");
+    private final Handler<RoutingContext> error404;
+    private final Handler<RoutingContext> error500;
+
+    public ExceptionHandler() {
+        this.error404 = ErrorHandler.create("static/404.html", false);
+        this.error500 = ErrorHandler.create("static/500.html", false);
     }
 
-    @ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR)
-    @org.springframework.web.bind.annotation.ExceptionHandler(Exception.class)
-    public ModelAndView anyOtherException(HttpServletRequest request, Exception e) {
-        LOGGER.error("Failed to load URL {}", request.getRequestURI(), e);
-        return new ModelAndView("error_500");
+    @Override
+    public void handle(RoutingContext event) {
+        Throwable exception = event.failure();
+
+        if (exception instanceof ItemNotFoundException) {
+            LOGGER.warn("An item was not found ({})", event.request().path(), exception);
+            // FIXME: set status code to 404, seems to be harder than expected :(
+            error404.handle(event);
+        } else {
+            LOGGER.error("Failed to load URL {}", event.request().path(), exception);
+            error500.handle(event);
+        }
     }
 }
