@@ -14,5 +14,7 @@ unzip $SRC_DIR/import/build/distributions/gw2trades-importer-$VERSION.zip -d $AP
 mv $APP_DIR/gw2trades-importer-$VERSION $APP_DIR/import
 chmod u+x $APP_DIR/import/*.sh
 
-rm -rf $APP_DIR/server/*
-cp -v $SRC_DIR/server/build/libs/server-$VERSION.jar $APP_DIR/server
+rm -rf $APP_DIR/server
+unzip $SRC_DIR/server/target/gw2trades-server-2.0-distribution.zip -d $APP_DIR/
+mv $APP_DIR/gw2trades-server-$VERSION $APP_DIR/server
+chmod u+x $APP_DIR/server/*.sh
