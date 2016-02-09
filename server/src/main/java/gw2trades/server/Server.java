@@ -15,11 +15,9 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.velocity.app.VelocityEngine;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
