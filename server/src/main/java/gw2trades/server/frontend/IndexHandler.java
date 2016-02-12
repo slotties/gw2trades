@@ -38,21 +38,11 @@ public class IndexHandler implements Handler<RoutingContext> {
         MultiMap params = event.request().params();
         String orderBy = params.get("orderBy");
         String orderDir = params.get("orderDir");
-        String pageStr = params.get("page");
-        int page;
-        try {
-            page = Integer.valueOf(pageStr);
-        } catch (NumberFormatException e) {
-            page = 1;
-        }
+        int page = resolvePage(params);
         String nameQuery = params.get("name");
 
         if (page < 1) {
-            // Bad call, redirect to main page.
-            HttpServerResponse response = event.response();
-            response.setStatusCode(301);
-            response.putHeader("Location", "/");
-            response.end();
+            redirectToHomepage(event);
             return;
         }
 
@@ -83,6 +73,22 @@ public class IndexHandler implements Handler<RoutingContext> {
         ctx.put("pagerEntries", pagerEntries(page, lastPage));
 
         event.response().end(renderer.render("frame.vm", event, ctx));
+    }
+
+    private int resolvePage(MultiMap params) {
+        try {
+            return Integer.valueOf(params.get("page"));
+        } catch (NumberFormatException e) {
+            return 1;
+        }
+    }
+
+    private void redirectToHomepage(RoutingContext event) {
+        // Bad call, redirect to main page.
+        HttpServerResponse response = event.response();
+        response.setStatusCode(301);
+        response.putHeader("Location", "/");
+        response.end();
     }
 
     private Query createQuery(String name) {
