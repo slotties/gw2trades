@@ -14,7 +14,9 @@ import io.vertx.ext.web.RoutingContext;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -78,6 +80,7 @@ public class IndexHandler implements Handler<RoutingContext> {
         ctx.put("orderBy", StringEscapeUtils.escapeHtml(orderBy));
         ctx.put("orderDir", StringEscapeUtils.escapeHtml(orderDir));
         ctx.put("query", query);
+        ctx.put("pagerEntries", pagerEntries(page, lastPage));
 
         event.response().end(renderer.render("frame.vm", event, ctx));
     }
@@ -98,5 +101,32 @@ public class IndexHandler implements Handler<RoutingContext> {
         int toPage = fromPage + PAGE_SIZE;
 
         return this.itemRepository.listStatistics(query, order, fromPage, toPage);
+    }
+
+    private List<String> pagerEntries(int currentPage, int lastPage) {
+        List<String> entries = new ArrayList<>(7);
+        if (currentPage > 2) {
+            entries.add("1");
+            if (currentPage > 3) {
+                entries.add("2");
+                if (currentPage > 4) {
+                    entries.add("...");
+                }
+            }
+        }
+
+        if (currentPage > 1) {
+            entries.add(Integer.toString(currentPage - 1));
+        }
+        entries.add(Integer.toString(currentPage));
+        if (currentPage < lastPage) {
+            entries.add(Integer.toString(currentPage + 1));
+            if (currentPage < lastPage - 1) {
+                entries.add("...");
+                entries.add(Integer.toString(lastPage));
+            }
+        }
+
+        return entries;
     }
 }

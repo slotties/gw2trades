@@ -6,29 +6,19 @@
             </a>
         </li>
 
-        #set($skippedEntryBefore = false)
-        #foreach($idx in [1..$lastPage])
-            #if($idx == $currentPage)
+        #foreach($pagerEntry in $pagerEntries)
+            #if($pagerEntry == $currentPage || $pagerEntry == "...")
                 <li class="disabled">
                     <a href="javascript:void(0);">
-                        <span>${idx}</span>
+                        <span>${pagerEntry}</span>
                     </a>
                 </li>
-                #set($skippedEntryBefore = false)
-            #elseif($idx < 4 || ($idx >= $mathtool.sub($currentPage, 1) && $idx <= $mathtool.add($currentPage, 1)) || ($idx == $lastPage))
+            #else
                 <li>
-                    <a href="#indexPagerLink($idx)">
-                        <span>${idx}</span>
+                    <a href="#indexPagerLink($pagerEntry)">
+                        <span>${pagerEntry}</span>
                     </a>
                 </li>
-                #set($skippedEntryBefore = false)
-            #elseif(!$skippedEntryBefore)
-                <li class="disabled">
-                    <a href="javascript:void(0);">
-                        <span>...</span>
-                    </a>
-                </li>
-                #set($skippedEntryBefore = true)
             #end
         #end
 
